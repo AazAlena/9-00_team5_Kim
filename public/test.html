@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тест API</title>
+</head>
+<body>
+    <h1>Тестирование API</h1>
+    
+    <button onclick="testImport()">Импорт данных</button>
+    <button onclick="testDoctors()">Список врачей</button>
+    
+    <div style="margin-top: 20px;">
+        <h3>Результат:</h3>
+        <pre id="result" style="background: #f0f0f0; padding: 10px; min-height: 100px;"></pre>
+    </div>
+
+    <script>
+    async function testImport() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.textContent = 'Загрузка...';
+        
+        try {
+            const response = await fetch('http://localhost:3000/import', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            // Показываем статус ответа
+            let output = `Статус: ${response.status} ${response.statusText}\n\n`;
+            
+            const text = await response.text();
+            
+            try {
+                // Пробуем распарсить как JSON
+                const data = JSON.parse(text);
+                output += 'Ответ (JSON):\n' + JSON.stringify(data, null, 2);
+            } catch {
+                // Если не JSON, показываем как есть
+                output += 'Ответ (текст):\n' + text;
+            }
+            
+            resultDiv.textContent = output;
+            
+        } catch (error) {
+            resultDiv.textContent = 'Ошибка сети: ' + error.message;
+        }
+    }
+
+    async function testDoctors() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.textContent = 'Загрузка...';
+        
+        try {
+            const response = await fetch('http://localhost:3000/doctors');
+            
+            let output = `Статус: ${response.status} ${response.statusText}\n\n`;
+            const text = await response.text();
+            
+            try {
+                const data = JSON.parse(text);
+                output += 'Данные врачей:\n' + JSON.stringify(data, null, 2);
+            } catch {
+                output += 'Ответ (не JSON):\n' + text;
+            }
+            
+            resultDiv.textContent = output;
+            
+        } catch (error) {
+            resultDiv.textContent = 'Ошибка сети: ' + error.message;
+        }
+    }
+    </script>
+</body>
+</html>
