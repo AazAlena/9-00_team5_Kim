@@ -11,7 +11,12 @@ if (!fs.existsSync(path.join(__dirname, 'database'))) {
 }
 
 app.use(express.json());
-
+//app.use((req, res, next) => {
+//    console.log(`\n📨 ${req.method} ${req.url}`);
+//    console.log('📦 Headers:', req.headers['content-type']);
+//    console.log('📦 Body:', req.body);
+//    next();
+//});
 app.use(express.static('public'));
 
 require('./src/routes')(app);

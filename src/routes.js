@@ -155,23 +155,33 @@ app.get('/slots', (req, res) => {
     });
 });
 
-    // PUT /appointments/:id/cancel - отменить запись
-    app.put('/appointments/:id/cancel', (req, res) => {
-    const id = req.params.id;
+    // POST /appointments/cancel - отменить запись
+    app.post('/appointments/cancel', (req, res) => {
     
-    // Проверка, что ID - число
-    const idNum = Number(id);
-    if (isNaN(idNum) || idNum <= 0 || !Number.isInteger(idNum)) {
+    const { doctorId, patientCode, slotDateTime} = req.body;
+    
+    // Валидация всех полей
+    const doctorValidation = validation.validateDoctorId(doctorId);
+    const dateTimeValidation = validation.validateDateTime(slotDateTime);
+    const patientValidation = validation.validatePatientCode(patientCode);
+    
+    const errors = [];
+    if (!doctorValidation.valid) errors.push(doctorValidation.message);
+    if (!dateTimeValidation.valid) errors.push(dateTimeValidation.message);
+    if (!patientValidation.valid) errors.push(patientValidation.message);
+
+    if (errors.length > 0) {
         return res.status(400).json({ 
-            error: 'ID записи должен быть положительным целым числом' 
+            error: 'Ошибка валидации',
+            details: errors 
         });
     }
     
     db.run(`
         UPDATE appointments 
         SET status = 'cancelled' 
-        WHERE appointment_id = ? AND status = 'booked'
-    `, [idNum], function(err) {
+        WHERE doctor_id = ? AND slot_datetime = ? AND patient_code = ?AND status = 'booked'
+    `, [doctorValidation.value, dateTimeValidation.value, patientValidation.value], function(err) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -179,7 +189,7 @@ app.get('/slots', (req, res) => {
         
         if (this.changes === 0) {
             // Проверяем, существует ли такая запись вообще
-            db.get('SELECT status FROM appointments WHERE appointment_id = ?', [idNum], (err, row) => {
+            db.get('SELECT status FROM appointments WHERE doctor_id = ? AND slot_datetime = ? AND patient_code = ? ', [doctorId.value, slotDateTime.value, patientCode.value], (err, row) => {
                 if (err) {
                     res.status(500).json({ error: err.message });
                     return;

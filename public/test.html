@@ -52,9 +52,11 @@
     <!-- Секция отмены -->
     <div class="section">
         <h3>❌ 5. Отменить запись</h3>
-        <input type="number" id="cancelId" placeholder="ID записи" value="1">
+        <input type="number" id="canselDoctorId" placeholder="ID врача" value="1">
+        <input type="text" id="canselDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
+        <input type="text" id="canselPatient" placeholder="Код пациента" value="TEST001">
         <button onclick="testCancelAppointment()">Отменить</button>
-        <p style="color: #666; font-size: 12px;">PUT /appointments/:id/cancel</p>
+        <p style="color: #666; font-size: 12px;">POST /appointments/cancel</p>
     </div>
 
     <!-- Секция отчета -->
@@ -139,31 +141,36 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
+            const result = await response.json();
         
-            
-        const result = await response.json();
+            // Красиво показываем результат
+            let output = `Статус: ${response.status}\n\n`;
+            if (response.ok) {
+                output += '✅ Успех:\n' + JSON.stringify(result, null, 2);
+            } else {
+                output += '❌ Ошибка:\n' + JSON.stringify(result, null, 2);
+            }
         
-        // Красиво показываем результат
-        let output = `Статус: ${response.status}\n\n`;
-        if (response.ok) {
-            output += '✅ Успех:\n' + JSON.stringify(result, null, 2);
-        } else {
-            output += '❌ Ошибка:\n' + JSON.stringify(result, null, 2);
+            document.getElementById('result').innerText = output;
+        
+        } catch (error) {
+            document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
         }
-        
-        document.getElementById('result').innerText = output;
-        
-    } catch (error) {
-        document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
     }
-}
 
         // 5. Отменить запись
         async function testCancelAppointment() {
             try {
-                const id = document.getElementById('cancelId').value;
-                const response = await fetch(`/appointments/${id}/cancel`, {
-                    method: 'PUT'
+                const data = {
+                    doctorId: parseInt(document.getElementById('canselDoctorId').value),
+                    slotDateTime: document.getElementById('canselDateTime').value,
+                    patientCode: document.getElementById('canselPatient').value
+                };
+                //const id = document.getElementById('cancelDoctorIdPatientCodeSlotDatetime').value;
+                const response = await fetch(`/appointments/cancel`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
                 });
                 const result = await response.json();
                 showResult(JSON.stringify(result, null, 2), response.status);
