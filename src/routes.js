@@ -17,12 +17,11 @@ module.exports = function(app) {
         });
     });
 
-    // GET /slots - слоты врача на дату
     // GET /slots - слоты врача на дату (с учетом перерыва)
 app.get('/slots', (req, res) => {
     const { doctorId, date } = req.query;
     
-    // Валидация...
+    // Валидация
     const doctorValidation = validation.validateDoctorId(doctorId);
     const dateValidation = validation.validateDate(date);
     
@@ -45,17 +44,17 @@ app.get('/slots', (req, res) => {
         
         // Получаем все ЗАНЯТЫЕ слоты на эту дату
         db.all(`
-            SELECT time(slot_datetime) as time 
+            SELECT strftime('%H:%M', slot_datetime) as time 
             FROM appointments 
             WHERE doctor_id = ? AND date(slot_datetime) = ? AND status = 'booked'
-        `, [doctorValidation.value, dateValidation.value], (err, booked) => {
+        `, [doctorId, date], (err, booked) => {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
             }
             
             const bookedTimes = booked.map(b => b.time);
-            
+            //console.log("!!!!", bookedTimes);
             // Генерируем слоты с учетом расписания и перерыва
             const slots = [];
             const startHour = parseInt(workSlot.start_time.split(':')[0]);
@@ -199,7 +198,7 @@ app.get('/slots', (req, res) => {
         
         res.json({ message: 'Запись отменена' });
     });
-});s
+});
 
     // GET /report/utilization - отчет по утилизации
     app.get('/report/utilization', (req, res) => {
