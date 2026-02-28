@@ -1,76 +1,196 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Тест API</title>
+    <title>Тест API больницы</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 800px; margin: 0 auto; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 3px; }
+        button:hover { background: #45a049; }
+        .result { background: #f5f5f5; border: 1px solid #ddd; padding: 15px; margin-top: 20px; border-radius: 5px; white-space: pre-wrap; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 3px; width: 200px; }
+        .section { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+    </style>
 </head>
 <body>
-    <h1>Тестирование API</h1>
-    
-    <button onclick="testImport()">Импорт данных</button>
-    <button onclick="testDoctors()">Список врачей</button>
-    
-    <div style="margin-top: 20px;">
-        <h3>Результат:</h3>
-        <pre id="result" style="background: #f0f0f0; padding: 10px; min-height: 100px;"></pre>
+    <h1>🏥 Тестирование API</h1>
+    <p>Сервер: <b>http://localhost:3000</b></p>
+
+    <!-- Секция импорта -->
+    <div class="section">
+        <h3>📥 1. Импорт данных из CSV</h3>
+        <button onclick="testImport()">Импортировать все данные</button>
+        <p style="color: #666; font-size: 12px;">POST /import - загружает doctors.csv, work_slots.csv, appointments.csv</p>
+    </div>
+
+    <!-- Секция врачей -->
+    <div class="section">
+        <h3>👨‍⚕️ 2. Список врачей</h3>
+        <button onclick="testDoctors()">Получить всех врачей</button>
+        <p style="color: #666; font-size: 12px;">GET /doctors</p>
+    </div>
+
+    <!-- Секция слотов -->
+    <div class="section">
+        <h3>📅 3. Свободные слоты</h3>
+        <input type="number" id="doctorId" placeholder="ID врача" value="1">
+        <input type="date" id="slotDate" value="2025-05-20">
+        <button onclick="testSlots()">Показать слоты</button>
+        <p style="color: #666; font-size: 12px;">GET /slots?doctorId=1&date=2025-05-20</p>
+    </div>
+
+    <!-- Секция записи -->
+    <div class="section">
+        <h3>📝 4. Создать запись</h3>
+        <input type="number" id="appDoctorId" placeholder="ID врача" value="1">
+        <input type="text" id="appDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
+        <input type="text" id="appPatient" placeholder="Код пациента" value="TEST001">
+        <button onclick="testCreateAppointment()">Записать</button>
+        <p style="color: #666; font-size: 12px;">POST /appointments</p>
+    </div>
+
+    <!-- Секция отмены -->
+    <div class="section">
+        <h3>❌ 5. Отменить запись</h3>
+        <input type="number" id="cancelId" placeholder="ID записи" value="1">
+        <button onclick="testCancelAppointment()">Отменить</button>
+        <p style="color: #666; font-size: 12px;">PUT /appointments/:id/cancel</p>
+    </div>
+
+    <!-- Секция отчета -->
+    <div class="section">
+        <h3>📊 6. Отчет по утилизации</h3>
+        <input type="date" id="reportStart" value="2025-05-01">
+        <input type="date" id="reportEnd" value="2025-05-31">
+        <button onclick="testReport()">Показать отчет</button>
+        <p style="color: #666; font-size: 12px;">GET /report/utilization?startDate=...&endDate=...</p>
+    </div>
+
+    <!-- Результат -->
+    <div class="section">
+        <h3>📋 Результат:</h3>
+        <div id="result" class="result">Нажми на любую кнопку</div>
     </div>
 
     <script>
-    async function testImport() {
-        const resultDiv = document.getElementById('result');
-        resultDiv.textContent = 'Загрузка...';
-        
-        try {
-            const response = await fetch('http://localhost:3000/import', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            // Показываем статус ответа
-            let output = `Статус: ${response.status} ${response.statusText}\n\n`;
-            
-            const text = await response.text();
-            
-            try {
-                // Пробуем распарсить как JSON
-                const data = JSON.parse(text);
-                output += 'Ответ (JSON):\n' + JSON.stringify(data, null, 2);
-            } catch {
-                // Если не JSON, показываем как есть
-                output += 'Ответ (текст):\n' + text;
-            }
-            
-            resultDiv.textContent = output;
-            
-        } catch (error) {
-            resultDiv.textContent = 'Ошибка сети: ' + error.message;
-        }
-    }
+        const BASE_URL = '';
 
-    async function testDoctors() {
-        const resultDiv = document.getElementById('result');
-        resultDiv.textContent = 'Загрузка...';
-        
-        try {
-            const response = await fetch('http://localhost:3000/doctors');
-            
-            let output = `Статус: ${response.status} ${response.statusText}\n\n`;
-            const text = await response.text();
-            
-            try {
-                const data = JSON.parse(text);
-                output += 'Данные врачей:\n' + JSON.stringify(data, null, 2);
-            } catch {
-                output += 'Ответ (не JSON):\n' + text;
+        // Функция для показа результата
+        function showResult(data, status) {
+            const resultDiv = document.getElementById('result');
+            if (status) {
+                resultDiv.innerHTML = `<span style="color: #666;">Статус: ${status}</span>\n\n${data}`;
+            } else {
+                resultDiv.textContent = data;
             }
-            
-            resultDiv.textContent = output;
-            
-        } catch (error) {
-            resultDiv.textContent = 'Ошибка сети: ' + error.message;
         }
+
+        // 1. Импорт
+        async function testImport() {
+            try {
+                const response = await fetch('/import', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' 
+                    },
+                });
+                const text = await response.text();
+                showResult(text, response.status);
+            } catch (error) {
+                showResult('Ошибка: ' + error.message);
+            }
+        }
+
+        // 2. Список врачей
+        async function testDoctors() {
+            try {
+                const response = await fetch('/doctors');
+                const data = await response.json();
+                showResult(JSON.stringify(data, null, 2), response.status);
+            } catch (error) {
+                showResult('Ошибка: ' + error.message);
+            }
+        }
+
+        // 3. Слоты
+        async function testSlots() {
+            try {
+                const doctorId = document.getElementById('doctorId').value;
+                const date = document.getElementById('slotDate').value;
+                const response = await fetch(`/slots?doctorId=${doctorId}&date=${date}`);
+                const data = await response.json();
+                showResult(JSON.stringify(data, null, 2), response.status);
+            } catch (error) {
+                showResult('Ошибка: ' + error.message);
+            }
+        }
+
+        // 4. Создать запись
+        async function testCreateAppointment() {
+        try {
+            const data = {
+                doctorId: parseInt(document.getElementById('appDoctorId').value),
+                slotDateTime: document.getElementById('appDateTime').value,
+                patientCode: document.getElementById('appPatient').value
+            };
+
+            const response = await fetch('/appointments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+        
+            
+        const result = await response.json();
+        
+        // Красиво показываем результат
+        let output = `Статус: ${response.status}\n\n`;
+        if (response.ok) {
+            output += '✅ Успех:\n' + JSON.stringify(result, null, 2);
+        } else {
+            output += '❌ Ошибка:\n' + JSON.stringify(result, null, 2);
+        }
+        
+        document.getElementById('result').innerText = output;
+        
+    } catch (error) {
+        document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
     }
+}
+
+        // 5. Отменить запись
+        async function testCancelAppointment() {
+            try {
+                const id = document.getElementById('cancelId').value;
+                const response = await fetch(`/appointments/${id}/cancel`, {
+                    method: 'PUT'
+                });
+                const result = await response.json();
+                showResult(JSON.stringify(result, null, 2), response.status);
+            } catch (error) {
+                showResult('Ошибка: ' + error.message);
+            }
+        }
+
+        // 6. Отчет
+        async function testReport() {
+            try {
+                const start = document.getElementById('reportStart').value;
+                const end = document.getElementById('reportEnd').value;
+                const response = await fetch(`/report/utilization?startDate=${start}&endDate=${end}`);
+                const result = await response.json();
+                showResult(JSON.stringify(result, null, 2), response.status);
+            } catch (error) {
+                showResult('Ошибка: ' + error.message);
+            }
+        }
+
+        //при перезагрузке страницы данные не обновляяются и не подтягиваются из data, а выгружаются из database
+        window.onload = function() {
+            if (typeof testDoctors === 'function') testDoctors();
+            if (typeof testSlots === 'function') testSlots();
+        }
+
     </script>
 </body>
 </html>
