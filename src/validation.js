@@ -1,24 +1,8 @@
-// src/validation.js
 
 // Проверка ID врача
 function validateDoctorId(doctorId) {
     const id = Number(doctorId);
-    
-    // Проверка 1: должно быть число
-    if (isNaN(id)) {
-        return { valid: false, message: 'ID врача должен быть числом' };
-    }
-    
-    // Проверка 2: должно быть положительным
-    if (id <= 0) {
-        return { valid: false, message: 'ID врача должен быть положительным числом' };
-    }
-    
-    // Проверка 3: должно быть целым
-    if (!Number.isInteger(id)) {
-        return { valid: false, message: 'ID врача должен быть целым числом' };
-    }
-    
+
     return { valid: true, value: id };
 }
 

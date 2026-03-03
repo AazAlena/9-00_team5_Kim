@@ -27,8 +27,8 @@
         //const crypto = require('crypto');
         async function register() {
             const data = {
-                patient_code: crypto.randomUUID(),
-                patient_name: document.getElementById('regName').value,
+                patient_id: crypto.randomUUID(),
+                patient_full_name: document.getElementById('regName').value,
                 patient_mail: document.getElementById('regEmail').value,
                 password: document.getElementById('regPassword').value
             };
@@ -65,9 +65,18 @@
             
             const result = await response.json();
             
+            console.log('Статус ответа:', response.status);  // ← ДОБАВЬ
+            console.log('response.ok:', response.ok);        // ← ДОБАВЬ
+            console.log('Ответ от сервера:', result);  // ← ДОБАВЬ ЭТО
+            
             if (response.ok) {
-                localStorage.setItem('patientCode', result.patient_code);
+                console.log('Сохраняем в localStorage:', result.patient_id, result.patient_full_name);  // ← ДОБАВЬ
+
+                localStorage.setItem('patientId', result.patient_id);
                 localStorage.setItem('patientName', result.patient_name);
+
+                console.log('Проверка:', localStorage.getItem('patientId'));  // ← ДОБАВЬ
+
                 window.location.href = '/test.html';
             } else {
                 document.getElementById('message').innerHTML = '❌ ' + result.error;

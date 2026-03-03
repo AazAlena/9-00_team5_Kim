@@ -55,7 +55,7 @@
         <h3>❌ 5. Отменить запись</h3>
         <input type="number" id="canselDoctorId" placeholder="ID врача" value="1">
         <input type="text" id="canselDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
-        <input type="text" id="canselPatient" placeholder="Код пациента" value="TEST001">
+        
         <button onclick="testCancelAppointment()">Отменить</button>
         <p style="color: #666; font-size: 12px;">POST /appointments/cancel</p>
     </div>
@@ -100,7 +100,7 @@
     // Функция выхода
     function logout() {
         // Удаляем данные из localStorage
-        localStorage.removeItem('patientCode');
+        localStorage.removeItem('patientId');
         localStorage.removeItem('patientName');
         // Отправляем на страницу входа
         window.location.href = '/auth.html';
@@ -158,14 +158,9 @@
             }
         }
 
-        // 4. Создать запись
-        async function testCreateAppointment() {
-   
-    // ... остальной код
-}
         async function testCreateAppointment() {
         try {
-             const patientCode = localStorage.getItem('patientCode'); // ← берем из авторизации
+            const patientCode = localStorage.getItem('patientId');
     
             if (!patientCode) {
                 alert('Сначала войдите в систему');
@@ -202,11 +197,18 @@
 
         // 5. Отменить запись
         async function testCancelAppointment() {
+            const patientCode = localStorage.getItem('patientId');
+    
+            if (!patientCode) {
+                alert('Сначала войдите в систему');
+                return;
+            }
+
             try {
                 const data = {
                     doctorId: parseInt(document.getElementById('canselDoctorId').value),
                     slotDateTime: document.getElementById('canselDateTime').value,
-                    patientCode: document.getElementById('canselPatient').value
+                    patientCode: patientCode
                 };
                 //const id = document.getElementById('cancelDoctorIdPatientCodeSlotDatetime').value;
                 const response = await fetch(`/appointments/cancel`, {

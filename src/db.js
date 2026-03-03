@@ -10,7 +10,7 @@ db.serialize(() => {
     db.run(`
         CREATE TABLE IF NOT EXISTS doctors (
             doctor_id INTEGER PRIMARY KEY,
-            full_name TEXT NOT NULL,
+            doctor_full_name TEXT NOT NULL,
             specialty TEXT NOT NULL
         )
     `);
@@ -33,7 +33,7 @@ db.serialize(() => {
         CREATE TABLE IF NOT EXISTS appointments (
             appointment_id INTEGER PRIMARY KEY,
             doctor_id INTEGER NOT NULL,
-            patient_code TEXT NOT NULL,
+            patient_id TEXT NOT NULL,
             slot_datetime TEXT NOT NULL,
             status TEXT CHECK(status IN ('booked', 'cancelled', 'served')) DEFAULT 'booked',
             FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id)
@@ -42,8 +42,8 @@ db.serialize(() => {
 
     db.run(`
         CREATE TABLE IF NOT EXISTS patients (
-            patient_code TEXT PRIMARY KEY,
-            patient_name TEXT NOT NULL,
+            patient_id TEXT PRIMARY KEY,
+            patient_full_name TEXT NOT NULL,
             patient_mail TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP

@@ -8,7 +8,7 @@ module.exports = function(app) {
 
     // GET /doctors - список всех врачей
     app.get('/doctors', (req, res) => {
-        db.all('SELECT doctor_id, full_name, specialty FROM doctors', [], (err, rows) => {
+        db.all('SELECT doctor_id, doctor_full_name, specialty FROM doctors', [], (err, rows) => {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
@@ -136,7 +136,7 @@ app.get('/slots', (req, res) => {
         }
         
         db.run(`
-            INSERT INTO appointments (doctor_id, patient_code, slot_datetime, status) 
+            INSERT INTO appointments (doctor_id, patient_id, slot_datetime, status) 
             VALUES (?, ?, ?, 'booked')
         `, [doctorValidation.value, patientValidation.value, dateTimeValidation.value], function(err) {
             if (err) {
@@ -180,7 +180,7 @@ app.get('/slots', (req, res) => {
     db.run(`
         UPDATE appointments 
         SET status = 'cancelled' 
-        WHERE doctor_id = ? AND slot_datetime = ? AND patient_code = ?AND status = 'booked'
+        WHERE doctor_id = ? AND slot_datetime = ? AND patient_id = ? AND status = 'booked'
     `, [doctorValidation.value, dateTimeValidation.value, patientValidation.value], function(err) {
         if (err) {
             res.status(500).json({ error: err.message });
@@ -189,14 +189,14 @@ app.get('/slots', (req, res) => {
         
         if (this.changes === 0) {
             // Проверяем, существует ли такая запись вообще
-            db.get('SELECT status FROM appointments WHERE doctor_id = ? AND slot_datetime = ? AND patient_code = ? ', [doctorId.value, slotDateTime.value, patientCode.value], (err, row) => {
+            db.get('SELECT status FROM appointments WHERE doctor_id = ? AND slot_datetime = ? AND patient_id = ? ', [doctorId.value, slotDateTime.value, patientCode.value], (err, row) => {
                 if (err) {
                     res.status(500).json({ error: err.message });
                     return;
                 }
                 
                 if (!row) {
-                    return res.status(404).json({ error: 'Запись не найдена' });
+                    return res.status(404).json({ error: 'Запись не найдена или принадлежит другому пациенту' });
                 } else {
                     return res.status(400).json({ 
                         error: `Запись не может быть отменена (текущий статус: ${row.status})` 
@@ -221,7 +221,7 @@ app.get('/slots', (req, res) => {
         db.all(`
             SELECT 
                 d.doctor_id,
-                d.full_name,
+                d.doctor_full_name,
                 d.specialty,
                 COUNT(DISTINCT ws.slot_id) as total_slots,
                 COUNT(a.appointment_id) as booked_slots
@@ -297,21 +297,21 @@ app.get('/slots', (req, res) => {
 
     // Регистрация (новый пациент)
 app.post('/register', (req, res) => {
-    const { patient_code, patient_name, patient_mail, password } = req.body;
-    
-    if (!patient_code || !patient_name || !patient_mail || !password) {
+    const { patient_id, patient_full_name, patient_mail, password } = req.body;
+    console.log(patient_id, patient_full_name, patient_mail, password)
+    if (!patient_id || !patient_full_name || !patient_mail || !password) {
         return res.status(400).json({ error: 'Все поля обязательны' });
     }
     
-    db.get('SELECT patient_code FROM patients WHERE patient_code = ? OR patient_mail = ?', 
-        [patient_code, patient_mail], (err, row) => {
+    db.get('SELECT patient_id FROM patients WHERE patient_id = ? OR patient_mail = ?', 
+        [patient_id, patient_mail], (err, row) => {
         if (row) {
             return res.status(400).json({ error: 'Пациент с таким кодом или email уже существует' });
         }
         
         db.run(
-            'INSERT INTO patients (patient_code, patient_name, patient_mail, password) VALUES (?, ?, ?, ?)',
-            [patient_code, patient_name, patient_mail, password],
+            'INSERT INTO patients (patient_id, patient_full_name, patient_mail, password) VALUES (?, ?, ?, ?)',
+            [patient_id, patient_full_name, patient_mail, password],
             function(err) {
                 if (err) {
                     res.status(500).json({ error: err.message });
@@ -319,7 +319,7 @@ app.post('/register', (req, res) => {
                 }
                 res.status(201).json({ 
                     message: '✅ Пациент зарегистрирован',
-                    patient_code: patient_code
+                    patient_id: patient_id
                 });
             }
         );
@@ -330,23 +330,29 @@ app.post('/register', (req, res) => {
 app.post('/login', (req, res) => {
     const { login, password } = req.body; // login может быть code или email
     
+    console.log('📥 Логин запрос:', { login, password });  // ← ДОБАВЬ
+
     db.get(
-        'SELECT * FROM patients WHERE patient_code = ? OR patient_mail = ?', 
+        'SELECT * FROM patients WHERE patient_id = ? OR patient_mail = ?', 
         [login, login], 
         (err, patient) => {
         if (err) {
+            console.log('❌ Ошибка БД:', err);  // ← ДОБАВЬ
             res.status(500).json({ error: err.message });
             return;
         }
         
+         console.log('Найден пациент:', patient);  // ← ДОБАВЬ
+
         if (!patient || patient.password !== password) {
+            console.log('❌ Неверный логин/пароль');  // ← ДОБАВЬ
             return res.status(401).json({ error: 'Неверный код/email или пароль' });
         }
         
         res.json({
             message: '✅ Вход выполнен',
-            patient_code: patient.patient_code,
-            patient_name: patient.patient_name
+            patient_id: patient.patient_id,
+            patient_full_name: patient.patient_full_name
         });
     });
 });
@@ -354,7 +360,7 @@ app.post('/login', (req, res) => {
 // Получение данных пациента
 app.get('/patient/:code', (req, res) => {
     db.get(
-        'SELECT patient_code, patient_name, patient_mail FROM patients WHERE patient_code = ?',
+        'SELECT patient_id, patient_full_name, patient_mail FROM patients WHERE patient_id = ?',
         [req.params.code],
         (err, patient) => {
             if (err) {

@@ -11,7 +11,7 @@ function importDoctors(filePath, callback) {
         .on('data', (row) => {
             doctors.push({
                 doctor_id: parseInt(row.doctor_id),
-                full_name: row.full_name,
+                doctor_full_name: row.doctor_full_name,
                 specialty: row.specialty
             });
         })
@@ -19,9 +19,9 @@ function importDoctors(filePath, callback) {
             db.serialize(() => {
                 db.run('DELETE FROM doctors');
                 
-                const stmt = db.prepare('INSERT INTO doctors (doctor_id, full_name, specialty) VALUES (?, ?, ?)');
+                const stmt = db.prepare('INSERT INTO doctors (doctor_id, doctor_full_name, specialty) VALUES (?, ?, ?)');
                 doctors.forEach(d => {
-                    stmt.run(d.doctor_id, d.full_name, d.specialty);
+                    stmt.run(d.doctor_id, d.doctor_full_name, d.specialty);
                 });
                 stmt.finalize();
                 
@@ -85,7 +85,7 @@ function importAppointments(filePath, callback) {
             appointments.push({
                 appointment_id: parseInt(row.appointment_id),
                 doctor_id: parseInt(row.doctor_id),
-                patient_code: row.patient_code,
+                patient_id: row.patient_id,
                 slot_datetime: row.slot_datetime,
                 status: row.status
             });
@@ -95,12 +95,12 @@ function importAppointments(filePath, callback) {
                 db.run('DELETE FROM appointments');
                 
                 const stmt = db.prepare(`
-                    INSERT INTO appointments (appointment_id, doctor_id, patient_code, slot_datetime, status) 
+                    INSERT INTO appointments (appointment_id, doctor_id, patient_id, slot_datetime, status) 
                     VALUES (?, ?, ?, ?, ?)
                 `);
                 
                 appointments.forEach(a => {
-                    stmt.run(a.appointment_id, a.doctor_id, a.patient_code, a.slot_datetime, a.status);
+                    stmt.run(a.appointment_id, a.doctor_id, a.patient_id, a.slot_datetime, a.status);
                 });
                 stmt.finalize();
                 
@@ -118,8 +118,8 @@ function importPatients(filePath, callback) {
         .pipe(csv())
         .on('data', (row) => {
             patients.push({
-                patient_code: row.patient_code,
-                patient_name: row.patient_name,
+                patient_id: row.patient_id,
+                patient_full_name: row.patient_full_name,
                 patient_mail: row.patient_mail,
                 password: row.password  // пока храним как есть
             });
@@ -129,11 +129,11 @@ function importPatients(filePath, callback) {
                 db.run('DELETE FROM patients');
                 
                 const stmt = db.prepare(
-                    'INSERT INTO patients (patient_code, patient_name, patient_mail, password) VALUES (?, ?, ?, ?)'
+                    'INSERT INTO patients (patient_id, patient_full_name, patient_mail, password) VALUES (?, ?, ?, ?)'
                 );
                 
                 patients.forEach(p => {
-                    stmt.run(p.patient_code, p.patient_name, p.patient_mail, p.password);
+                    stmt.run(p.patient_id, p.patient_full_name, p.patient_mail, p.password);
                 });
                 stmt.finalize();
                 
