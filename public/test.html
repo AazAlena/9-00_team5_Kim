@@ -197,6 +197,54 @@
             if (typeof testDoctors === 'function') testDoctors();
             if (typeof testSlots === 'function') testSlots();
         }
+    </script>
+
+    <!-- ===== ТЕСТ ЗАГРУЗКИ ФАЙЛОВ ===== -->
+    <div style="border: 2px solid red; padding: 10px; margin: 20px 0;">
+        <h3>ТЕСТ ЗАГРУЗКИ ФАЙЛОВ (1С)</h3>
+    
+        <p>Файл doctors.csv:</p>
+        <input type="file" id="testDoctorsFile" accept=".csv">
+    
+        <p>Файл work_slots.csv:</p>
+        <input type="file" id="testSlotsFile" accept=".csv">
+    
+        <p>Файл appointments.csv:</p>
+        <input type="file" id="testAppsFile" accept=".csv">
+    
+        <br><br>
+        <button onclick="uploadTestFiles()">ЗАГРУЗИТЬ ФАЙЛЫ</button>
+    </div>
+
+    <script>
+    // Функция загрузки файлов
+    async function uploadTestFiles() {
+        const formData = new FormData();
+    
+        const doctorsFile = document.getElementById('testDoctorsFile').files[0];
+        const slotsFile = document.getElementById('testSlotsFile').files[0];
+        const appsFile = document.getElementById('testAppsFile').files[0];
+    
+        if (doctorsFile) formData.append('doctors', doctorsFile);
+        if (slotsFile) formData.append('slots', slotsFile);
+        if (appsFile) formData.append('appointments', appsFile);
+    
+        if (!doctorsFile && !slotsFile && !appsFile) {
+            alert('Выберите файлы!');
+            return;
+        }
+    
+        try {
+            const response = await fetch('/api/1c/upload-csv', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById('result').innerText = JSON.stringify(result, null, 2);
+        } catch (error) {
+            document.getElementById('result').innerText = 'Ошибка: ' + error.message;
+        }
+    }
 
     </script>
 </body>

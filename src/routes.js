@@ -5,7 +5,7 @@ const importFunctions = require('./import');
 const validation = require('./validation');
 
 module.exports = function(app) {
-    
+
     // GET /doctors - список всех врачей
     app.get('/doctors', (req, res) => {
         db.all('SELECT doctor_id, full_name, specialty FROM doctors', [], (err, rows) => {
@@ -227,7 +227,7 @@ app.get('/slots', (req, res) => {
                 COUNT(a.appointment_id) as booked_slots
             FROM doctors d
             LEFT JOIN work_slots ws ON d.doctor_id = ws.doctor_id 
-                AND ws.work_date BETWEEN ? AND ?
+                AND ws.work_date BETWEEN ? AND ? 
             LEFT JOIN appointments a ON d.doctor_id = a.doctor_id 
                 AND date(a.slot_datetime) = ws.work_date 
                 AND a.status = 'booked'
@@ -294,4 +294,31 @@ app.get('/slots', (req, res) => {
             });
         });
     });
+    
+    //---------connect with 1C---------------------------------------
+    const multer = require('multer');
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'data')),
+        filename: (req, file, cb) => cb(null, file.originalname)
+    });
+    const uploadToData = multer({ storage });
+
+    app.post('/api/1c/upload-csv', uploadToData.fields([
+        { name: 'doctors' }, { name: 'slots' }, { name: 'appointments' }
+    ]), (req, res) => {
+        console.log('📥 Файлы получены:', req.files);
+    
+        // Импорт
+        importFunctions.importDoctors(
+            path.join(__dirname, '..', 'data', 'doctors.csv'),
+            () => importFunctions.importSlots(
+                path.join(__dirname, '..', 'data', 'work_slots.csv'),
+                () => importFunctions.importAppointments(
+                    path.join(__dirname, '..', 'data', 'appointments.csv'),
+                    () => res.json({ success: true, message: '✅ Готово' })
+                )
+            )
+        );
+    });
+    //-----------end---------------------------------------------------
 };
