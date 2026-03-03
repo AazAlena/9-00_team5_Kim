@@ -13,6 +13,7 @@
     </style>
 </head>
 <body>
+    
     <h1>🏥 Тестирование API</h1>
     <p>Сервер: <b>http://localhost:3000</b></p>
 
@@ -44,7 +45,7 @@
         <h3>📝 4. Создать запись</h3>
         <input type="number" id="appDoctorId" placeholder="ID врача" value="1">
         <input type="text" id="appDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
-        <input type="text" id="appPatient" placeholder="Код пациента" value="TEST001">
+       
         <button onclick="testCreateAppointment()">Записать</button>
         <p style="color: #666; font-size: 12px;">POST /appointments</p>
     </div>
@@ -75,7 +76,37 @@
     </div>
 
     <script>
-        const BASE_URL = '';
+    const BASE_URL = '';
+    (function() {
+        // 1. Достаем из localStorage данные пациента
+        const patientCode = localStorage.getItem('patientCode');
+        const patientName = localStorage.getItem('patientName');
+    
+        // 2. Проверяем, есть ли код пациента
+        if (!patientCode) {
+            // Если нет - отправляем на страницу входа
+            window.location.href = '/auth.html';
+        } else {
+            // Если есть - показываем приветствие
+            document.body.insertAdjacentHTML('afterbegin', 
+                '<div style="background:#e0f7fa; padding:10px; margin-bottom:20px;">' +
+                '👋 Пациент: ' + patientName + ' (' + patientCode + ') ' +
+                '<button onclick="logout()" style="margin-left:10px;">Выйти</button>' +
+                '</div>'
+            );
+        }
+    })();
+
+    // Функция выхода
+    function logout() {
+        // Удаляем данные из localStorage
+        localStorage.removeItem('patientCode');
+        localStorage.removeItem('patientName');
+        // Отправляем на страницу входа
+        window.location.href = '/auth.html';
+    }
+
+
 
         // Функция для показа результата
         function showResult(data, status) {
@@ -129,11 +160,22 @@
 
         // 4. Создать запись
         async function testCreateAppointment() {
+   
+    // ... остальной код
+}
+        async function testCreateAppointment() {
         try {
+             const patientCode = localStorage.getItem('patientCode'); // ← берем из авторизации
+    
+            if (!patientCode) {
+                alert('Сначала войдите в систему');
+                return;
+            }
+    
             const data = {
                 doctorId: parseInt(document.getElementById('appDoctorId').value),
                 slotDateTime: document.getElementById('appDateTime').value,
-                patientCode: document.getElementById('appPatient').value
+                patientCode: patientCode  
             };
 
             const response = await fetch('/appointments', {

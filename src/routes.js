@@ -294,6 +294,82 @@ app.get('/slots', (req, res) => {
             });
         });
     });
+
+    // Регистрация (новый пациент)
+app.post('/register', (req, res) => {
+    const { patient_code, patient_name, patient_mail, password } = req.body;
+    
+    if (!patient_code || !patient_name || !patient_mail || !password) {
+        return res.status(400).json({ error: 'Все поля обязательны' });
+    }
+    
+    db.get('SELECT patient_code FROM patients WHERE patient_code = ? OR patient_mail = ?', 
+        [patient_code, patient_mail], (err, row) => {
+        if (row) {
+            return res.status(400).json({ error: 'Пациент с таким кодом или email уже существует' });
+        }
+        
+        db.run(
+            'INSERT INTO patients (patient_code, patient_name, patient_mail, password) VALUES (?, ?, ?, ?)',
+            [patient_code, patient_name, patient_mail, password],
+            function(err) {
+                if (err) {
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+                res.status(201).json({ 
+                    message: '✅ Пациент зарегистрирован',
+                    patient_code: patient_code
+                });
+            }
+        );
+    });
+});
+
+// Вход
+app.post('/login', (req, res) => {
+    const { login, password } = req.body; // login может быть code или email
+    
+    db.get(
+        'SELECT * FROM patients WHERE patient_code = ? OR patient_mail = ?', 
+        [login, login], 
+        (err, patient) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        if (!patient || patient.password !== password) {
+            return res.status(401).json({ error: 'Неверный код/email или пароль' });
+        }
+        
+        res.json({
+            message: '✅ Вход выполнен',
+            patient_code: patient.patient_code,
+            patient_name: patient.patient_name
+        });
+    });
+});
+
+// Получение данных пациента
+app.get('/patient/:code', (req, res) => {
+    db.get(
+        'SELECT patient_code, patient_name, patient_mail FROM patients WHERE patient_code = ?',
+        [req.params.code],
+        (err, patient) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            if (!patient) {
+                res.status(404).json({ error: 'Пациент не найден' });
+                return;
+            }
+            res.json(patient);
+        }
+    );
+});
+
     
     //---------connect with 1C---------------------------------------
     const multer = require('multer');

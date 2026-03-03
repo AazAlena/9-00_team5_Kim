@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Вход для пациентов</title>
+</head>
+<body>
+    <h1>🏥 Вход в систему записи</h1>
+    
+    <div style="border:1px solid #ccc; padding:20px; max-width:400px;">
+        <h3>Вход</h3>
+        <input type="text" id="loginInput" placeholder="Код пациента или Email"><br>
+        <input type="password" id="loginPassword" placeholder="Пароль"><br>
+        <button onclick="login()">Войти</button>
+    </div>
+    
+    <div style="border:1px solid #ccc; padding:20px; max-width:400px; margin-top:20px;">
+        <h3>Регистрация</h3>
+        <input type="text" id="regName" placeholder="Полное имя"><br>
+        <input type="email" id="regEmail" placeholder="Email"><br>
+        <input type="password" id="regPassword" placeholder="Пароль"><br>
+        <button onclick="register()">Зарегистрироваться</button>
+    </div>
+    
+    <div id="message" style="margin-top:20px;"></div>
+
+    <script>
+        //const crypto = require('crypto');
+        async function register() {
+            const data = {
+                patient_code: crypto.randomUUID(),
+                patient_name: document.getElementById('regName').value,
+                patient_mail: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value
+            };
+            
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            const msg = document.getElementById('message');
+            
+            if (response.ok) {
+                msg.innerHTML = '✅ Регистрация успешна, можно войти';
+                msg.style.color = 'green';
+            } else {
+                msg.innerHTML = '❌ ' + result.error;
+                msg.style.color = 'red';
+            }
+        }
+
+        async function login() {
+            const data = {
+                login: document.getElementById('loginInput').value,
+                password: document.getElementById('loginPassword').value
+            };
+            
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                localStorage.setItem('patientCode', result.patient_code);
+                localStorage.setItem('patientName', result.patient_name);
+                window.location.href = '/test.html';
+            } else {
+                document.getElementById('message').innerHTML = '❌ ' + result.error;
+                document.getElementById('message').style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>

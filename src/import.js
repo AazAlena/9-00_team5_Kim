@@ -110,8 +110,43 @@ function importAppointments(filePath, callback) {
         });
 }
 
+//импорт пациентов
+function importPatients(filePath, callback) {
+    const patients = [];
+    
+    fs.createReadStream(filePath)
+        .pipe(csv())
+        .on('data', (row) => {
+            patients.push({
+                patient_code: row.patient_code,
+                patient_name: row.patient_name,
+                patient_mail: row.patient_mail,
+                password: row.password  // пока храним как есть
+            });
+        })
+        .on('end', () => {
+            db.serialize(() => {
+                db.run('DELETE FROM patients');
+                
+                const stmt = db.prepare(
+                    'INSERT INTO patients (patient_code, patient_name, patient_mail, password) VALUES (?, ?, ?, ?)'
+                );
+                
+                patients.forEach(p => {
+                    stmt.run(p.patient_code, p.patient_name, p.patient_mail, p.password);
+                });
+                stmt.finalize();
+                
+                console.log(`✅ Импортировано пациентов: ${patients.length}`);
+                callback(null, patients);
+            });
+        })
+        .on('error', callback);
+}
+
 module.exports = {
     importDoctors,
     importSlots,
-    importAppointments
+    importAppointments,
+    importPatients
 };

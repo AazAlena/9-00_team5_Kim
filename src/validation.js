@@ -64,22 +64,7 @@ function validateDateTime(dateTimeStr) {
 
 // Проверка кода пациента
 function validatePatientCode(code) {
-    if (!code || code.trim() === '') {
-        return { valid: false, message: 'Код пациента обязателен' };
-    }
     
-    if (code.length > 20) {
-        return { valid: false, message: 'Код пациента не может быть длиннее 20 символов' };
-    }
-    
-    // Разрешаем только буквы, цифры и некоторые символы
-    const codeRegex = /^[A-Za-z0-9_\-]+$/;
-    if (!codeRegex.test(code)) {
-        return { 
-            valid: false, 
-            message: 'Код пациента может содержать только буквы, цифры, _ и -' 
-        };
-    }
     
     return { valid: true, value: code };
 }

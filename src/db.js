@@ -39,6 +39,16 @@ db.serialize(() => {
             FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id)
         )
     `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS patients (
+            patient_code TEXT PRIMARY KEY,
+            patient_name TEXT NOT NULL,
+            patient_mail TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
     
     console.log('✅ Таблицы созданы или уже существуют');
 });
