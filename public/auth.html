@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Вход для пациентов</title>
 </head>
+
 <body>
     <h1>🏥 Вход в систему записи</h1>
-    
+
     <div style="border:1px solid #ccc; padding:20px; max-width:400px;">
         <h3>Вход</h3>
         <input type="text" id="loginInput" placeholder="Код пациента или Email"><br>
         <input type="password" id="loginPassword" placeholder="Пароль"><br>
         <button onclick="login()">Войти</button>
     </div>
-    
+
     <div style="border:1px solid #ccc; padding:20px; max-width:400px; margin-top:20px;">
         <h3>Регистрация</h3>
         <input type="text" id="regName" placeholder="Полное имя"><br>
@@ -20,7 +22,7 @@
         <input type="password" id="regPassword" placeholder="Пароль"><br>
         <button onclick="register()">Зарегистрироваться</button>
     </div>
-    
+
     <div id="message" style="margin-top:20px;"></div>
 
     <script>
@@ -32,16 +34,16 @@
                 patient_mail: document.getElementById('regEmail').value,
                 password: document.getElementById('regPassword').value
             };
-            
+
             const response = await fetch('/register', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            
+
             const result = await response.json();
             const msg = document.getElementById('message');
-            
+
             if (response.ok) {
                 msg.innerHTML = '✅ Регистрация успешна, можно войти';
                 msg.style.color = 'green';
@@ -56,26 +58,22 @@
                 login: document.getElementById('loginInput').value,
                 password: document.getElementById('loginPassword').value
             };
-            
+
             const response = await fetch('/login', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            
+
             const result = await response.json();
-            
-            console.log('Статус ответа:', response.status);  // ← ДОБАВЬ
-            console.log('response.ok:', response.ok);        // ← ДОБАВЬ
-            console.log('Ответ от сервера:', result);  // ← ДОБАВЬ ЭТО
-            
+
             if (response.ok) {
-                console.log('Сохраняем в localStorage:', result.patient_id, result.patient_full_name);  // ← ДОБАВЬ
+                console.log('Сохраняем в localStorage:', result.patient_id, result.patient_full_name);
 
                 localStorage.setItem('patientId', result.patient_id);
-                localStorage.setItem('patientName', result.patient_name);
+                localStorage.setItem('patientName', result.patient_full_name);
 
-                console.log('Проверка:', localStorage.getItem('patientId'));  // ← ДОБАВЬ
+                console.log('Проверка:', localStorage.getItem('patientId'));
 
                 window.location.href = '/test.html';
             } else {
@@ -85,4 +83,5 @@
         }
     </script>
 </body>
+
 </html>

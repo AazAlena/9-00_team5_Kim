@@ -1,19 +1,59 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Тест API больницы</title>
     <meta charset="UTF-8">
     <style>
-        body { font-family: Arial; padding: 20px; max-width: 800px; margin: 0 auto; }
-        button { padding: 8px 15px; margin: 5px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 3px; }
-        button:hover { background: #45a049; }
-        .result { background: #f5f5f5; border: 1px solid #ddd; padding: 15px; margin-top: 20px; border-radius: 5px; white-space: pre-wrap; }
-        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 3px; width: 200px; }
-        .section { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        body {
+            font-family: Arial;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        button {
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .result {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            width: 200px;
+        }
+
+        .section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
     </style>
 </head>
+
 <body>
-    
+
     <h1>🏥 Тестирование API</h1>
     <p>Сервер: <b>http://localhost:3000</b></p>
 
@@ -21,7 +61,8 @@
     <div class="section">
         <h3>📥 1. Импорт данных из CSV</h3>
         <button onclick="testImport()">Импортировать все данные</button>
-        <p style="color: #666; font-size: 12px;">POST /import - загружает doctors.csv, work_slots.csv, appointments.csv</p>
+        <p style="color: #666; font-size: 12px;">POST /import - загружает doctors.csv, work_slots.csv, appointments.csv
+        </p>
     </div>
 
     <!-- Секция врачей -->
@@ -45,7 +86,7 @@
         <h3>📝 4. Создать запись</h3>
         <input type="number" id="appDoctorId" placeholder="ID врача" value="1">
         <input type="text" id="appDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
-       
+
         <button onclick="testCreateAppointment()">Записать</button>
         <p style="color: #666; font-size: 12px;">POST /appointments</p>
     </div>
@@ -55,7 +96,7 @@
         <h3>❌ 5. Отменить запись</h3>
         <input type="number" id="canselDoctorId" placeholder="ID врача" value="1">
         <input type="text" id="canselDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
-        
+
         <button onclick="testCancelAppointment()">Отменить</button>
         <p style="color: #666; font-size: 12px;">POST /appointments/cancel</p>
     </div>
@@ -76,38 +117,35 @@
     </div>
 
     <script>
-    const BASE_URL = '';
-    (function() {
-        // 1. Достаем из localStorage данные пациента
-        const patientCode = localStorage.getItem('patientCode');
-        const patientName = localStorage.getItem('patientName');
-    
-        // 2. Проверяем, есть ли код пациента
-        if (!patientCode) {
-            // Если нет - отправляем на страницу входа
+        const BASE_URL = '';
+        (function () {
+            // 1. Достаем из localStorage данные пациента
+            const patientCode = localStorage.getItem('patientId');
+            const patientName = localStorage.getItem('patientName');
+
+            // 2. Проверяем, есть ли код пациента
+            if (!patientCode) {
+                // Если нет - отправляем на страницу входа
+                window.location.href = '/auth.html';
+            } else {
+                // Если есть - показываем приветствие
+                document.body.insertAdjacentHTML('afterbegin',
+                    '<div style="background:#e0f7fa; padding:10px; margin-bottom:20px;">' +
+                    '👋 Пациент: ' + patientName + ' (' + patientCode + ') ' +
+                    '<button onclick="logout()" style="margin-left:10px;">Выйти</button>' +
+                    '</div>'
+                );
+            }
+        })();
+
+        // Функция выхода
+        function logout() {
+            // Удаляем данные из localStorage
+            localStorage.removeItem('patientId');
+            localStorage.removeItem('patientName');
+            // Отправляем на страницу входа
             window.location.href = '/auth.html';
-        } else {
-            // Если есть - показываем приветствие
-            document.body.insertAdjacentHTML('afterbegin', 
-                '<div style="background:#e0f7fa; padding:10px; margin-bottom:20px;">' +
-                '👋 Пациент: ' + patientName + ' (' + patientCode + ') ' +
-                '<button onclick="logout()" style="margin-left:10px;">Выйти</button>' +
-                '</div>'
-            );
         }
-    })();
-
-    // Функция выхода
-    function logout() {
-        // Удаляем данные из localStorage
-        localStorage.removeItem('patientId');
-        localStorage.removeItem('patientName');
-        // Отправляем на страницу входа
-        window.location.href = '/auth.html';
-    }
-
-
-
         // Функция для показа результата
         function showResult(data, status) {
             const resultDiv = document.getElementById('result');
@@ -124,7 +162,7 @@
                 const response = await fetch('/import', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json' 
+                        'Content-Type': 'application/json'
                     },
                 });
                 const text = await response.text();
@@ -159,46 +197,46 @@
         }
 
         async function testCreateAppointment() {
-        try {
-            const patientCode = localStorage.getItem('patientId');
-    
-            if (!patientCode) {
-                alert('Сначала войдите в систему');
-                return;
-            }
-    
-            const data = {
-                doctorId: parseInt(document.getElementById('appDoctorId').value),
-                slotDateTime: document.getElementById('appDateTime').value,
-                patientCode: patientCode  
-            };
+            try {
+                const patientCode = localStorage.getItem('patientId');
 
-            const response = await fetch('/appointments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            const result = await response.json();
-        
-            // Красиво показываем результат
-            let output = `Статус: ${response.status}\n\n`;
-            if (response.ok) {
-                output += '✅ Успех:\n' + JSON.stringify(result, null, 2);
-            } else {
-                output += '❌ Ошибка:\n' + JSON.stringify(result, null, 2);
+                if (!patientCode) {
+                    alert('Сначала войдите в систему');
+                    return;
+                }
+
+                const data = {
+                    doctorId: parseInt(document.getElementById('appDoctorId').value),
+                    slotDateTime: document.getElementById('appDateTime').value,
+                    patientCode: patientCode
+                };
+
+                const response = await fetch('/appointments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                // Красиво показываем результат
+                let output = `Статус: ${response.status}\n\n`;
+                if (response.ok) {
+                    output += '✅ Успех:\n' + JSON.stringify(result, null, 2);
+                } else {
+                    output += '❌ Ошибка:\n' + JSON.stringify(result, null, 2);
+                }
+
+                document.getElementById('result').innerText = output;
+
+            } catch (error) {
+                document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
             }
-        
-            document.getElementById('result').innerText = output;
-        
-        } catch (error) {
-            document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
         }
-    }
 
         // 5. Отменить запись
         async function testCancelAppointment() {
             const patientCode = localStorage.getItem('patientId');
-    
+
             if (!patientCode) {
                 alert('Сначала войдите в систему');
                 return;
@@ -213,7 +251,7 @@
                 //const id = document.getElementById('cancelDoctorIdPatientCodeSlotDatetime').value;
                 const response = await fetch(`/appointments/cancel`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
                 const result = await response.json();
@@ -237,7 +275,7 @@
         }
 
         //при перезагрузке страницы данные не обновляяются и не подтягиваются из data, а выгружаются из database
-        window.onload = function() {
+        window.onload = function () {
             if (typeof testDoctors === 'function') testDoctors();
             if (typeof testSlots === 'function') testSlots();
         }
@@ -246,50 +284,51 @@
     <!-- ===== ТЕСТ ЗАГРУЗКИ ФАЙЛОВ ===== -->
     <div style="border: 2px solid red; padding: 10px; margin: 20px 0;">
         <h3>ТЕСТ ЗАГРУЗКИ ФАЙЛОВ (1С)</h3>
-    
+
         <p>Файл doctors.csv:</p>
         <input type="file" id="testDoctorsFile" accept=".csv">
-    
+
         <p>Файл work_slots.csv:</p>
         <input type="file" id="testSlotsFile" accept=".csv">
-    
+
         <p>Файл appointments.csv:</p>
         <input type="file" id="testAppsFile" accept=".csv">
-    
+
         <br><br>
         <button onclick="uploadTestFiles()">ЗАГРУЗИТЬ ФАЙЛЫ</button>
     </div>
 
     <script>
-    // Функция загрузки файлов
-    async function uploadTestFiles() {
-        const formData = new FormData();
-    
-        const doctorsFile = document.getElementById('testDoctorsFile').files[0];
-        const slotsFile = document.getElementById('testSlotsFile').files[0];
-        const appsFile = document.getElementById('testAppsFile').files[0];
-    
-        if (doctorsFile) formData.append('doctors', doctorsFile);
-        if (slotsFile) formData.append('slots', slotsFile);
-        if (appsFile) formData.append('appointments', appsFile);
-    
-        if (!doctorsFile && !slotsFile && !appsFile) {
-            alert('Выберите файлы!');
-            return;
+        // Функция загрузки файлов
+        async function uploadTestFiles() {
+            const formData = new FormData();
+
+            const doctorsFile = document.getElementById('testDoctorsFile').files[0];
+            const slotsFile = document.getElementById('testSlotsFile').files[0];
+            const appsFile = document.getElementById('testAppsFile').files[0];
+
+            if (doctorsFile) formData.append('doctors', doctorsFile);
+            if (slotsFile) formData.append('slots', slotsFile);
+            if (appsFile) formData.append('appointments', appsFile);
+
+            if (!doctorsFile && !slotsFile && !appsFile) {
+                alert('Выберите файлы!');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/1c/upload-csv', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                document.getElementById('result').innerText = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('result').innerText = 'Ошибка: ' + error.message;
+            }
         }
-    
-        try {
-            const response = await fetch('/api/1c/upload-csv', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            document.getElementById('result').innerText = JSON.stringify(result, null, 2);
-        } catch (error) {
-            document.getElementById('result').innerText = 'Ошибка: ' + error.message;
-        }
-    }
 
     </script>
 </body>
+
 </html>

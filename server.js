@@ -22,7 +22,7 @@ app.use(express.static('public'));
 require('./src/routes')(app);
 
 app.listen(PORT, () => {
-    console.log(`\n🚀 Сервер запущен на http://localhost:${PORT}/test.html`);
+    console.log(`\n🚀 Сервер запущен на http://localhost:${PORT}/auth.html`);
     console.log('📌 Доступные эндпоинты:');
     console.log('   GET  /doctors');
     console.log('   GET  /slots?doctorId=?&date=?');

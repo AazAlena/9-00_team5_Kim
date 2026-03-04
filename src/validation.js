@@ -37,12 +37,6 @@ function validateDateTime(dateTimeStr) {
     if (isNaN(dateTime.getTime())) {
         return { valid: false, message: 'Некорректная дата и время' };
     }
-    
-    // Проверка, что дата не в прошлом (опционально)
-    // if (dateTime < new Date()) {
-    //     return { valid: false, message: 'Нельзя записаться на прошедшую дату' };
-    // }
-    
     return { valid: true, value: dateTimeStr };
 }
 
