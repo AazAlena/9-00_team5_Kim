@@ -209,7 +209,7 @@ module.exports = function (app) {
         });
     });
 
-    // GET /report/utilization - отчет по утилизации
+    // GET /report/utilization - отчет по утилизацииx
     app.get('/report/utilization', (req, res) => {
         const { startDate, endDate } = req.query;
 
@@ -217,43 +217,109 @@ module.exports = function (app) {
             return res.status(400).json({ error: 'Нужны startDate и endDate' });
         }
 
-        db.all(`
-            SELECT 
-                d.doctor_id,
-                d.doctor_full_name,
-                d.specialty,
-                COUNT(DISTINCT ws.slot_id) as total_slots,
-                COUNT(a.appointment_id) as booked_slots
-            FROM doctors d
-            LEFT JOIN work_slots ws ON d.doctor_id = ws.doctor_id 
-                AND ws.work_date BETWEEN ? AND ? 
-            LEFT JOIN appointments a ON d.doctor_id = a.doctor_id 
-                AND date(a.slot_datetime) = ws.work_date 
-                AND a.status = 'booked'
-            GROUP BY d.doctor_id
-        `, [startDate, endDate], (err, rows) => {
+        // 1. Получаем всех врачей
+        db.all('SELECT doctor_id, doctor_full_name, specialty FROM doctors', [], (err, doctors) => {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
             }
 
-            rows.forEach(r => {
-                r.utilization = r.total_slots > 0
-                    ? Math.round((r.booked_slots / r.total_slots) * 100)
-                    : 0;
-            });
+            let result = [];
+            let totalSlotsAll = 0;
+            let totalBookedAll = 0;
+            let completed = 0;
 
-            const totalSlots = rows.reduce((sum, r) => sum + r.total_slots, 0);
-            const totalBooked = rows.reduce((sum, r) => sum + r.booked_slots, 0);
-            const totalUtilization = totalSlots > 0 ? Math.round((totalBooked / totalSlots) * 100) : 0;
+            if (doctors.length === 0) {
+                return res.json({
+                    doctors: [],
+                    summary: { total_slots: 0, total_booked: 0, total_utilization: 0 }
+                });
+            }
 
-            res.json({
-                doctors: rows,
-                summary: {
-                    totalSlots,
-                    totalBooked,
-                    totalUtilization
-                }
+            // Для каждого врача считаем статистику
+            doctors.forEach((doctor, index) => {
+
+                // 2. Получаем все слоты врача за период
+                db.all(`
+                SELECT * FROM work_slots 
+                WHERE doctor_id = ? AND work_date BETWEEN ? AND ?
+            `, [doctor.doctor_id, startDate, endDate], (err, workSlots) => {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                        return;
+                    }
+
+                    // Считаем общее количество слотов
+                    let totalSlots = 0;
+                    workSlots.forEach(slot => {
+                        // Парсим время
+                        const startHour = parseInt(slot.start_time.split(':')[0]);
+                        const endHour = parseInt(slot.end_time.split(':')[0]);
+                        const breakStartHour = slot.break_start ? parseInt(slot.break_start.split(':')[0]) : 0;
+                        const breakEndHour = slot.break_end ? parseInt(slot.break_end.split(':')[0]) : 0;
+
+                        // Часы работы = конец - начало
+                        let workHours = endHour - startHour;
+
+                        // Вычитаем перерыв
+                        if (slot.break_start && slot.break_end) {
+                            workHours = workHours - (breakEndHour - breakStartHour);
+                        }
+
+                        // Переводим в минуты и делим на длительность слота
+                        const slotsPerDay = (workHours * 60) / slot.slot_duration_minutes;
+                        totalSlots += slotsPerDay;
+                    });
+
+                    // 3. Получаем количество записей врача за период
+                    db.get(`
+                    SELECT COUNT(*) as count FROM appointments 
+                    WHERE doctor_id = ? 
+                        AND date(slot_datetime) BETWEEN ? AND ? 
+                        AND status = 'booked'
+                `, [doctor.doctor_id, startDate, endDate], (err, row) => {
+                        if (err) {
+                            res.status(500).json({ error: err.message });
+                            return;
+                        }
+                        console.log(row);
+                        const bookedSlots = row.count;
+
+                        totalSlotsAll += totalSlots;
+                        totalBookedAll += bookedSlots;
+
+                        // Сохраняем результат
+                        result[index] = {
+                            doctor_id: doctor.doctor_id,
+                            doctor_full_name: doctor.doctor_full_name,
+                            specialty: doctor.specialty,
+                            total_slots: Math.round(totalSlots),
+                            booked_slots: bookedSlots,
+                            utilization: totalSlots > 0
+                                ? Math.round((bookedSlots / totalSlots) * 100)
+                                : 0
+                        };
+
+                        completed++;
+
+                        // Когда все врачи обработаны - отправляем ответ
+                        if (completed === doctors.length) {
+                            // Убираем пустые элементы (если были)
+                            result = result.filter(r => r);
+
+                            res.json({
+                                doctors: result,
+                                summary: {
+                                    total_slots: totalSlotsAll,
+                                    total_booked: totalBookedAll,
+                                    total_utilization: totalSlotsAll > 0
+                                        ? Math.round((totalBookedAll / totalSlotsAll) * 100)
+                                        : 0
+                                }
+                            });
+                        }
+                    });
+                });
             });
         });
     });
