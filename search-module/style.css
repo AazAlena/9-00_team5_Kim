@@ -1,0 +1,50 @@
+body{
+    margin: 0;
+}
+
+main{
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.main{
+    background-color: #D3EDFF;
+    width: 600px;
+    height: 500px;
+    border-radius: 30px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px 10px;
+    gap: 20px;
+}
+
+.search{
+    background-color: #BAD5FF;
+    border: none;
+    padding: 5px 30px;
+    border-radius: 30px;
+    height: 30px;
+    width: 450px;
+}
+
+.alldoctors{
+    background-color: #BAD5FF;
+    height: 408px;
+    width: 550px;
+    padding: 15px;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: auto;
+}
+
+.alldoctors-item{
+    background-color: #88ABDF;
+    padding: 12px 20px;
+    border-radius: 30px;
+}
