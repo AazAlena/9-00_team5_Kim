@@ -1,0 +1,143 @@
+body {
+    margin: 0;
+    font-family: 'Comfortaa', cursive;
+    color: #ffffff;
+    background-color: #D8D1FF;
+}
+
+.h2 {
+    text-align: center;
+    font-size: 36px;
+    padding-top: 80px;
+    padding-bottom: 30px;
+}
+
+
+#Carousel-slider{
+    overflow: hidden;
+    position: relative;
+}
+
+a,a:link,a:visited {
+    color: #212121;
+    text-decoration: none;
+}
+
+.Carousel-slider {
+    height: 560px;
+    position: relative;
+    width: 100%;
+}
+
+.Carousel-slider.fullwidth {
+    height: 500px;
+}
+
+.Carousel-slider.fullwidth .slider-item {
+    height: 480px;
+    line-height: 480px;
+    width: 100%
+}
+
+.slider-wrapper {
+    overflow: hidden;
+    position: relative;
+    transform-style: preserve-3d;
+    transform-origin: 0 50%;
+    perspective: 800px !important;
+}
+
+.slider-item {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.12);
+    display: flex !important;
+    justify-content: center;
+    align-items: end;
+    height: 400px;
+    left: 0;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    width: 320px;
+    cursor: pointer;
+    border: 5px solid #6a3499;
+    border-radius: 20px;
+}
+
+.indicators {
+    top: 0;
+    left: 50%;
+    padding: 0;
+    list-style-type: none;
+    margin: 40px 0 0 -77px;
+    position: absolute;
+}
+
+.indicators li {
+    color: #0091ff;
+    float: left;
+    height: 16px;
+    margin-right: 8px;
+    text-align: center;
+    width: 16px;
+}
+
+.indicators li:last-child {
+    margin: 0;
+}
+
+.indicators a {
+    background: #230049;
+    border-radius: 8px;
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+}
+
+.indicators .active a {
+    background: #6a00ff;
+}
+
+.superHero1 {
+    background-image: url(./image/D1243.jpg);
+    border-radius: 50px !important;
+}
+
+.superHero2 {
+    background-image: url(./image/D1244.jpg);
+    border-radius: 50px !important;
+}
+
+.superHero3 {
+    background-image: url(./image/D1245.jpg);
+    border-radius: 50px !important;
+}
+
+.superHero4 {
+    background-image: url(./image/D1246.jpg);
+    border-radius: 50px !important;
+}
+
+.superHero5 {
+    background-image: url(./image/D1247.jpg);
+    border-radius: 50px !important;
+}
+
+.superHero6 {
+    background-image: url(./image/D1247.jpg);
+    border-radius: 50px !important;
+}
+
+.superHero7 {
+    background-image: url(./image/D1247.jpg);
+    border-radius: 50px !important;
+}
+
+.podpis{
+    background-color: #c290f0;
+    color: #212121;
+    font-family: 'Comfortaa', cursive;
+    font-size: 20px;
+    width: 80%;
+    border-radius: 20px;
+}
+
