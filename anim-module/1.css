@@ -1,0 +1,116 @@
+body {
+    margin: 0;
+    font-family: 'Comfortaa', cursive;
+    color: #ffffff;
+    background-color: #D8D1FF;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+nav {
+    background-color: #9A8BF0;
+    padding: 29px 0px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.navigation {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 40px;
+}
+
+.headerButton {
+    background-color: #5F47EA;
+    color: #ffffff;
+    border: none;
+    border-radius: 40px;
+    padding: 15px 50px;
+    font-family: 'Comfortaa', cursive;
+    font-size: 16px;
+}
+
+main {
+    padding: 130px 52px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 60px;
+}
+
+.aboutClinic {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.h1 {
+    font-size: 64px;
+
+    transform: translate(0px,120%);
+    opacity: 0;
+    transition: all 0.8s ease 0s;
+}
+
+.h1._active{
+    transform: translate(0px, 0px);
+    opacity: 1;
+}
+
+.clinicImage {
+    transform: translate(0px, 120%);
+    opacity: 0;
+    transition: all 0.8s ease 0s;
+}
+
+.clinicImage img{
+    width: 701px;
+    height: 400px;
+}
+
+.clinicImage._active {
+    transform: translate(0px, 0px);
+    opacity: 1;
+}
+
+.visitClinic {
+    display: flex;
+    flex-direction: row;
+    padding: 0px 88px;
+    justify-content: center;
+    column-gap: 60px;
+}
+
+.doctorAppointmentButton {
+    background-color: #5F47EA;
+    color: #ffffff;
+    border: none;
+    flex: 1;
+    padding: 25px 50px;
+    border-radius: 40px;
+    font-size: 18px;
+}
+
+.h2 {
+    text-align: center;
+    font-size: 36px;
+    padding-top: 200px;
+    padding-bottom: 30px;
+
+    transform: translate(0px, 120%);
+    opacity: 0;
+    transition: all 0.8s ease 0s;
+}
+
+.h2._active {
+    transform: translate(0px, 0px);
+    opacity: 1;
+}
