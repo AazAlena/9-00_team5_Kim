@@ -101,6 +101,19 @@
         <p style="color: #666; font-size: 12px;">POST /appointments/cancel</p>
     </div>
 
+    <!-- Секция переноса -->
+    <div class="section">
+        <h3>6. Перенести запись с:</h3>
+        <input type="number" id="transferDoctorId" placeholder="ID врача" value="1">
+        <input type="text" id="transferFromDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
+
+        <h3>На</h3>
+        <input type="text" id="transferToDateTime" placeholder="Дата и время" value="2025-05-20 11:00:00">
+        <button onclick="testTransferAppointment()">Отменить</button>
+        <p style="color: #666; font-size: 12px;">POST /appointments/transfer</p>
+    </div>
+
+
     <!-- Секция отчета -->
     <div class="section">
         <h3>📊 6. Отчет по утилизации</h3>
@@ -219,12 +232,14 @@
                 const result = await response.json();
 
                 // Красиво показываем результат
-                let output = `Статус: ${response.status}\n\n`;
-                if (response.ok) {
-                    output += '✅ Успех:\n' + JSON.stringify(result, null, 2);
-                } else {
-                    output += '❌ Ошибка:\n' + JSON.stringify(result, null, 2);
-                }
+                //let output = `Статус: ${response.status}\n\n`;
+                //if (response.ok) {
+                //    output += '✅ Успех:\n' + JSON.stringify(result, null, 2);
+                //} else {
+                //    output += '❌ Ошибка:\n' + JSON.stringify(result, null, 2);
+                ///}
+
+                showResult(JSON.stringify(result, null, 2), response.status);
 
                 document.getElementById('result').innerText = output;
 
@@ -256,6 +271,36 @@
                 });
                 const result = await response.json();
                 showResult(JSON.stringify(result, null, 2), response.status);
+
+            } catch (error) {
+                showResult('Ошибка: ' + error.message);
+            }
+        }
+
+        //6. Перенос
+        async function testTransferAppointment() {
+            const patientCode = localStorage.getItem('patientId');
+
+            if (!patientCode) {
+                alert('Сначала войдите в систему');
+                return;
+            }
+
+            try {
+                const data = {
+                    transferDoctorId: parseInt(document.getElementById('transferDoctorId').value),
+                    transferFromDateTime: document.getElementById('transferFromDateTime').value,
+                    transferToDateTime: document.getElementById('transferToDateTime').value,
+                    patientCode: patientCode
+                };
+                const response = await fetch(`/appointments/transfer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showResult(JSON.stringify(result, null, 2), response.status);
+
             } catch (error) {
                 showResult('Ошибка: ' + error.message);
             }

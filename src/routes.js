@@ -209,6 +209,98 @@ module.exports = function (app) {
         });
     });
 
+    app.post('/appointments/transfer', (req, res) => {
+        const { transferDoctorId, transferFromDateTime, transferToDateTime, patientCode } = req.body;
+        // Валидация всех полей
+        const doctorValidation = validation.validateDoctorId(transferDoctorId);
+        const dateFromTimeValidation = validation.validateDateTime(transferFromDateTime);
+        const dateToTimeValidation = validation.validateDateTime(transferToDateTime);
+        const patientValidation = validation.validatePatientCode(patientCode);
+
+        const errors = [];
+        if (!doctorValidation.valid) errors.push(doctorValidation.message);
+        if (!dateFromTimeValidation.valid) errors.push(dateFromTimeValidation.message);
+        if (!dateToTimeValidation.valid) errors.push(dateToTimeValidation.message);
+        if (!patientValidation.valid) errors.push(patientValidation.message);
+
+        if (errors.length > 0) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors
+            });
+        }
+        //отменить прошлую запись
+        db.run(`
+        UPDATE appointments 
+        SET status = 'cancelled' 
+        WHERE doctor_id = ? AND slot_datetime = ? AND patient_id = ? AND status = 'booked'
+    `, [doctorValidation.value, dateFromTimeValidation.value, patientValidation.value], function (err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+
+            if (this.changes === 0) {
+                // Проверяем, существует ли такая запись вообще
+                db.get('SELECT status FROM appointments WHERE doctor_id = ? AND slot_datetime = ? AND patient_id = ? ', [transferDoctorId.value, transferFromDateTime.value, patientCode.value], (err, row) => {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                        return;
+                    }
+
+                    if (!row) {
+                        return res.status(404).json({ error: 'Запись не найдена или принадлежит другому пациенту' });
+                    } else {
+                        return res.status(400).json({
+                            error: `Запись не может быть отменена (текущий статус: ${row.status})`
+                        });
+                    }
+                });
+                return;
+            }
+
+            // Проверяем, свободен ли слот
+            db.get(`
+            SELECT appointment_id FROM appointments 
+            WHERE doctor_id = ? AND slot_datetime = ? AND status = 'booked'
+        `, [doctorValidation.value, dateToTimeValidation.valid, patientValidation.value], (err, row) => {
+                if (err) {
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+
+                if (row) {
+                    return res.status(409).json({ error: 'Слот уже занят' });
+                }
+
+                db.run(`
+                INSERT INTO appointments (doctor_id, patient_id, slot_datetime, status) 
+                VALUES (?, ?, ?, 'booked')
+            `, [doctorValidation.value, patientValidation.value, dateToTimeValidation.value], function (err) {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                        return;
+                    }
+
+                    res.status(201).json({
+                        appointmentId: this.lastID,
+                        doctorId: doctorValidation.value,
+                        patientCode: patientValidation.value,
+                        slotDateTime: dateToTimeValidation.value,
+                        status: 'booked'
+                    });
+                });
+            });
+
+            res.json({ message: 'Запись отменена и сделана' });
+        });
+
+
+    });
+
+
+    
+
     // GET /report/utilization - отчет по утилизацииx
     app.get('/report/utilization', (req, res) => {
         const { startDate, endDate } = req.query;
