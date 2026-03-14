@@ -1,5 +1,5 @@
 appointment_id,doctor_id,patient_id,slot_datetime,status
-1,1,P001,2025-05-20 09:00:00,booked
-2,1,P002,2025-05-21 09:00:00,booked
-4,3,P004,2025-05-20 09:00:00,booked
-5,1,P001,2025-05-20 12:00:00,cancelled
+1,1,P001,2025-05-20 09:00,booked
+2,1,P002,2025-05-21 09:00,booked
+4,3,P004,2025-05-20 09:00,booked
+5,1,P001,2025-05-20 12:00,cancelled

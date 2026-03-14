@@ -23,16 +23,17 @@ function validateDate(dateStr) {
     return { valid: true, value: dateStr };
 }
 
-// Проверка даты и времени (формат YYYY-MM-DD HH:MM:SS)
+// Проверка даты и времени (формат YYYY-MM-DD HH:MM)
 function validateDateTime(dateTimeStr) {
-    const dateTimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+    const dateTimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/;
     if (!dateTimeRegex.test(dateTimeStr)) {
         return { 
             valid: false, 
-            message: 'Дата и время должны быть в формате ГГГГ-ММ-ДД ЧЧ:ММ:СС' 
+            message: 'Дата и время должны быть в формате ГГГГ-ММ-ДД ЧЧ:ММ' 
         };
     }
     
+    //const dateTime = new Date(dateTimeStr + ':00');
     const dateTime = new Date(dateTimeStr);
     if (isNaN(dateTime.getTime())) {
         return { valid: false, message: 'Некорректная дата и время' };
@@ -42,12 +43,10 @@ function validateDateTime(dateTimeStr) {
 
 // Проверка кода пациента
 function validatePatientCode(code) {
-    
     return { valid: true, value: code };
 }
 
 function validateWhyCancelled(text) {
-    
     return { valid: true, value: text };
 }
 

@@ -85,7 +85,7 @@
     <div class="section">
         <h3>📝 4. Создать запись</h3>
         <input type="number" id="appDoctorId" placeholder="ID врача" value="1">
-        <input type="text" id="appDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
+        <input type="text" id="appDateTime" placeholder="Дата и время" value="2025-05-20 10:00">
 
         <button onclick="testCreateAppointment()">Записать</button>
         <p style="color: #666; font-size: 12px;">POST /appointments</p>
@@ -95,7 +95,7 @@
     <div class="section">
         <h3>❌ 5. Отменить запись</h3>
         <input type="number" id="canselDoctorId" placeholder="ID врача" value="1">
-        <input type="text" id="canselDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
+        <input type="text" id="canselDateTime" placeholder="Дата и время" value="2025-05-20 10:00">
         <input type="text" id="canselWhy" placeholder="Причина отмены" value="рука больше не болит - отвалилась">
 
         <button onclick="testCancelAppointment()">Отменить</button>
@@ -106,11 +106,11 @@
     <div class="section">
         <h3>6. Перенести запись с:</h3>
         <input type="number" id="transferDoctorId" placeholder="ID врача" value="1">
-        <input type="text" id="transferFromDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
+        <input type="text" id="transferFromDateTime" placeholder="Дата и время" value="2025-05-20 10:00">
         <input type="text" id="transferWhy" placeholder="Причина переноса" value="рука отросла обратно и теперь болит">
 
         <h3>На</h3>
-        <input type="text" id="transferToDateTime" placeholder="Дата и время" value="2025-05-20 11:00:00">
+        <input type="text" id="transferToDateTime" placeholder="Дата и время" value="2025-05-20 11:00">
         <button onclick="testTransferAppointment()">Перенести</button>
         <p style="color: #666; font-size: 12px;">POST /appointments/transfer</p>
     </div>
