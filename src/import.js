@@ -153,7 +153,7 @@ function importPatients(filePath, callback) {
                 patient_id: row.patient_id,
                 patient_full_name: row.patient_full_name,
                 patient_mail: row.patient_mail,
-                password: row.password  // пока храним как есть
+                password: row.password 
             });
         })
         .on('end', () => {
