@@ -120,40 +120,53 @@ module.exports = function (app) {
             });
         }
 
-        // Проверяем, свободен ли слот
+        //существует ли такой слот
         db.get(`
-        SELECT appointment_id FROM appointments 
-        WHERE doctor_id = ? AND slot_datetime = ? AND status = 'booked'
-    `, [doctorValidation.value, dateTimeValidation.value], (err, row) => {
+        SELECT * FROM work_slots 
+        WHERE doctor_id = ? AND work_date = ?
+    `, [doctorValidation.value, dateTimeValidation.value.split(' ')[0]], (err, workSlot) => {
             if (err) {
-                res.status(500).json({ error: err.message });
-                return;
+                return res.status(500).json({ error: err.message });
             }
 
-            if (row) {
-                return res.status(409).json({ error: 'Слот уже занят' });
+            if (!workSlot) {
+                return res.status(400).json({ error: 'Врач не работает в указанную дату' });
             }
 
-            db.run(`
-            INSERT INTO appointments (doctor_id, patient_id, slot_datetime, status) 
-            VALUES (?, ?, ?, 'booked')
-        `, [doctorValidation.value, patientValidation.value, dateTimeValidation.value], function (err) {
+            // Проверяем, свободен ли слот
+            db.get(`
+            SELECT appointment_id FROM appointments 
+            WHERE doctor_id = ? AND slot_datetime = ? AND status = 'booked'
+        `, [doctorValidation.value, dateTimeValidation.value], (err, row) => {
                 if (err) {
                     res.status(500).json({ error: err.message });
                     return;
                 }
 
-                res.status(201).json({
-                    appointmentId: this.lastID,
-                    doctorId: doctorValidation.value,
-                    patientCode: patientValidation.value,
-                    slotDateTime: dateTimeValidation.value,
-                    status: 'booked'
+                if (row) {
+                    return res.status(409).json({ error: 'Слот уже занят' });
+                }
+
+                db.run(`
+            INSERT INTO appointments (doctor_id, patient_id, slot_datetime, status) 
+            VALUES (?, ?, ?, 'booked')
+        `, [doctorValidation.value, patientValidation.value, dateTimeValidation.value], function (err) {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                        return;
+                    }
+
+                    res.status(201).json({
+                        appointmentId: this.lastID,
+                        doctorId: doctorValidation.value,
+                        patientCode: patientValidation.value,
+                        slotDateTime: dateTimeValidation.value,
+                        status: 'booked'
+                    });
                 });
             });
         });
     });
-
     // POST /appointments/cancel - отменить запись
     app.post('/appointments/cancel', (req, res) => {
 
@@ -229,41 +242,25 @@ module.exports = function (app) {
                 details: errors
             });
         }
-        //отменить прошлую запись
-        db.run(`
-        UPDATE appointments 
-        SET status = 'cancelled' 
-        WHERE doctor_id = ? AND slot_datetime = ? AND patient_id = ? AND status = 'booked'
-    `, [doctorValidation.value, dateFromTimeValidation.value, patientValidation.value], function (err) {
+
+        //существует ли слот для записи
+        db.get(`
+        SELECT * FROM work_slots 
+        WHERE doctor_id = ? AND work_date = ?
+    `, [doctorValidation.value, dateToTimeValidation.value.split(' ')[0]], (err, workSlot) => {
             if (err) {
-                res.status(500).json({ error: err.message });
-                return;
+                return res.status(500).json({ error: err.message });
             }
 
-            if (this.changes === 0) {
-                // Проверяем, существует ли такая запись вообще
-                db.get('SELECT status FROM appointments WHERE doctor_id = ? AND slot_datetime = ? AND patient_id = ? ', [transferDoctorId.value, transferFromDateTime.value, patientCode.value], (err, row) => {
-                    if (err) {
-                        res.status(500).json({ error: err.message });
-                        return;
-                    }
-
-                    if (!row) {
-                        return res.status(404).json({ error: 'Запись не найдена или принадлежит другому пациенту' });
-                    } else {
-                        return res.status(400).json({
-                            error: `Запись не может быть отменена (текущий статус: ${row.status})`
-                        });
-                    }
-                });
-                return;
+            if (!workSlot) {
+                return res.status(400).json({ error: 'Врач не работает в указанную дату' });
             }
 
-            // Проверяем, свободен ли слот
+            // свободен ли слот для записи
             db.get(`
             SELECT appointment_id FROM appointments 
             WHERE doctor_id = ? AND slot_datetime = ? AND status = 'booked'
-        `, [doctorValidation.value, dateToTimeValidation.valid, patientValidation.value], (err, row) => {
+        `, [doctorValidation.value, dateToTimeValidation.value], (err, row) => {
                 if (err) {
                     res.status(500).json({ error: err.message });
                     return;
@@ -273,285 +270,337 @@ module.exports = function (app) {
                     return res.status(409).json({ error: 'Слот уже занят' });
                 }
 
-                db.run(`
-                INSERT INTO appointments (doctor_id, patient_id, slot_datetime, status) 
-                VALUES (?, ?, ?, 'booked')
-            `, [doctorValidation.value, patientValidation.value, dateToTimeValidation.value], function (err) {
+                //получить айдишник отменяемой записи (понадобится)
+                db.get(`
+                SELECT appointment_id FROM appointments 
+                WHERE doctor_id = ? AND slot_datetime = ? AND patient_id = ? AND status = 'booked'
+            `, [doctorValidation.value, dateFromTimeValidation.value, patientValidation.value], (err, row) => {
                     if (err) {
-                        res.status(500).json({ error: err.message });
-                        return;
+                        return res.status(500).json({ error: err.message });
                     }
 
-                    res.status(201).json({
-                        appointmentId: this.lastID,
-                        doctorId: doctorValidation.value,
-                        patientCode: patientValidation.value,
-                        slotDateTime: dateToTimeValidation.value,
-                        status: 'booked'
+                    if (!row) {
+                        return res.status(404).json({ error: 'Запись не найдена' });
+                    }
+
+                    const cancelledAppointmentId = row.appointment_id;
+                    
+                    //отменить прошлую запис
+                    db.run(`
+                    UPDATE appointments 
+                    SET status = 'cancelled' 
+                    WHERE appointment_id = ?
+                `, [cancelledAppointmentId], function (err) {
+                        if (err) {
+                            res.status(500).json({ error: err.message });
+                            return;
+                        }
+
+                        if (this.changes === 0) {
+                            // Проверяем, существует ли такая запись вообще
+                            db.get('SELECT status FROM appointments WHERE doctor_id = ? AND slot_datetime = ? AND patient_id = ? ',
+                                [doctorValidation.value, dateFromTimeValidation.value, patientValidation.value], (err, row) => {
+                                    if (err) {
+                                        res.status(500).json({ error: err.message });
+                                        return;
+                                    }
+
+                                    if (!row) {
+                                        return res.status(404).json({ error: 'Запись не найдена или принадлежит другому пациенту' });
+                                    } else {
+                                        return res.status(400).json({
+                                            error: `Запись не может быть отменена (текущий статус: ${row.status})`
+                                        });
+                                    }
+                                });
+                            return;
+                        }
+
+
+                        db.run(`
+                        INSERT INTO appointments (doctor_id, patient_id, slot_datetime, status) 
+                        VALUES (?, ?, ?, 'booked')
+                    `, [doctorValidation.value, patientValidation.value, dateToTimeValidation.value], function (err) {
+                            if (err) {
+                                res.status(500).json({ error: err.message });
+                                return;
+                            }
+
+                            res.status(201).json({
+                                message: 'Запись успешно перенесена',
+                                oldAppointment: {
+                                    appointmentId: cancelledAppointmentId,
+                                    doctorId: doctorValidation.value,
+                                    slotDateTime: dateFromTimeValidation.value,
+                                    status: 'cancelled'
+                                },
+                                newAppointment: {
+                                    appointmentId: this.lastID,
+                                    doctorId: doctorValidation.value,
+                                    patientCode: patientValidation.value,
+                                    slotDateTime: dateToTimeValidation.value,
+                                    status: 'booked'
+                                }
+                            });
+                        });
                     });
                 });
             });
-
-            res.json({ message: 'Запись отменена и сделана' });
         });
-
-
     });
 
 
-    
+// GET /report/utilization - отчет по утилизацииx
+app.get('/report/utilization', (req, res) => {
+    const { startDate, endDate } = req.query;
 
-    // GET /report/utilization - отчет по утилизацииx
-    app.get('/report/utilization', (req, res) => {
-        const { startDate, endDate } = req.query;
+    if (!startDate || !endDate) {
+        return res.status(400).json({ error: 'Нужны startDate и endDate' });
+    }
 
-        if (!startDate || !endDate) {
-            return res.status(400).json({ error: 'Нужны startDate и endDate' });
+    // 1. Получаем всех врачей
+    db.all('SELECT doctor_id, doctor_full_name, specialty FROM doctors', [], (err, doctors) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
         }
 
-        // 1. Получаем всех врачей
-        db.all('SELECT doctor_id, doctor_full_name, specialty FROM doctors', [], (err, doctors) => {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
+        let result = [];
+        let totalSlotsAll = 0;
+        let totalBookedAll = 0;
+        let completed = 0;
 
-            let result = [];
-            let totalSlotsAll = 0;
-            let totalBookedAll = 0;
-            let completed = 0;
+        if (doctors.length === 0) {
+            return res.json({
+                doctors: [],
+                summary: { total_slots: 0, total_booked: 0, total_utilization: 0 }
+            });
+        }
 
-            if (doctors.length === 0) {
-                return res.json({
-                    doctors: [],
-                    summary: { total_slots: 0, total_booked: 0, total_utilization: 0 }
-                });
-            }
+        // Для каждого врача считаем статистику
+        doctors.forEach((doctor, index) => {
 
-            // Для каждого врача считаем статистику
-            doctors.forEach((doctor, index) => {
-
-                // 2. Получаем все слоты врача за период
-                db.all(`
+            // 2. Получаем все слоты врача за период
+            db.all(`
                 SELECT * FROM work_slots 
                 WHERE doctor_id = ? AND work_date BETWEEN ? AND ?
             `, [doctor.doctor_id, startDate, endDate], (err, workSlots) => {
-                    if (err) {
-                        res.status(500).json({ error: err.message });
-                        return;
+                if (err) {
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+
+                // Считаем общее количество слотов
+                let totalSlots = 0;
+                workSlots.forEach(slot => {
+                    // Парсим время
+                    const startHour = parseInt(slot.start_time.split(':')[0]);
+                    const endHour = parseInt(slot.end_time.split(':')[0]);
+                    const breakStartHour = slot.break_start ? parseInt(slot.break_start.split(':')[0]) : 0;
+                    const breakEndHour = slot.break_end ? parseInt(slot.break_end.split(':')[0]) : 0;
+
+                    // Часы работы = конец - начало
+                    let workHours = endHour - startHour;
+
+                    // Вычитаем перерыв
+                    if (slot.break_start && slot.break_end) {
+                        workHours = workHours - (breakEndHour - breakStartHour);
                     }
 
-                    // Считаем общее количество слотов
-                    let totalSlots = 0;
-                    workSlots.forEach(slot => {
-                        // Парсим время
-                        const startHour = parseInt(slot.start_time.split(':')[0]);
-                        const endHour = parseInt(slot.end_time.split(':')[0]);
-                        const breakStartHour = slot.break_start ? parseInt(slot.break_start.split(':')[0]) : 0;
-                        const breakEndHour = slot.break_end ? parseInt(slot.break_end.split(':')[0]) : 0;
+                    // Переводим в минуты и делим на длительность слота
+                    const slotsPerDay = (workHours * 60) / slot.slot_duration_minutes;
+                    totalSlots += slotsPerDay;
+                });
 
-                        // Часы работы = конец - начало
-                        let workHours = endHour - startHour;
-
-                        // Вычитаем перерыв
-                        if (slot.break_start && slot.break_end) {
-                            workHours = workHours - (breakEndHour - breakStartHour);
-                        }
-
-                        // Переводим в минуты и делим на длительность слота
-                        const slotsPerDay = (workHours * 60) / slot.slot_duration_minutes;
-                        totalSlots += slotsPerDay;
-                    });
-
-                    // 3. Получаем количество записей врача за период
-                    db.get(`
+                // 3. Получаем количество записей врача за период
+                db.get(`
                     SELECT COUNT(*) as count FROM appointments 
                     WHERE doctor_id = ? 
                         AND date(slot_datetime) BETWEEN ? AND ? 
                         AND status = 'booked'
                 `, [doctor.doctor_id, startDate, endDate], (err, row) => {
-                        if (err) {
-                            res.status(500).json({ error: err.message });
-                            return;
-                        }
-                        console.log(row);
-                        const bookedSlots = row.count;
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                        return;
+                    }
+                    console.log(row);
+                    const bookedSlots = row.count;
 
-                        totalSlotsAll += totalSlots;
-                        totalBookedAll += bookedSlots;
+                    totalSlotsAll += totalSlots;
+                    totalBookedAll += bookedSlots;
 
-                        // Сохраняем результат
-                        result[index] = {
-                            doctor_id: doctor.doctor_id,
-                            doctor_full_name: doctor.doctor_full_name,
-                            specialty: doctor.specialty,
-                            total_slots: Math.round(totalSlots),
-                            booked_slots: bookedSlots,
-                            utilization: totalSlots > 0
-                                ? Math.round((bookedSlots / totalSlots) * 100)
-                                : 0
-                        };
+                    // Сохраняем результат
+                    result[index] = {
+                        doctor_id: doctor.doctor_id,
+                        doctor_full_name: doctor.doctor_full_name,
+                        specialty: doctor.specialty,
+                        total_slots: Math.round(totalSlots),
+                        booked_slots: bookedSlots,
+                        utilization: totalSlots > 0
+                            ? Math.round((bookedSlots / totalSlots) * 100)
+                            : 0
+                    };
 
-                        completed++;
+                    completed++;
 
-                        // Когда все врачи обработаны - отправляем ответ
-                        if (completed === doctors.length) {
-                            // Убираем пустые элементы (если были)
-                            result = result.filter(r => r);
+                    // Когда все врачи обработаны - отправляем ответ
+                    if (completed === doctors.length) {
+                        // Убираем пустые элементы (если были)
+                        result = result.filter(r => r);
 
-                            res.json({
-                                doctors: result,
-                                summary: {
-                                    total_slots: totalSlotsAll,
-                                    total_booked: totalBookedAll,
-                                    total_utilization: totalSlotsAll > 0
-                                        ? Math.round((totalBookedAll / totalSlotsAll) * 100)
-                                        : 0
-                                }
-                            });
-                        }
-                    });
+                        res.json({
+                            doctors: result,
+                            summary: {
+                                total_slots: totalSlotsAll,
+                                total_booked: totalBookedAll,
+                                total_utilization: totalSlotsAll > 0
+                                    ? Math.round((totalBookedAll / totalSlotsAll) * 100)
+                                    : 0
+                            }
+                        });
+                    }
                 });
             });
         });
     });
+});
 
-    // POST /import - загрузить все CSV
-    app.post('/import', (req, res) => {
-        const { doctorsPath, slotsPath, appointmentsPath } = req.body;
+// POST /import - загрузить все CSV
+app.post('/import', (req, res) => {
+    const { doctorsPath, slotsPath, appointmentsPath } = req.body;
 
-        const docsPath = doctorsPath || path.join(__dirname, '..', 'data', 'doctors.csv');
-        const slsPath = slotsPath || path.join(__dirname, '..', 'data', 'work_slots.csv');
-        const appsPath = appointmentsPath || path.join(__dirname, '..', 'data', 'appointments.csv');
+    const docsPath = doctorsPath || path.join(__dirname, '..', 'data', 'doctors.csv');
+    const slsPath = slotsPath || path.join(__dirname, '..', 'data', 'work_slots.csv');
+    const appsPath = appointmentsPath || path.join(__dirname, '..', 'data', 'appointments.csv');
 
-        if (!fs.existsSync(docsPath)) {
-            return res.status(400).json({ error: `Файл не найден: ${docsPath}` });
+    if (!fs.existsSync(docsPath)) {
+        return res.status(400).json({ error: `Файл не найден: ${docsPath}` });
+    }
+
+    importFunctions.importDoctors(docsPath, (err) => {
+        if (err) {
+            res.status(500).json({ error: 'Ошибка импорта врачей' });
+            return;
         }
 
-        importFunctions.importDoctors(docsPath, (err) => {
+        importFunctions.importSlots(slsPath, (err) => {
             if (err) {
-                res.status(500).json({ error: 'Ошибка импорта врачей' });
+                res.status(500).json({ error: 'Ошибка импорта слотов' });
                 return;
             }
 
-            importFunctions.importSlots(slsPath, (err) => {
+            importFunctions.importAppointments(appsPath, (err) => {
                 if (err) {
-                    res.status(500).json({ error: 'Ошибка импорта слотов' });
+                    res.status(500).json({ error: 'Ошибка импорта записей' });
                     return;
                 }
 
-                importFunctions.importAppointments(appsPath, (err) => {
-                    if (err) {
-                        res.status(500).json({ error: 'Ошибка импорта записей' });
-                        return;
-                    }
-
-                    res.json({ message: '✅ Все данные успешно импортированы' });
-                });
+                res.json({ message: '✅ Все данные успешно импортированы' });
             });
         });
     });
+});
 
-    // Регистрация (новый пациент)
-    app.post('/register', (req, res) => {
-        const { patient_id, patient_full_name, patient_mail, password } = req.body;
-        console.log(patient_id, patient_full_name, patient_mail, password)
-        if (!patient_id || !patient_full_name || !patient_mail || !password) {
-            return res.status(400).json({ error: 'Все поля обязательны' });
-        }
+// Регистрация (новый пациент)
+app.post('/register', (req, res) => {
+    const { patient_id, patient_full_name, patient_mail, password } = req.body;
+    console.log(patient_id, patient_full_name, patient_mail, password)
+    if (!patient_id || !patient_full_name || !patient_mail || !password) {
+        return res.status(400).json({ error: 'Все поля обязательны' });
+    }
 
-        db.get('SELECT patient_id FROM patients WHERE patient_id = ? OR patient_mail = ?',
-            [patient_id, patient_mail], (err, row) => {
-                if (row) {
-                    return res.status(400).json({ error: 'Пациент с таким кодом или email уже существует' });
-                }
-
-                db.run(
-                    'INSERT INTO patients (patient_id, patient_full_name, patient_mail, password) VALUES (?, ?, ?, ?)',
-                    [patient_id, patient_full_name, patient_mail, password],
-                    function (err) {
-                        if (err) {
-                            res.status(500).json({ error: err.message });
-                            return;
-                        }
-                        res.status(201).json({
-                            message: '✅ Пациент зарегистрирован',
-                            patient_id: patient_id
-                        });
-                    }
-                );
-            });
-    });
-
-    // Вход
-    app.post('/login', (req, res) => {
-        const { login, password } = req.body; // login может быть code или email
-        db.get(
-            'SELECT * FROM patients WHERE patient_full_name = ?',
-            [login],
-            (err, patient) => {
-                if (err) {
-
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-                if (!patient || patient.password !== password) {
-
-                    return res.status(401).json({ error: 'Неверный код/email или пароль' });
-                }
-
-                res.json({
-                    message: '✅ Вход выполнен',
-                    patient_id: patient.patient_id,
-                    patient_full_name: patient.patient_full_name
-                });
-            });
-    });
-
-    // Получение данных пациента
-    app.get('/patient/:code', (req, res) => {
-        db.get(
-            'SELECT patient_id, patient_full_name, patient_mail FROM patients WHERE patient_id = ?',
-            [req.params.code],
-            (err, patient) => {
-                if (err) {
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-                if (!patient) {
-                    res.status(404).json({ error: 'Пациент не найден' });
-                    return;
-                }
-                res.json(patient);
+    db.get('SELECT patient_id FROM patients WHERE patient_id = ? OR patient_mail = ?',
+        [patient_id, patient_mail], (err, row) => {
+            if (row) {
+                return res.status(400).json({ error: 'Пациент с таким кодом или email уже существует' });
             }
-        );
-    });
+
+            db.run(
+                'INSERT INTO patients (patient_id, patient_full_name, patient_mail, password) VALUES (?, ?, ?, ?)',
+                [patient_id, patient_full_name, patient_mail, password],
+                function (err) {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                        return;
+                    }
+                    res.status(201).json({
+                        message: '✅ Пациент зарегистрирован',
+                        patient_id: patient_id
+                    });
+                }
+            );
+        });
+});
+
+// Вход
+app.post('/login', (req, res) => {
+    const { login, password } = req.body; // login может быть code или email
+    db.get(
+        'SELECT * FROM patients WHERE patient_full_name = ?',
+        [login],
+        (err, patient) => {
+            if (err) {
+
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            if (!patient || patient.password !== password) {
+
+                return res.status(401).json({ error: 'Неверный код/email или пароль' });
+            }
+
+            res.json({
+                message: '✅ Вход выполнен',
+                patient_id: patient.patient_id,
+                patient_full_name: patient.patient_full_name
+            });
+        });
+});
+
+// Получение данных пациента
+app.get('/patient/:code', (req, res) => {
+    db.get(
+        'SELECT patient_id, patient_full_name, patient_mail FROM patients WHERE patient_id = ?',
+        [req.params.code],
+        (err, patient) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            if (!patient) {
+                res.status(404).json({ error: 'Пациент не найден' });
+                return;
+            }
+            res.json(patient);
+        }
+    );
+});
 
 
-    //---------connect with 1C---------------------------------------
-    const multer = require('multer');
-    const storage = multer.diskStorage({
-        destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'data')),
-        filename: (req, file, cb) => cb(null, file.originalname)
-    });
-    const uploadToData = multer({ storage });
+//---------connect with 1C---------------------------------------
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'data')),
+    filename: (req, file, cb) => cb(null, file.originalname)
+});
+const uploadToData = multer({ storage });
 
-    app.post('/api/1c/upload-csv', uploadToData.fields([
-        { name: 'doctors' }, { name: 'slots' }, { name: 'appointments' }
-    ]), (req, res) => {
-        console.log('📥 Файлы получены:', req.files);
+app.post('/api/1c/upload-csv', uploadToData.fields([
+    { name: 'doctors' }, { name: 'slots' }, { name: 'appointments' }
+]), (req, res) => {
+    console.log('📥 Файлы получены:', req.files);
 
-        // Импорт
-        importFunctions.importDoctors(
-            path.join(__dirname, '..', 'data', 'doctors.csv'),
-            () => importFunctions.importSlots(
-                path.join(__dirname, '..', 'data', 'work_slots.csv'),
-                () => importFunctions.importAppointments(
-                    path.join(__dirname, '..', 'data', 'appointments.csv'),
-                    () => res.json({ success: true, message: '✅ Готово' })
-                )
+    // Импорт
+    importFunctions.importDoctors(
+        path.join(__dirname, '..', 'data', 'doctors.csv'),
+        () => importFunctions.importSlots(
+            path.join(__dirname, '..', 'data', 'work_slots.csv'),
+            () => importFunctions.importAppointments(
+                path.join(__dirname, '..', 'data', 'appointments.csv'),
+                () => res.json({ success: true, message: '✅ Готово' })
             )
-        );
-    });
+        )
+    );
+});
     //-----------end---------------------------------------------------
 };

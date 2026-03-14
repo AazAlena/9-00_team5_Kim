@@ -109,7 +109,7 @@
 
         <h3>На</h3>
         <input type="text" id="transferToDateTime" placeholder="Дата и время" value="2025-05-20 11:00:00">
-        <button onclick="testTransferAppointment()">Отменить</button>
+        <button onclick="testTransferAppointment()">Перенести</button>
         <p style="color: #666; font-size: 12px;">POST /appointments/transfer</p>
     </div>
 
@@ -241,7 +241,7 @@
 
                 showResult(JSON.stringify(result, null, 2), response.status);
 
-                document.getElementById('result').innerText = output;
+                //document.getElementById('result').innerText = output;
 
             } catch (error) {
                 document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
