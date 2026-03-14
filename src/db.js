@@ -41,6 +41,14 @@ db.serialize(() => {
     `);
 
     db.run(`
+        CREATE TABLE IF NOT EXISTS cancelled_appointments (
+            appointment_id INTEGER PRIMARY KEY,
+            why_cancelled TEXT NOT NULL,
+            FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id)
+        )
+    `);
+
+    db.run(`
         CREATE TABLE IF NOT EXISTS patients (
             patient_id TEXT PRIMARY KEY,
             patient_full_name TEXT NOT NULL,

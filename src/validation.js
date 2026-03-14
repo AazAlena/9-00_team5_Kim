@@ -43,13 +43,18 @@ function validateDateTime(dateTimeStr) {
 // Проверка кода пациента
 function validatePatientCode(code) {
     
-    
     return { valid: true, value: code };
+}
+
+function validateWhyCancelled(text) {
+    
+    return { valid: true, value: text };
 }
 
 module.exports = {
     validateDoctorId,
     validateDate,
     validateDateTime,
-    validatePatientCode
+    validatePatientCode,
+    validateWhyCancelled
 };

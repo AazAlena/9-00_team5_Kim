@@ -75,6 +75,38 @@ function importSlots(filePath, callback) {
         });
 }
 
+// Импорт отмененных записей
+function importCancelledAppointments(filePath, callback) {
+    const cancelled_appointments = [];
+    
+    fs.createReadStream(filePath)
+        .pipe(csv())
+        .on('data', (row) => {
+            cancelled_appointments.push({
+                appointment_id: parseInt(row.appointment_id),
+                why_cancelled: row.why_cancelled
+            });
+        })
+        .on('end', () => {
+            db.serialize(() => {
+                db.run('DELETE FROM cancelled_appointments');
+                
+                const stmt = db.prepare(`
+                    INSERT INTO cancelled_appointments (appointment_id, why_cancelled) 
+                    VALUES (?, ?)
+                `);
+                
+                cancelled_appointments.forEach(a => {
+                    stmt.run(a.appointment_id, a.why_cancelled);
+                });
+                stmt.finalize();
+                
+                console.log(`✅ Импортировано отмененных записей: ${cancelled_appointments.length}`);
+                if (callback) callback(null, cancelled_appointments);
+            });
+        });
+}
+
 // Импорт записей
 function importAppointments(filePath, callback) {
     const appointments = [];
@@ -147,6 +179,7 @@ function importPatients(filePath, callback) {
 module.exports = {
     importDoctors,
     importSlots,
+    importCancelledAppointments,
     importAppointments,
     importPatients
 };

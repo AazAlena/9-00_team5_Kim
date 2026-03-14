@@ -96,6 +96,7 @@
         <h3>❌ 5. Отменить запись</h3>
         <input type="number" id="canselDoctorId" placeholder="ID врача" value="1">
         <input type="text" id="canselDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
+        <input type="text" id="canselWhy" placeholder="Причина отмены" value="рука больше не болит - отвалилась">
 
         <button onclick="testCancelAppointment()">Отменить</button>
         <p style="color: #666; font-size: 12px;">POST /appointments/cancel</p>
@@ -106,6 +107,7 @@
         <h3>6. Перенести запись с:</h3>
         <input type="number" id="transferDoctorId" placeholder="ID врача" value="1">
         <input type="text" id="transferFromDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
+        <input type="text" id="transferWhy" placeholder="Причина переноса" value="моя рука отросла обратно">
 
         <h3>На</h3>
         <input type="text" id="transferToDateTime" placeholder="Дата и время" value="2025-05-20 11:00:00">
@@ -230,19 +232,7 @@
                     body: JSON.stringify(data)
                 });
                 const result = await response.json();
-
-                // Красиво показываем результат
-                //let output = `Статус: ${response.status}\n\n`;
-                //if (response.ok) {
-                //    output += '✅ Успех:\n' + JSON.stringify(result, null, 2);
-                //} else {
-                //    output += '❌ Ошибка:\n' + JSON.stringify(result, null, 2);
-                ///}
-
                 showResult(JSON.stringify(result, null, 2), response.status);
-
-                //document.getElementById('result').innerText = output;
-
             } catch (error) {
                 document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
             }
@@ -261,6 +251,7 @@
                 const data = {
                     doctorId: parseInt(document.getElementById('canselDoctorId').value),
                     slotDateTime: document.getElementById('canselDateTime').value,
+                    whyCancelled: document.getElementById('canselWhy').value,
                     patientCode: patientCode
                 };
                 //const id = document.getElementById('cancelDoctorIdPatientCodeSlotDatetime').value;
@@ -291,6 +282,7 @@
                     transferDoctorId: parseInt(document.getElementById('transferDoctorId').value),
                     transferFromDateTime: document.getElementById('transferFromDateTime').value,
                     transferToDateTime: document.getElementById('transferToDateTime').value,
+                    whyCancelled: document.getElementById('transferWhy').value,
                     patientCode: patientCode
                 };
                 const response = await fetch(`/appointments/transfer`, {
@@ -351,12 +343,14 @@
             const doctorsFile = document.getElementById('testDoctorsFile').files[0];
             const slotsFile = document.getElementById('testSlotsFile').files[0];
             const appsFile = document.getElementById('testAppsFile').files[0];
+            const appsCancelledFile = document.getElementById('testAppsFile').files[0];
 
             if (doctorsFile) formData.append('doctors', doctorsFile);
             if (slotsFile) formData.append('slots', slotsFile);
             if (appsFile) formData.append('appointments', appsFile);
+            if (appsCancelledFile) formData.append('cancelled', appsFile);
 
-            if (!doctorsFile && !slotsFile && !appsFile) {
+            if (!doctorsFile && !slotsFile && !appsFile && !appsCancelledFile) {
                 alert('Выберите файлы!');
                 return;
             }
