@@ -240,7 +240,7 @@ module.exports = function (app) {
                 db.run(`
                 INSERT INTO cancelled_appointments (appointment_id, why_cancelled) 
                 VALUES (?,?)
-            `, [whyCancelledValidation.value], function (err) {
+            `, [cancelledAppointmentId, whyCancelledValidation.value], function (err) {
                     if (err) {
                         res.status(500).json({ error: err.message });
                         return;
@@ -360,7 +360,7 @@ module.exports = function (app) {
                         db.run(`
                         INSERT INTO cancelled_appointments (appointment_id, why_cancelled) 
                         VALUES (?,?)
-                    `, [whyCancelledValidation.value], function (err) {
+                    `, [cancelledAppointmentId,whyCancelledValidation.value], function (err) {
                         if (err) {
                             res.status(500).json({ error: err.message });
                             return;
