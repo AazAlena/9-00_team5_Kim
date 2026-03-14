@@ -107,7 +107,7 @@
         <h3>6. Перенести запись с:</h3>
         <input type="number" id="transferDoctorId" placeholder="ID врача" value="1">
         <input type="text" id="transferFromDateTime" placeholder="Дата и время" value="2025-05-20 10:00:00">
-        <input type="text" id="transferWhy" placeholder="Причина переноса" value="моя рука отросла обратно и теперь болит">
+        <input type="text" id="transferWhy" placeholder="Причина переноса" value="рука отросла обратно и теперь болит">
 
         <h3>На</h3>
         <input type="text" id="transferToDateTime" placeholder="Дата и время" value="2025-05-20 11:00:00">
@@ -123,6 +123,16 @@
         <input type="date" id="reportEnd" value="2025-05-31">
         <button onclick="testReport()">Показать отчет</button>
         <p style="color: #666; font-size: 12px;">GET /report/utilization?startDate=...&endDate=...</p>
+    </div>
+
+    <!--Покзать отмены и переносы с причинами-->
+    <div class="section">
+        <h3>7. Причины отмен и переносов</h3>
+        <input type="number" id="reportCancelDoctorId" placeholder="ID врача" value="1">
+        <input type="date" id="reportCancelStart" value="2025-05-01">
+        <input type="date" id="reportCancelEnd" value="2025-05-31">
+        <button onclick="testCancelReport()">Показать отчет по отменам и переносам</button>
+        <p style="color: #666; font-size: 12px;">POST /report/cancelled?startDate=...&endDate=...&idDoctor=...</p>
     </div>
 
     <!-- Результат -->
@@ -309,6 +319,40 @@
             } catch (error) {
                 showResult('Ошибка: ' + error.message);
             }
+        }
+
+        //Отчет по отменам
+        async function testCancelReport() {
+            try {
+                const start = document.getElementById('reportCancelStart').value;
+                const end = document.getElementById('reportCancelEnd').value;
+                const doctorId = document.getElementById('reportCancelDoctorId').value;
+                //сделать пост запрос для отчета по отменам
+                
+                const data = {
+                    startDate: start,
+                    endDate: end,
+                    doctorId: doctorId
+                };
+
+                const response = await fetch('/report/cancel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                showResult(JSON.stringify(result, null, 2), response.status);
+            } catch (error) {
+                document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
+            }
+                
+                //const response = await fetch(`/report/cancel?startDate=${start}&endDate=${end}&`);
+                //const result = await response.json();
+                //showResult(JSON.stringify(result, null, 2), response.status);
+            //} catch (error) {
+            //    showResult('Ошибка: ' + error.message);
+            //}
         }
 
         //при перезагрузке страницы данные не обновляяются и не подтягиваются из data, а выгружаются из database

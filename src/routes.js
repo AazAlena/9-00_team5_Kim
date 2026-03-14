@@ -516,6 +516,50 @@ module.exports = function (app) {
         });
     });
 
+    
+    // POST /report/cancel - причины отмены записей
+    app.post('/report/cancel', (req, res) => {
+        const { startDate, endDate, doctorId} = req.body;
+        
+        // Валидация всех полей
+        const startDateValidation = validation.validateDate(startDate);
+        const endDateValidation = validation.validateDate(endDate);
+        const doctorIdValidation = validation.validatePatientCode(doctorId);
+        
+        const errors = [];
+        if (!startDateValidation.valid) errors.push(startDateValidation.message);
+        if (!endDateValidation.valid) errors.push(endDateValidation.message);
+        if (!doctorIdValidation.valid) errors.push(doctorIdValidation.message);
+        
+        if (errors.length > 0) {
+            return res.status(400).json({
+                error: 'Ошибка валидации',
+                details: errors
+            });
+        }
+        //console.log(startDateValidation, endDateValidation, doctorIdValidation);
+        db.all(`SELECT 
+                a.appointment_id,
+                a.doctor_id,
+                a.patient_id,
+                a.slot_datetime,
+                a.status,
+                c.why_cancelled
+            FROM appointments a
+            LEFT JOIN cancelled_appointments c ON a.appointment_id = c.appointment_id
+            WHERE a.doctor_id = ? 
+                AND a.status = 'cancelled'
+                AND date(a.slot_datetime) BETWEEN ? AND ?`
+        , [doctorIdValidation.value,startDateValidation.value,endDateValidation.value], (err, rows) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            res.json(rows);
+        });
+
+    });
+
     // POST /import - загрузить все CSV
     app.post('/import', (req, res) => {
         const { doctorsPath, slotsPath, appointmentsPath, appointmentsCancelledPath} = req.body;
