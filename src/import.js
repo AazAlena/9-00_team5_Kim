@@ -149,6 +149,7 @@ function importPatients(filePath, callback) {
     fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (row) => {
+            console.log('Прочитана строка:', row);  // ← посмотри, что приходит
             patients.push({
                 patient_id: row.patient_id,
                 patient_full_name: row.patient_full_name,
@@ -176,10 +177,45 @@ function importPatients(filePath, callback) {
         .on('error', callback);
 }
 
+// Импорт admins
+function importAdmins(filePath, callback) {
+    const admins = [];
+    
+    fs.createReadStream(filePath)
+        .pipe(csv())
+        .on('data', (row) => {
+            admins.push({
+                admin_id: row.admin_id,
+                admin_full_name: row.admin_full_name,
+                admin_mail: row.admin_mail,
+                admin_password: row.admin_password
+            });
+        })
+        .on('end', () => {
+            db.serialize(() => {
+                db.run('DELETE FROM admins');
+                
+                const stmt = db.prepare('INSERT INTO admins (admin_id, admin_full_name, admin_mail, admin_password) VALUES (?, ?, ?, ?)');
+                admins.forEach(a => {
+                    stmt.run(a.admin_id, a.admin_full_name, a.admin_mail, a.admin_password);
+                });
+                stmt.finalize();
+                
+                console.log(`✅ Импортировано админов: ${admins.length}`);
+                if (callback) callback(null, admins);
+            });
+        })
+        .on('error', (err) => {
+            console.error('❌ Ошибка чтения CSV:', err);
+            if (callback) callback(err);
+        });
+}
+
 module.exports = {
     importDoctors,
     importSlots,
     importCancelledAppointments,
     importAppointments,
-    importPatients
+    importPatients,
+    importAdmins
 };

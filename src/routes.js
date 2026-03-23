@@ -5,7 +5,6 @@ const importFunctions = require('./import');
 const validation = require('./validation');
 
 module.exports = function (app) {
-
     // GET /doctors - список всех врачей
     app.get('/doctors', (req, res) => {
         db.all('SELECT doctor_id, doctor_full_name, specialty FROM doctors', [], (err, rows) => {
@@ -562,16 +561,19 @@ module.exports = function (app) {
 
     // POST /import - загрузить все CSV
     app.post('/import', (req, res) => {
-        const { doctorsPath, slotsPath, appointmentsPath, appointmentsCancelledPath} = req.body;
+        const { doctorsPath, slotsPath, appointmentsPath, appointmentsCancelledPath, adminsPath, patientsPath } = req.body;
 
         const docsPath = doctorsPath || path.join(__dirname, '..', 'data', 'doctors.csv');
         const slsPath = slotsPath || path.join(__dirname, '..', 'data', 'work_slots.csv');
         const appsPath = appointmentsPath || path.join(__dirname, '..', 'data', 'appointments.csv');
         const cancelledPath = appointmentsCancelledPath || path.join(__dirname, '..', 'data', 'cancelled_appointments.csv');
+        const adsPath = adminsPath || path.join(__dirname, '..', 'data', 'admins.csv');
+        const patPath = patientsPath || path.join(__dirname, '..', 'data', 'patients.csv');
 
         if (!fs.existsSync(docsPath)) {
             return res.status(400).json({ error: `Файл не найден: ${docsPath}` });
         }
+        //сделать такие же проверки дя останыъ файлов
 
         importFunctions.importDoctors(docsPath, (err) => {
             if (err) {
@@ -596,8 +598,21 @@ module.exports = function (app) {
                             res.status(500).json({ error: 'Ошибка импорта записей' });
                             return;
                         }
-                    
-                        res.json({ message: '✅ Все данные успешно импортированы' });
+
+                        importFunctions.importAdmins(adsPath, (err) => {
+                            if (err) {
+                                res.status(500).json({ error: 'Ошибка импорта админов' });
+                                return;
+                            }
+                            
+                            importFunctions.importPatients(patPath, (err) => {
+                                if (err) {
+                                    res.status(500).json({ error: 'Ошибка импорта пациентов' });
+                                    return;
+                                }
+                                res.json({ message: '✅ Все данные успешно импортированы' });
+                            });
+                        });
                     });
                 });
             });
@@ -632,32 +647,75 @@ module.exports = function (app) {
                         });
                     }
                 );
-            });
+            }
+        );
     });
 
     // Вход
     app.post('/login', (req, res) => {
-        const { login, password } = req.body; // login может быть code или email
-        db.get(
-            'SELECT * FROM patients WHERE patient_full_name = ?',
-            [login],
-            (err, patient) => {
-                if (err) {
-
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-                if (!patient || patient.password !== password) {
-
-                    return res.status(401).json({ error: 'Неверный код/email или пароль' });
-                }
-
-                res.json({
-                    message: '✅ Вход выполнен',
-                    patient_id: patient.patient_id,
-                    patient_full_name: patient.patient_full_name
-                });
+        const {role, login, password } = req.body; // login может быть email
+        if (role == "пациент"){
+            db.get(
+                'SELECT * FROM patients WHERE patient_mail = ?',
+                [login],
+                (err, patient) => {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                        return;
+                    }
+                    if (!patient || patient.password !== password) {
+                        return res.status(401).json({ error: 'Неверный код/email или пароль' });
+                    }
+                    
+                    res.json({
+                        message: '✅ Вход выполнен',
+                        role:"patient",
+                        patient_id: patient.patient_id,
+                        patient_full_name: patient.patient_full_name
+                    });
             });
+        } else if (role == "врач") {
+            db.get(
+                'SELECT * FROM doctors WHERE doctor_mail = ?',
+                [login],
+                (err, doctor) => {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                        return;
+                    }
+                    if (!doctor || doctor.password !== password) {
+
+                        return res.status(401).json({ error: 'Неверный код/email или пароль' });
+                    }
+
+                    res.json({
+                        message: '✅ Вход выполнен',
+                        role:"doctor",
+                        doctor_id: doctor.doctor_id,
+                        doctor_full_name: doctor.doctor_full_name
+                    });
+            });
+        } else if (role == "администратор") {
+            db.get(
+                'SELECT * FROM admins WHERE admin_mail = ?',
+                [login],
+                (err, admin) => {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                        return;
+                    }
+                    if (!admin || admin.password !== password) {
+                        return res.status(401).json({ error: 'Неверный код/email или пароль' });
+                    }
+
+                    res.json({
+                        message: '✅ Вход выполнен',
+                        role:"admin",
+                        admin_id: admin.doctor_id,
+                        admin_full_name: admin.doctor_full_name
+                    });
+            });
+        }
     });
 
     // Получение данных пациента
@@ -679,6 +737,24 @@ module.exports = function (app) {
         );
     });
 
+    app.get('/doctor/:code', (req, res) => {
+        db.get(
+            'SELECT doctor_id, doctor_full_name, doctor_mail FROM doctors WHERE doctor_id = ?',
+            [req.params.code],
+            (err, doctor) => {
+                if (err) {
+                    res.status(500).json({ error: err.message });
+                    return;
+                }
+                if (!doctor) {
+                    res.status(404).json({ error: 'Врач не найден' });
+                    return;
+                }
+                res.json(doctor);
+            }
+        );
+    });
+
 
     //---------connect with 1C---------------------------------------
     const multer = require('multer');
@@ -689,7 +765,7 @@ module.exports = function (app) {
     const uploadToData = multer({ storage });
 
     app.post('/api/1c/upload-csv', uploadToData.fields([
-        { name: 'doctors' }, { name: 'slots' }, { name: 'appointments' }, {name: "cancelled"}
+        { name: 'doctors' }, { name: 'slots' }, { name: 'appointments' }, {name: 'cancelled'}, {name: 'admins'},  {name: 'patients'}
     ]), (req, res) => {
         console.log('📥 Файлы получены:', req.files);
 
@@ -702,7 +778,13 @@ module.exports = function (app) {
                     path.join(__dirname, '..', 'data', 'appointments.csv'),
                     () => importFunctions.importCancelledAppointments(
                         path.join(__dirname, '..', 'data', 'cancelled_appointments.csv'),
-                        () => res.json({ success: true, message: '✅ Готово' })
+                        () => importFunctions.importAdmins(
+                            path.join(__dirname, '..', 'data', 'admins.csv'),
+                            () => importFunctions.importPatients(
+                                path.join(__dirname, '..', 'data', 'patients.csv'),
+                                () => res.json({ success: true, message: '✅ Готово' })
+                            )
+                        )
                     )
                 )
             )
@@ -710,3 +792,5 @@ module.exports = function (app) {
     });
     //-----------end---------------------------------------------------
 };
+
+

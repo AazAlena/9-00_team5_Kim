@@ -61,7 +61,7 @@
     <div class="section">
         <h3>📥 1. Импорт данных из CSV</h3>
         <button onclick="testImport()">Импортировать все данные</button>
-        <p style="color: #666; font-size: 12px;">POST /import - загружает doctors.csv, work_slots.csv, appointments.csv
+        <p style="color: #666; font-size: 12px;">POST /import - загружает doctors.csv, work_slots.csv, appointments.csv, ...
         </p>
     </div>
 
@@ -144,19 +144,20 @@
     <script>
         const BASE_URL = '';
         (function () {
-            // 1. Достаем из localStorage данные пациента
-            const patientCode = localStorage.getItem('patientId');
-            const patientName = localStorage.getItem('patientName');
+            // 1. Достаем из localStorage данные пользователя
+            const code = localStorage.getItem('id');
+            const name = localStorage.getItem('name');
+            const role = localStorage.getItem('role');
 
-            // 2. Проверяем, есть ли код пациента
-            if (!patientCode) {
+            // 2. Проверяем, есть ли код
+            if (!code) {
                 // Если нет - отправляем на страницу входа
                 window.location.href = '/auth.html';
             } else {
                 // Если есть - показываем приветствие
                 document.body.insertAdjacentHTML('afterbegin',
                     '<div style="background:#e0f7fa; padding:10px; margin-bottom:20px;">' +
-                    '👋 Пациент: ' + patientName + ' (' + patientCode + ') ' +
+                    role + ': ' + name + ' (' + code + ') ' +
                     '<button onclick="logout()" style="margin-left:10px;">Выйти</button>' +
                     '</div>'
                 );
@@ -166,8 +167,9 @@
         // Функция выхода
         function logout() {
             // Удаляем данные из localStorage
-            localStorage.removeItem('patientId');
-            localStorage.removeItem('patientName');
+            localStorage.removeItem('role');
+            localStorage.removeItem('id');
+            localStorage.removeItem('name');
             // Отправляем на страницу входа
             window.location.href = '/auth.html';
         }
@@ -346,13 +348,6 @@
             } catch (error) {
                 document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
             }
-                
-                //const response = await fetch(`/report/cancel?startDate=${start}&endDate=${end}&`);
-                //const result = await response.json();
-                //showResult(JSON.stringify(result, null, 2), response.status);
-            //} catch (error) {
-            //    showResult('Ошибка: ' + error.message);
-            //}
         }
 
         //при перезагрузке страницы данные не обновляяются и не подтягиваются из data, а выгружаются из database
@@ -375,6 +370,12 @@
         <p>Файл appointments.csv:</p>
         <input type="file" id="testAppsFile" accept=".csv">
 
+        <p>Файл cancelled_appointments.csv:</p>
+        <input type="file" id="testCancelledFile" accept=".csv">
+
+        <p>Файл admins.csv:</p>
+        <input type="file" id="testAdminsFile" accept=".csv">
+
         <br><br>
         <button onclick="uploadTestFiles()">ЗАГРУЗИТЬ ФАЙЛЫ</button>
     </div>
@@ -387,14 +388,16 @@
             const doctorsFile = document.getElementById('testDoctorsFile').files[0];
             const slotsFile = document.getElementById('testSlotsFile').files[0];
             const appsFile = document.getElementById('testAppsFile').files[0];
-            const appsCancelledFile = document.getElementById('testAppsFile').files[0];
+            const appsCancelledFile = document.getElementById('testCancelledFile').files[0];
+            const adminsFile = document.getElementById('testAdminsFile').files[0];
 
             if (doctorsFile) formData.append('doctors', doctorsFile);
             if (slotsFile) formData.append('slots', slotsFile);
             if (appsFile) formData.append('appointments', appsFile);
             if (appsCancelledFile) formData.append('cancelled', appsFile);
+            if (adminsFile) formData.append('admins', appsFile);
 
-            if (!doctorsFile && !slotsFile && !appsFile && !appsCancelledFile) {
+            if (!doctorsFile && !slotsFile && !appsFile && !appsCancelledFile && !adminsFile) {
                 alert('Выберите файлы!');
                 return;
             }

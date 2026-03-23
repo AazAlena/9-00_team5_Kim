@@ -8,9 +8,17 @@
 <body>
     <h1>🏥 Вход в систему записи</h1>
 
+    <div class="section">
+        <h3>📥 1. Импорт данных из CSV</h3>
+        <button onclick="testImport()">Импортировать все данные</button>
+        <p style="color: #666; font-size: 12px;">POST /import - загружает doctors.csv, work_slots.csv, appointments.csv, ...
+        </p>
+    </div>
+
     <div style="border:1px solid #ccc; padding:20px; max-width:400px;">
         <h3>Вход</h3>
-        <input type="text" id="loginInput" placeholder="Код пациента или Email"><br>
+        <input type="text" id="loginRole" placeholder="Кто вы: пациент, врач, администратор"><br>
+        <input type="text" id="loginInput" placeholder="Email"><br>
         <input type="password" id="loginPassword" placeholder="Пароль"><br>
         <button onclick="login()">Войти</button>
     </div>
@@ -26,6 +34,21 @@
     <div id="message" style="margin-top:20px;"></div>
 
     <script>
+        async function testImport() {
+            try {
+                const response = await fetch('/import', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                });
+                const text = await response.text();
+                console.log(text);
+            } catch (error) {
+                console.log('Ошибка: ' + error.message);
+            }
+        }
+
         //const crypto = require('crypto');
         async function register() {
             const data = {
@@ -55,6 +78,7 @@
 
         async function login() {
             const data = {
+                role: document.getElementById('loginRole').value,
                 login: document.getElementById('loginInput').value,
                 password: document.getElementById('loginPassword').value
             };
@@ -68,13 +92,31 @@
             const result = await response.json();
 
             if (response.ok) {
-                console.log('Сохраняем в localStorage:', result.patient_id, result.patient_full_name);
+                if (result.role == "patient"){
+                    console.log('Сохраняем в localStorage пацента:', result.patient_id, result.patient_full_name);
 
-                localStorage.setItem('patientId', result.patient_id);
-                localStorage.setItem('patientName', result.patient_full_name);
+                    localStorage.setItem('role', result.role);
+                    localStorage.setItem('id', result.patient_id);
+                    localStorage.setItem('name', result.patient_full_name);
 
-                console.log('Проверка:', localStorage.getItem('patientId'));
+                    console.log('Проверка:', localStorage.getItem('patientId'));
+                } else if (result.role == "doctor"){
+                    console.log('Сохраняем в localStorage врача:', result.doctor_id, result.doctor_full_name);
+                    
+                    localStorage.setItem('role', result.role);
+                    localStorage.setItem('id', result.doctor_id);
+                    localStorage.setItem('name', result.doctor_full_name);
 
+                    console.log('Проверка:', localStorage.getItem('doctorId'));
+                } else if (result.role == "admin"){
+                    console.log('Сохраняем в localStorage админа:', result.admin_id, result.admin_full_name);
+
+                    localStorage.setItem('role', result.role);
+                    localStorage.setItem('id', result.admin_id);
+                    localStorage.setItem('name', result.admin_full_name);
+
+                    console.log('Проверка:', localStorage.getItem('adminId'));
+                }
                 window.location.href = '/test.html';
             } else {
                 document.getElementById('message').innerHTML = '❌ ' + result.error;
