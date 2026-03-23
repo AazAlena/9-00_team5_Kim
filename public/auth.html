@@ -99,7 +99,7 @@
                     localStorage.setItem('id', result.patient_id);
                     localStorage.setItem('name', result.patient_full_name);
 
-                    console.log('Проверка:', localStorage.getItem('patientId'));
+                    //console.log('Проверка:', localStorage.getItem('patientId'));
                 } else if (result.role == "doctor"){
                     console.log('Сохраняем в localStorage врача:', result.doctor_id, result.doctor_full_name);
                     
@@ -107,7 +107,7 @@
                     localStorage.setItem('id', result.doctor_id);
                     localStorage.setItem('name', result.doctor_full_name);
 
-                    console.log('Проверка:', localStorage.getItem('doctorId'));
+                    //console.log('Проверка:', localStorage.getItem('doctorId'));
                 } else if (result.role == "admin"){
                     console.log('Сохраняем в localStorage админа:', result.admin_id, result.admin_full_name);
 
@@ -115,7 +115,7 @@
                     localStorage.setItem('id', result.admin_id);
                     localStorage.setItem('name', result.admin_full_name);
 
-                    console.log('Проверка:', localStorage.getItem('adminId'));
+                    //console.log('Проверка:', localStorage.getItem('adminId'));
                 }
                 window.location.href = '/test.html';
             } else {

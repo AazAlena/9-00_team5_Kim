@@ -11,7 +11,9 @@ db.serialize(() => {
         CREATE TABLE IF NOT EXISTS doctors (
             doctor_id INTEGER PRIMARY KEY,
             doctor_full_name TEXT NOT NULL,
-            specialty TEXT NOT NULL
+            specialty TEXT NOT NULL,
+            doctor_mail TEXT UNIQUE NOT NULL,
+            doctor_password TEXT NOT NULL
         )
     `);
     
@@ -63,12 +65,11 @@ db.serialize(() => {
             admin_id TEXT PRIMARY KEY,
             admin_full_name TEXT NOT NULL,
             admin_mail TEXT UNIQUE NOT NULL,
-            admin_password TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            admin_password TEXT NOT NULL
         )
     `);
     
     console.log('✅ Таблицы созданы или уже существуют');
 });
-
+//created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 module.exports = db;

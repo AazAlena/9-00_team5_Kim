@@ -12,16 +12,18 @@ function importDoctors(filePath, callback) {
             doctors.push({
                 doctor_id: parseInt(row.doctor_id),
                 doctor_full_name: row.doctor_full_name,
-                specialty: row.specialty
+                specialty: row.specialty,
+                doctor_mail: row.doctor_mail,
+                doctor_password: row.doctor_password
             });
         })
         .on('end', () => {
             db.serialize(() => {
                 db.run('DELETE FROM doctors');
                 
-                const stmt = db.prepare('INSERT INTO doctors (doctor_id, doctor_full_name, specialty) VALUES (?, ?, ?)');
+                const stmt = db.prepare('INSERT INTO doctors (doctor_id, doctor_full_name, specialty, doctor_mail, doctor_password) VALUES (?, ?, ?, ?, ?)');
                 doctors.forEach(d => {
-                    stmt.run(d.doctor_id, d.doctor_full_name, d.specialty);
+                    stmt.run(d.doctor_id, d.doctor_full_name, d.specialty, d.doctor_mail, d.doctor_password);
                 });
                 stmt.finalize();
                 
@@ -149,7 +151,6 @@ function importPatients(filePath, callback) {
     fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (row) => {
-            console.log('Прочитана строка:', row);  // ← посмотри, что приходит
             patients.push({
                 patient_id: row.patient_id,
                 patient_full_name: row.patient_full_name,

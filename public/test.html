@@ -225,7 +225,7 @@
 
         async function testCreateAppointment() {
             try {
-                const patientCode = localStorage.getItem('patientId');
+                const patientCode = localStorage.getItem('id');
 
                 if (!patientCode) {
                     alert('Сначала войдите в систему');
@@ -252,7 +252,7 @@
 
         // 5. Отменить запись
         async function testCancelAppointment() {
-            const patientCode = localStorage.getItem('patientId');
+            const patientCode = localStorage.getItem('id');
 
             if (!patientCode) {
                 alert('Сначала войдите в систему');
@@ -282,7 +282,7 @@
 
         //6. Перенос
         async function testTransferAppointment() {
-            const patientCode = localStorage.getItem('patientId');
+            const patientCode = localStorage.getItem('id');
 
             if (!patientCode) {
                 alert('Сначала войдите в систему');
@@ -390,13 +390,15 @@
             const appsFile = document.getElementById('testAppsFile').files[0];
             const appsCancelledFile = document.getElementById('testCancelledFile').files[0];
             const adminsFile = document.getElementById('testAdminsFile').files[0];
+            //нет пациетов
 
             if (doctorsFile) formData.append('doctors', doctorsFile);
             if (slotsFile) formData.append('slots', slotsFile);
             if (appsFile) formData.append('appointments', appsFile);
             if (appsCancelledFile) formData.append('cancelled', appsFile);
             if (adminsFile) formData.append('admins', appsFile);
-
+            //нет пациетов
+            
             if (!doctorsFile && !slotsFile && !appsFile && !appsCancelledFile && !adminsFile) {
                 alert('Выберите файлы!');
                 return;

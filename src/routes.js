@@ -683,8 +683,7 @@ module.exports = function (app) {
                         res.status(500).json({ error: err.message });
                         return;
                     }
-                    if (!doctor || doctor.password !== password) {
-
+                    if (!doctor || doctor.doctor_password !== password) {
                         return res.status(401).json({ error: 'Неверный код/email или пароль' });
                     }
 
@@ -704,15 +703,15 @@ module.exports = function (app) {
                         res.status(500).json({ error: err.message });
                         return;
                     }
-                    if (!admin || admin.password !== password) {
+                    if (!admin || admin.admin_password !== password) {
                         return res.status(401).json({ error: 'Неверный код/email или пароль' });
                     }
 
                     res.json({
                         message: '✅ Вход выполнен',
                         role:"admin",
-                        admin_id: admin.doctor_id,
-                        admin_full_name: admin.doctor_full_name
+                        admin_id: admin.admin_id,
+                        admin_full_name: admin.admin_full_name
                     });
             });
         }
