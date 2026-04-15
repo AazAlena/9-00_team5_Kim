@@ -1,0 +1,10 @@
+id,fio,email,password,role
+"doc_1","Иванова Анна Петровна","doctor1@clinic.com","pass1","doctor"
+"doc_2","Петров Сергей Иванович","doctor2@clinic.com","pass2","doctor"
+"doc_3","Сидорова Мария Владимировна","doctor3@clinic.com","pass3","doctor"
+"doc_4","Сидорова Мария Владимировна2","doctor4@clinic.com","pass4","doctor"
+"pat_101","Алексеев Дмитрий Викторович","pat1@mail.com","userpass1","patient"
+"pat_102","Борисова Елена Андреевна","pat2@mail.com","userpass2","patient"
+"pat_103","Васильев Игорь Павлович","pat3@mail.com","userpass3","patient"
+"pat_104","Григорьева Светлана Олеговна","pat4@mail.com","userpass4","patient"
+"pat_105","Дмитриев Алексей Николаевич","pat5@mail.com","userpass5","patient"

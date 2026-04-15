@@ -1,0 +1,3 @@
+appt_id,doctor_id,patient_code,slot_datetime,status
+"appt_998","doc_3","pat_103","2024-10-23 09:00:00","booked"
+"appt_997","doc_3","pat_104","2024-10-23 09:00:00","booked"

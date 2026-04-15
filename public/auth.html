@@ -1,129 +1,113 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Вход для пациентов</title>
+    <meta charset="UTF-8">
+    <title>Вход / Регистрация</title>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 500px; margin: 0 auto; }
+        .form { border: 1px solid #ccc; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
+        input { padding: 8px; margin: 5px; width: 100%; box-sizing: border-box; }
+        button { padding: 8px 15px; margin-top: 10px; cursor: pointer; }
+        .msg { margin-top: 10px; padding: 10px; }
+    </style>
 </head>
-
 <body>
-    <h1>🏥 Вход в систему записи</h1>
+<div class="section">
+    <h3>📥 0. Импорт CSV</h3>
+    <button onclick="testImport()">Импортировать все данные</button>
+</div>
 
-    <div class="section">
-        <h3>📥 1. Импорт данных из CSV</h3>
-        <button onclick="testImport()">Импортировать все данные</button>
-        <p style="color: #666; font-size: 12px;">POST /import - загружает doctors.csv, work_slots.csv, appointments.csv, ...
-        </p>
-    </div>
+<h1>🏥 Вход / Регистрация</h1>
 
-    <div style="border:1px solid #ccc; padding:20px; max-width:400px;">
-        <h3>Вход</h3>
-        <input type="text" id="loginRole" placeholder="Кто вы: пациент, врач, администратор"><br>
-        <input type="text" id="loginInput" placeholder="Email"><br>
-        <input type="password" id="loginPassword" placeholder="Пароль"><br>
-        <button onclick="login()">Войти</button>
-    </div>
+<div class="form">
+    <h3>🔐 Вход</h3>
+    <input type="email" id="loginEmail" placeholder="Email" value="P1@yandex.ru">
+    <input type="password" id="loginPassword" placeholder="Пароль" value="1">
+    <button onclick="login()">Войти</button>
+</div>
 
-    <div style="border:1px solid #ccc; padding:20px; max-width:400px; margin-top:20px;">
-        <h3>Регистрация</h3>
-        <input type="text" id="regName" placeholder="Полное имя"><br>
-        <input type="email" id="regEmail" placeholder="Email"><br>
-        <input type="password" id="regPassword" placeholder="Пароль"><br>
-        <button onclick="register()">Зарегистрироваться</button>
-    </div>
+<div class="form">
+    <h3>📝 Регистрация (только пациент)</h3>
+    <input type="text" id="regName" placeholder="ФИО">
+    <input type="email" id="regEmail" placeholder="Email">
+    <input type="password" id="regPassword" placeholder="Пароль (мин. 3 символа)">
+    <button onclick="register()">Зарегистрироваться</button>
+</div>
 
-    <div id="message" style="margin-top:20px;"></div>
+<div id="message" class="msg"></div>
 
-    <script>
-        async function testImport() {
-            try {
-                const response = await fetch('/import', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                });
-                const text = await response.text();
-                console.log(text);
-            } catch (error) {
-                console.log('Ошибка: ' + error.message);
-            }
+<script>
+    async function testImport() {
+        try {
+            const res = await fetch('/import', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+            const text = await res.text();
+            showMessage(text, 'green');
+        } catch(e) { 
+            showMessage('Ошибка: '+e.message, 'red'); 
         }
+    }
 
-        //const crypto = require('crypto');
-        async function register() {
-            const data = {
-                patient_id: crypto.randomUUID(),
-                patient_full_name: document.getElementById('regName').value,
-                patient_mail: document.getElementById('regEmail').value,
-                password: document.getElementById('regPassword').value
-            };
-
-            const response = await fetch('/register', {
+    async function register() {
+        const fio = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        if (!fio || !email || !password) {
+            showMessage('Заполните все поля', 'red');
+            return;
+        }
+        try {
+            const res = await fetch('/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify({ fio, email, password })
             });
-
-            const result = await response.json();
-            const msg = document.getElementById('message');
-
-            if (response.ok) {
-                msg.innerHTML = '✅ Регистрация успешна, можно войти';
-                msg.style.color = 'green';
+            const data = await res.json();
+            if (res.ok) {
+                showMessage('✅ Регистрация успешна! Теперь войдите.', 'green');
+                // очистить поля
+                document.getElementById('regName').value = '';
+                document.getElementById('regEmail').value = '';
+                document.getElementById('regPassword').value = '';
             } else {
-                msg.innerHTML = '❌ ' + result.error;
-                msg.style.color = 'red';
+                showMessage('❌ ' + (data.error || 'Ошибка'), 'red');
             }
+        } catch(e) { showMessage('Ошибка: '+e.message, 'red'); }
+    }
+
+    async function login() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        if (!email || !password) {
+            showMessage('Введите email и пароль', 'red');
+            return;
         }
-
-        async function login() {
-            const data = {
-                role: document.getElementById('loginRole').value,
-                login: document.getElementById('loginInput').value,
-                password: document.getElementById('loginPassword').value
-            };
-
-            const response = await fetch('/login', {
+        try {
+            const res = await fetch('/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify({ email, password })
             });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                if (result.role == "patient"){
-                    console.log('Сохраняем в localStorage пацента:', result.patient_id, result.patient_full_name);
-
-                    localStorage.setItem('role', result.role);
-                    localStorage.setItem('id', result.patient_id);
-                    localStorage.setItem('name', result.patient_full_name);
-
-                    //console.log('Проверка:', localStorage.getItem('patientId'));
-                } else if (result.role == "doctor"){
-                    console.log('Сохраняем в localStorage врача:', result.doctor_id, result.doctor_full_name);
-                    
-                    localStorage.setItem('role', result.role);
-                    localStorage.setItem('id', result.doctor_id);
-                    localStorage.setItem('name', result.doctor_full_name);
-
-                    //console.log('Проверка:', localStorage.getItem('doctorId'));
-                } else if (result.role == "admin"){
-                    console.log('Сохраняем в localStorage админа:', result.admin_id, result.admin_full_name);
-
-                    localStorage.setItem('role', result.role);
-                    localStorage.setItem('id', result.admin_id);
-                    localStorage.setItem('name', result.admin_full_name);
-
-                    //console.log('Проверка:', localStorage.getItem('adminId'));
-                }
-                window.location.href = '/test.html';
+            const data = await res.json();
+            if (res.ok) {
+                localStorage.setItem('id', data.id);
+                localStorage.setItem('name', data.name);
+                localStorage.setItem('role', data.role);
+                showMessage(`✅ Вход выполнен. Привет, ${data.name}! Перенаправление...`, 'green');
+                setTimeout(() => { window.location.href = '/test.html'; }, 1000);
             } else {
-                document.getElementById('message').innerHTML = '❌ ' + result.error;
-                document.getElementById('message').style.color = 'red';
+                showMessage('❌ ' + (data.error || 'Неверный email или пароль'), 'red');
             }
-        }
-    </script>
+        } catch(e) { showMessage('Ошибка: '+e.message, 'red'); }
+    }
+
+    function showMessage(msg, color) {
+        const msgDiv = document.getElementById('message');
+        msgDiv.innerHTML = msg;
+        msgDiv.style.color = color;
+        msgDiv.style.background = '#f9f9f9';
+        msgDiv.style.padding = '10px';
+        msgDiv.style.border = '1px solid ' + color;
+    }
+</script>
 </body>
-
 </html>

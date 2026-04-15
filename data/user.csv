@@ -1,0 +1,9 @@
+id,fio,email,password,role
+D1,D1,D1@yandex.ru,1,"doctor"
+D2,D2,D2@yandex.ru,1,"doctor"
+D3,D3,D3@yandex.ru,1,"doctor"
+P1,P1,P1@yandex.ru,1,"patient"
+P2,P2,P2@yandex.ru,1,"patient"
+P3,P3,P3@yandex.ru,1,"patient"
+P4,P4,P4@yandex.ru,1,"patient"
+A1,A1,A1@yandex.ru,1,"admin"

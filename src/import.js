@@ -2,33 +2,34 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const db = require('./db');
 
-// Импорт врачей
-function importDoctors(filePath, callback) {
-    const doctors = [];
+// Импорт пользователей
+function importUsers(filePath, callback) {
+    const users = [];
     
     fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (row) => {
-            doctors.push({
-                doctor_id: parseInt(row.doctor_id),
-                doctor_full_name: row.doctor_full_name,
-                specialty: row.specialty,
-                doctor_mail: row.doctor_mail,
-                doctor_password: row.doctor_password
+            users.push({
+                id: row.id,
+                fio: row.fio,
+                email: row.email,
+                password: row.password,
+                role: row.role
             });
         })
+
         .on('end', () => {
             db.serialize(() => {
-                db.run('DELETE FROM doctors');
+                db.run('DELETE FROM user');
                 
-                const stmt = db.prepare('INSERT INTO doctors (doctor_id, doctor_full_name, specialty, doctor_mail, doctor_password) VALUES (?, ?, ?, ?, ?)');
-                doctors.forEach(d => {
-                    stmt.run(d.doctor_id, d.doctor_full_name, d.specialty, d.doctor_mail, d.doctor_password);
+                const stmt = db.prepare('INSERT INTO user (id, fio, email, password, role) VALUES (?, ?, ?, ?, ?)');
+                users.forEach(u => {
+                    stmt.run(u.id, u.fio, u.email, u.password, u.role);
                 });
                 stmt.finalize();
                 
-                console.log(`✅ Импортировано врачей: ${doctors.length}`);
-                if (callback) callback(null, doctors);
+                console.log(`✅ Импортировано пользователей: ${users.length}`);
+                if (callback) callback(null, users);
             });
         })
         .on('error', (err) => {
@@ -38,40 +39,34 @@ function importDoctors(filePath, callback) {
 }
 
 // Импорт слотов
-function importSlots(filePath, callback) {
+function importWorkSlots(filePath, callback) {
     const slots = [];
-    
     fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (row) => {
             slots.push({
-                slot_id: parseInt(row.slot_id),
-                doctor_id: parseInt(row.doctor_id),
-                work_date: row.work_date,
+                id: row.id,                     
+                date: row.date,
                 start_time: row.start_time,
                 end_time: row.end_time,
-                slot_duration_minutes: parseInt(row.slot_duration_minutes),
-                break_start: row.break_start || null,
-                break_end: row.break_end || null
+                slots_minutes: row.slots_minutes,
+                break_start: row.break_start,
+                break_end: row.break_end
             });
         })
         .on('end', () => {
             db.serialize(() => {
-                db.run('DELETE FROM work_slots');
-                
+                db.run('DELETE FROM work_slot');
                 const stmt = db.prepare(`
-                    INSERT INTO work_slots 
-                    (slot_id, doctor_id, work_date, start_time, end_time, slot_duration_minutes, break_start, break_end) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO work_slot (id, date, start_time, end_time, slots_minutes, break_start, break_end) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                 `);
-                
-                slots.forEach(s => {
-                    stmt.run(s.slot_id, s.doctor_id, s.work_date, s.start_time, s.end_time, 
-                             s.slot_duration_minutes, s.break_start, s.break_end);
+                slots.forEach(ws => {
+                    stmt.run(ws.id, ws.date, ws.start_time, ws.end_time, ws.slots_minutes, ws.break_start, ws.break_end);
                 });
                 stmt.finalize();
                 
-                console.log(`✅ Импортировано слотов: ${slots.length}`);
+                console.log(`✅ Импортировано рабочих слотов: ${slots.length}`);
                 if (callback) callback(null, slots);
             });
         });
@@ -85,21 +80,21 @@ function importCancelledAppointments(filePath, callback) {
         .pipe(csv())
         .on('data', (row) => {
             cancelled_appointments.push({
-                appointment_id: parseInt(row.appointment_id),
+                appt_id: parseInt(row.appt_id),
                 why_cancelled: row.why_cancelled
             });
         })
         .on('end', () => {
             db.serialize(() => {
-                db.run('DELETE FROM cancelled_appointments');
+                db.run('DELETE FROM cancelled_appointment');
                 
                 const stmt = db.prepare(`
-                    INSERT INTO cancelled_appointments (appointment_id, why_cancelled) 
+                    INSERT INTO cancelled_appointment (appt_id, why_cancelled) 
                     VALUES (?, ?)
                 `);
                 
                 cancelled_appointments.forEach(a => {
-                    stmt.run(a.appointment_id, a.why_cancelled);
+                    stmt.run(a.appt_id, a.why_cancelled);
                 });
                 stmt.finalize();
                 
@@ -117,24 +112,24 @@ function importAppointments(filePath, callback) {
         .pipe(csv())
         .on('data', (row) => {
             appointments.push({
-                appointment_id: parseInt(row.appointment_id),
-                doctor_id: parseInt(row.doctor_id),
-                patient_id: row.patient_id,
+                appt_id: parseInt(row.appt_id),
+                doctor_id: row.doctor_id,
+                patient_code: row.patient_code,
                 slot_datetime: row.slot_datetime,
                 status: row.status
             });
         })
         .on('end', () => {
             db.serialize(() => {
-                db.run('DELETE FROM appointments');
+                db.run('DELETE FROM appointment');
                 
                 const stmt = db.prepare(`
-                    INSERT INTO appointments (appointment_id, doctor_id, patient_id, slot_datetime, status) 
+                    INSERT INTO appointment (appt_id, doctor_id, patient_code, slot_datetime, status) 
                     VALUES (?, ?, ?, ?, ?)
                 `);
                 
                 appointments.forEach(a => {
-                    stmt.run(a.appointment_id, a.doctor_id, a.patient_id, a.slot_datetime, a.status);
+                    stmt.run(a.appt_id, a.doctor_id, a.patient_code, a.slot_datetime, a.status);
                 });
                 stmt.finalize();
                 
@@ -144,40 +139,40 @@ function importAppointments(filePath, callback) {
         });
 }
 
-//импорт пациентов
-function importPatients(filePath, callback) {
-    const patients = [];
+
+
+//импорт специаьности
+function importSpeciality(filePath, callback) {
+    const speciality = [];
     
     fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (row) => {
-            patients.push({
-                patient_id: row.patient_id,
-                patient_full_name: row.patient_full_name,
-                patient_mail: row.patient_mail,
-                password: row.password 
+            speciality.push({
+                id: row.id,
+                speciality: row.speciality
             });
         })
         .on('end', () => {
             db.serialize(() => {
-                db.run('DELETE FROM patients');
+                db.run('DELETE FROM speciality');
                 
                 const stmt = db.prepare(
-                    'INSERT INTO patients (patient_id, patient_full_name, patient_mail, password) VALUES (?, ?, ?, ?)'
+                    'INSERT INTO speciality (id, speciality) VALUES (?, ?)'
                 );
                 
-                patients.forEach(p => {
-                    stmt.run(p.patient_id, p.patient_full_name, p.patient_mail, p.password);
+                speciality.forEach(s => {
+                    stmt.run(s.id, s.speciality);
                 });
                 stmt.finalize();
                 
-                console.log(`✅ Импортировано пациентов: ${patients.length}`);
-                callback(null, patients);
+                console.log(`✅ Импортировано специальностей: ${speciality.length}`);
+                callback(null, speciality);
             });
         })
         .on('error', callback);
 }
-
+/*
 // Импорт admins
 function importAdmins(filePath, callback) {
     const admins = [];
@@ -210,13 +205,12 @@ function importAdmins(filePath, callback) {
             console.error('❌ Ошибка чтения CSV:', err);
             if (callback) callback(err);
         });
-}
+}*/
 
 module.exports = {
-    importDoctors,
-    importSlots,
+    importUsers,
+    importWorkSlots,
     importCancelledAppointments,
     importAppointments,
-    importPatients,
-    importAdmins
+    importSpeciality
 };

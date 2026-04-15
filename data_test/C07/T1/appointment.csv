@@ -1,0 +1,8 @@
+appt_id,doctor_id,patient_code,slot_datetime,status
+"appt_1","doc_1","pat_101","2024-10-21 09:00:00","booked"
+"appt_2","doc_1","pat_102","2024-10-21 09:20:00","served"
+"appt_3","doc_1","pat_103","2024-10-21 12:00:00","canceled"
+"appt_4","doc_2","pat_104","2024-10-22 10:30:00","booked"
+"appt_5","doc_2","pat_105","2024-10-22 11:00:00","served"
+"appt_6","doc_3","pat_101","2024-10-23 09:00:00","booked"
+"appt_7","doc_3","pat_102","2024-10-23 15:00:00","booked"

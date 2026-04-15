@@ -1,422 +1,196 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Тест API больницы</title>
     <meta charset="UTF-8">
+    <title>Тест API (новая БД)</title>
     <style>
-        body {
-            font-family: Arial;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        button {
-            padding: 8px 15px;
-            margin: 5px;
-            cursor: pointer;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 3px;
-        }
-
-        button:hover {
-            background: #45a049;
-        }
-
-        .result {
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 5px;
-            white-space: pre-wrap;
-        }
-
-        input {
-            padding: 8px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            width: 200px;
-        }
-
-        .section {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
+        body { font-family: Arial; padding: 20px; max-width: 900px; margin: 0 auto; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 3px; }
+        .result { background: #f5f5f5; border: 1px solid #ddd; padding: 15px; margin-top: 20px; border-radius: 5px; white-space: pre-wrap; }
+        input, select { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 3px; width: 200px; }
+        .section { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
     </style>
 </head>
-
 <body>
+<h1>🏥 Тестирование API (новая схема)</h1>
+<p>Сервер: <b>http://localhost:3000</b></p>
 
-    <h1>🏥 Тестирование API</h1>
-    <p>Сервер: <b>http://localhost:3000</b></p>
+<!-- Импорт CSV -->
+<div class="section">
+    <h3>📥 0. Импорт CSV</h3>
+    <button onclick="testImport()">Импортировать все данные</button>
+</div>
 
-    <!-- Секция импорта -->
-    <div class="section">
-        <h3>📥 1. Импорт данных из CSV</h3>
-        <button onclick="testImport()">Импортировать все данные</button>
-        <p style="color: #666; font-size: 12px;">POST /import - загружает doctors.csv, work_slots.csv, appointments.csv, ...
-        </p>
-    </div>
+<!-- Специальности -->
+<div class="section">
+    <h3>📌 1. Список специальностей</h3>
+    <button onclick="getSpecialities()">Получить специальности</button>
+</div>
 
-    <!-- Секция врачей -->
-    <div class="section">
-        <h3>👨‍⚕️ 2. Список врачей</h3>
-        <button onclick="testDoctors()">Получить всех врачей</button>
-        <p style="color: #666; font-size: 12px;">GET /doctors</p>
-    </div>
+<!-- Врачи по специальности -->
+<div class="section">
+    <h3>👨‍⚕️ 2. Врачи по специальности</h3>
+    <input type="text" id="specName" placeholder="Название специальности" value="speciality1">
+    <button onclick="getDoctorsBySpeciality()">Найти врачей</button>
+</div>
 
-    <!-- Секция слотов -->
-    <div class="section">
-        <h3>📅 3. Свободные слоты</h3>
-        <input type="number" id="doctorId" placeholder="ID врача" value="1">
-        <input type="date" id="slotDate" value="2025-05-20">
-        <button onclick="testSlots()">Показать слоты</button>
-        <p style="color: #666; font-size: 12px;">GET /slots?doctorId=1&date=2025-05-20</p>
-    </div>
+<!-- Слоты по дате и специальности -->
+<div class="section">
+    <h3>📅 3. Слоты на дату по специальности</h3>
+    <input type="date" id="slotDate" value="2025-05-20">
+    <input type="text" id="slotSpec" placeholder="Специальность" value="speciality1">
+    <button onclick="getSlotsByDateAndSpec()">Показать слоты</button>
+</div>
 
-    <!-- Секция записи -->
-    <div class="section">
-        <h3>📝 4. Создать запись</h3>
-        <input type="number" id="appDoctorId" placeholder="ID врача" value="1">
-        <input type="text" id="appDateTime" placeholder="Дата и время" value="2025-05-20 10:00">
+<!-- Слоты конкретного врача на дату -->
+<div class="section">
+    <h3>🕒 4. Слоты врача на дату</h3>
+    <input type="text" id="doctorIdForSlots" placeholder="ID врача (текст)" value="D1">
+    <input type="date" id="doctorSlotDate" value="2025-05-20">
+    <button onclick="getDoctorSlots()">Показать слоты врача</button>
+</div>
 
-        <button onclick="testCreateAppointment()">Записать</button>
-        <p style="color: #666; font-size: 12px;">POST /appointments</p>
-    </div>
+<!-- Создание записи -->
+<div class="section">
+    <h3>📝 5. Создать запись</h3>
+    <input type="text" id="appDoctorId" placeholder="ID врача" value="D1">
+    <input type="text" id="appDateTime" placeholder="Дата время" value="2025-05-20 10:00">
+    <button onclick="createAppointment()">Записаться</button>
+    <p style="color:gray">patientCode берётся из localStorage (после входа)</p>
+</div>
 
-    <!-- Секция отмены -->
-    <div class="section">
-        <h3>❌ 5. Отменить запись</h3>
-        <input type="number" id="canselDoctorId" placeholder="ID врача" value="1">
-        <input type="text" id="canselDateTime" placeholder="Дата и время" value="2025-05-20 10:00">
-        <input type="text" id="canselWhy" placeholder="Причина отмены" value="рука больше не болит - отвалилась">
+<!-- Записи пациента на день -->
+<div class="section">
+    <h3>📋 6. Записи пациента на дату</h3>
+    <input type="date" id="patientDate" value="2025-05-20">
+    <button onclick="getPatientAppointments()">Мои записи</button>
+</div>
 
-        <button onclick="testCancelAppointment()">Отменить</button>
-        <p style="color: #666; font-size: 12px;">POST /appointments/cancel</p>
-    </div>
+<!-- Отмена записи -->
+<div class="section">
+    <h3>❌ 7. Отменить запись</h3>
+    <input type="text" id="cancelDoctorId" placeholder="ID врача" value="1">
+    <input type="text" id="cancelDateTime" placeholder="Дата время" value="2025-05-20 10:00">
+    <input type="text" id="cancelReason" placeholder="Причина" value="Тест отмены">
+    <button onclick="cancelAppointment()">Отменить</button>
+</div>
 
-    <!-- Секция переноса -->
-    <div class="section">
-        <h3>6. Перенести запись с:</h3>
-        <input type="number" id="transferDoctorId" placeholder="ID врача" value="1">
-        <input type="text" id="transferFromDateTime" placeholder="Дата и время" value="2025-05-20 10:00">
-        <input type="text" id="transferWhy" placeholder="Причина переноса" value="рука отросла обратно и теперь болит">
+<!-- Результат -->
+<div class="section">
+    <h3>📋 Результат:</h3>
+    <div id="result" class="result">Нажми на любую кнопку</div>
+</div>
 
-        <h3>На</h3>
-        <input type="text" id="transferToDateTime" placeholder="Дата и время" value="2025-05-20 11:00">
-        <button onclick="testTransferAppointment()">Перенести</button>
-        <p style="color: #666; font-size: 12px;">POST /appointments/transfer</p>
-    </div>
+<script>
+    // Утилита для показа результата
+    function showResult(data, status) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `<span style="color:#666;">Статус: ${status}</span>\n\n` + 
+                              (typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+    }
 
+    // 0. Импорт
+    async function testImport() {
+        try {
+            const res = await fetch('/import', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+            const text = await res.text();
+            showResult(text, res.status);
+        } catch(e) { showResult('Ошибка: '+e.message); }
+    }
 
-    <!-- Секция отчета -->
-    <div class="section">
-        <h3>📊 6. Отчет по утилизации</h3>
-        <input type="date" id="reportStart" value="2025-05-01">
-        <input type="date" id="reportEnd" value="2025-05-31">
-        <button onclick="testReport()">Показать отчет</button>
-        <p style="color: #666; font-size: 12px;">GET /report/utilization?startDate=...&endDate=...</p>
-    </div>
+    // 1. Специальности
+    async function getSpecialities() {
+        try {
+            const res = await fetch('/speciality');
+            const data = await res.json();
+            showResult(data, res.status);
+        } catch(e) { showResult('Ошибка: '+e.message); }
+    }
 
-    <!--Покзать отмены и переносы с причинами-->
-    <div class="section">
-        <h3>7. Причины отмен и переносов</h3>
-        <input type="number" id="reportCancelDoctorId" placeholder="ID врача" value="1">
-        <input type="date" id="reportCancelStart" value="2025-05-01">
-        <input type="date" id="reportCancelEnd" value="2025-05-31">
-        <button onclick="testCancelReport()">Показать отчет по отменам и переносам</button>
-        <p style="color: #666; font-size: 12px;">POST /report/cancelled?startDate=...&endDate=...&idDoctor=...</p>
-    </div>
+    // 2. Врачи по специальности
+    async function getDoctorsBySpeciality() {
+        const spec = document.getElementById('specName').value;
+        if(!spec) { showResult('Введите специальность'); return; }
+        try {
+            const res = await fetch(`/doctors/speciality?speciality=${encodeURIComponent(spec)}`);
+            const data = await res.json();
+            showResult(data, res.status);
+        } catch(e) { showResult('Ошибка: '+e.message); }
+    }
 
-    <!-- Результат -->
-    <div class="section">
-        <h3>📋 Результат:</h3>
-        <div id="result" class="result">Нажми на любую кнопку</div>
-    </div>
+    // 3. Слоты по дате и специальности
+    async function getSlotsByDateAndSpec() {
+        const date = document.getElementById('slotDate').value;
+        const spec = document.getElementById('slotSpec').value;
+        if(!date || !spec) { showResult('Дата и специальность обязательны'); return; }
+        try {
+            const res = await fetch(`/slots?date=${date}&speciality=${encodeURIComponent(spec)}`);
+            const data = await res.json();
+            showResult(data, res.status);
+        } catch(e) { showResult('Ошибка: '+e.message); }
+    }
 
-    <script>
-        const BASE_URL = '';
-        (function () {
-            // 1. Достаем из localStorage данные пользователя
-            const code = localStorage.getItem('id');
-            const name = localStorage.getItem('name');
-            const role = localStorage.getItem('role');
+    // 4. Слоты врача на дату
+    async function getDoctorSlots() {
+        const doctorId = document.getElementById('doctorIdForSlots').value;
+        const date = document.getElementById('doctorSlotDate').value;
+        if(!doctorId || !date) { showResult('ID врача и дата обязательны'); return; }
+        try {
+            const res = await fetch(`/slots/doctors/data?doctorId=${doctorId}&date=${date}`);
+            const data = await res.json();
+            showResult(data, res.status);
+        } catch(e) { showResult('Ошибка: '+e.message); }
+    }
 
-            // 2. Проверяем, есть ли код
-            if (!code) {
-                // Если нет - отправляем на страницу входа
-                window.location.href = '/auth.html';
-            } else {
-                // Если есть - показываем приветствие
-                document.body.insertAdjacentHTML('afterbegin',
-                    '<div style="background:#e0f7fa; padding:10px; margin-bottom:20px;">' +
-                    role + ': ' + name + ' (' + code + ') ' +
-                    '<button onclick="logout()" style="margin-left:10px;">Выйти</button>' +
-                    '</div>'
-                );
-            }
-        })();
+    // 5. Создать запись (patientCode из localStorage)
+    async function createAppointment() {
+        const patientCode = localStorage.getItem('id');
+        if(!patientCode) { showResult('Вы не авторизованы. Сначала войдите через auth.html'); return; }
+        const doctorId = document.getElementById('appDoctorId').value;
+        const slotDateTime = document.getElementById('appDateTime').value;
+        if(!doctorId || !slotDateTime) { showResult('Заполните поля'); return; }
+        try {
+            const res = await fetch('/appointments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ doctorId, slotDateTime, patientCode })
+            });
+            const data = await res.json();
+            showResult(data, res.status);
+        } catch(e) { showResult('Ошибка: '+e.message); }
+    }
 
-        // Функция выхода
-        function logout() {
-            // Удаляем данные из localStorage
-            localStorage.removeItem('role');
-            localStorage.removeItem('id');
-            localStorage.removeItem('name');
-            // Отправляем на страницу входа
-            window.location.href = '/auth.html';
-        }
-        // Функция для показа результата
-        function showResult(data, status) {
-            const resultDiv = document.getElementById('result');
-            if (status) {
-                resultDiv.innerHTML = `<span style="color: #666;">Статус: ${status}</span>\n\n${data}`;
-            } else {
-                resultDiv.textContent = data;
-            }
-        }
+    // 6. Записи пациента на дату
+    async function getPatientAppointments() {
+        const patientId = localStorage.getItem('id');
+        if(!patientId) { showResult('Не авторизован'); return; }
+        const date = document.getElementById('patientDate').value;
+        if(!date) { showResult('Выберите дату'); return; }
+        try {
+            const res = await fetch(`/patient/appointments?patientId=${patientId}&date=${date}`);
+            const data = await res.json();
+            showResult(data, res.status);
+        } catch(e) { showResult('Ошибка: '+e.message); }
+    }
 
-        // 1. Импорт
-        async function testImport() {
-            try {
-                const response = await fetch('/import', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                });
-                const text = await response.text();
-                showResult(text, response.status);
-            } catch (error) {
-                showResult('Ошибка: ' + error.message);
-            }
-        }
-
-        // 2. Список врачей
-        async function testDoctors() {
-            try {
-                const response = await fetch('/doctors');
-                const data = await response.json();
-                showResult(JSON.stringify(data, null, 2), response.status);
-            } catch (error) {
-                showResult('Ошибка: ' + error.message);
-            }
-        }
-
-        // 3. Слоты
-        async function testSlots() {
-            try {
-                const doctorId = document.getElementById('doctorId').value;
-                const date = document.getElementById('slotDate').value;
-                const response = await fetch(`/slots?doctorId=${doctorId}&date=${date}`);
-                const data = await response.json();
-                showResult(JSON.stringify(data, null, 2), response.status);
-            } catch (error) {
-                showResult('Ошибка: ' + error.message);
-            }
-        }
-
-        async function testCreateAppointment() {
-            try {
-                const patientCode = localStorage.getItem('id');
-
-                if (!patientCode) {
-                    alert('Сначала войдите в систему');
-                    return;
-                }
-
-                const data = {
-                    doctorId: parseInt(document.getElementById('appDoctorId').value),
-                    slotDateTime: document.getElementById('appDateTime').value,
-                    patientCode: patientCode
-                };
-
-                const response = await fetch('/appointments', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                showResult(JSON.stringify(result, null, 2), response.status);
-            } catch (error) {
-                document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
-            }
-        }
-
-        // 5. Отменить запись
-        async function testCancelAppointment() {
-            const patientCode = localStorage.getItem('id');
-
-            if (!patientCode) {
-                alert('Сначала войдите в систему');
-                return;
-            }
-
-            try {
-                const data = {
-                    doctorId: parseInt(document.getElementById('canselDoctorId').value),
-                    slotDateTime: document.getElementById('canselDateTime').value,
-                    whyCancelled: document.getElementById('canselWhy').value,
-                    patientCode: patientCode
-                };
-                //const id = document.getElementById('cancelDoctorIdPatientCodeSlotDatetime').value;
-                const response = await fetch(`/appointments/cancel`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                showResult(JSON.stringify(result, null, 2), response.status);
-
-            } catch (error) {
-                showResult('Ошибка: ' + error.message);
-            }
-        }
-
-        //6. Перенос
-        async function testTransferAppointment() {
-            const patientCode = localStorage.getItem('id');
-
-            if (!patientCode) {
-                alert('Сначала войдите в систему');
-                return;
-            }
-
-            try {
-                const data = {
-                    transferDoctorId: parseInt(document.getElementById('transferDoctorId').value),
-                    transferFromDateTime: document.getElementById('transferFromDateTime').value,
-                    transferToDateTime: document.getElementById('transferToDateTime').value,
-                    whyCancelled: document.getElementById('transferWhy').value,
-                    patientCode: patientCode
-                };
-                const response = await fetch(`/appointments/transfer`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                showResult(JSON.stringify(result, null, 2), response.status);
-
-            } catch (error) {
-                showResult('Ошибка: ' + error.message);
-            }
-        }
-
-        // 6. Отчет
-        async function testReport() {
-            try {
-                const start = document.getElementById('reportStart').value;
-                const end = document.getElementById('reportEnd').value;
-                const response = await fetch(`/report/utilization?startDate=${start}&endDate=${end}`);
-                const result = await response.json();
-                showResult(JSON.stringify(result, null, 2), response.status);
-            } catch (error) {
-                showResult('Ошибка: ' + error.message);
-            }
-        }
-
-        //Отчет по отменам
-        async function testCancelReport() {
-            try {
-                const start = document.getElementById('reportCancelStart').value;
-                const end = document.getElementById('reportCancelEnd').value;
-                const doctorId = document.getElementById('reportCancelDoctorId').value;
-                //сделать пост запрос для отчета по отменам
-                
-                const data = {
-                    startDate: start,
-                    endDate: end,
-                    doctorId: doctorId
-                };
-
-                const response = await fetch('/report/cancel', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json();
-                showResult(JSON.stringify(result, null, 2), response.status);
-            } catch (error) {
-                document.getElementById('result').innerText = '❌ Ошибка сети: ' + error.message;
-            }
-        }
-
-        //при перезагрузке страницы данные не обновляяются и не подтягиваются из data, а выгружаются из database
-        window.onload = function () {
-            if (typeof testDoctors === 'function') testDoctors();
-            if (typeof testSlots === 'function') testSlots();
-        }
-    </script>
-
-    <!-- ===== ТЕСТ ЗАГРУЗКИ ФАЙЛОВ ===== -->
-    <div style="border: 2px solid red; padding: 10px; margin: 20px 0;">
-        <h3>ТЕСТ ЗАГРУЗКИ ФАЙЛОВ (1С)</h3>
-
-        <p>Файл doctors.csv:</p>
-        <input type="file" id="testDoctorsFile" accept=".csv">
-
-        <p>Файл work_slots.csv:</p>
-        <input type="file" id="testSlotsFile" accept=".csv">
-
-        <p>Файл appointments.csv:</p>
-        <input type="file" id="testAppsFile" accept=".csv">
-
-        <p>Файл cancelled_appointments.csv:</p>
-        <input type="file" id="testCancelledFile" accept=".csv">
-
-        <p>Файл admins.csv:</p>
-        <input type="file" id="testAdminsFile" accept=".csv">
-
-        <br><br>
-        <button onclick="uploadTestFiles()">ЗАГРУЗИТЬ ФАЙЛЫ</button>
-    </div>
-
-    <script>
-        // Функция загрузки файлов
-        async function uploadTestFiles() {
-            const formData = new FormData();
-
-            const doctorsFile = document.getElementById('testDoctorsFile').files[0];
-            const slotsFile = document.getElementById('testSlotsFile').files[0];
-            const appsFile = document.getElementById('testAppsFile').files[0];
-            const appsCancelledFile = document.getElementById('testCancelledFile').files[0];
-            const adminsFile = document.getElementById('testAdminsFile').files[0];
-            //нет пациетов
-
-            if (doctorsFile) formData.append('doctors', doctorsFile);
-            if (slotsFile) formData.append('slots', slotsFile);
-            if (appsFile) formData.append('appointments', appsFile);
-            if (appsCancelledFile) formData.append('cancelled', appsFile);
-            if (adminsFile) formData.append('admins', appsFile);
-            //нет пациетов
-            
-            if (!doctorsFile && !slotsFile && !appsFile && !appsCancelledFile && !adminsFile) {
-                alert('Выберите файлы!');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/1c/upload-csv', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await response.json();
-                document.getElementById('result').innerText = JSON.stringify(result, null, 2);
-            } catch (error) {
-                document.getElementById('result').innerText = 'Ошибка: ' + error.message;
-            }
-        }
-
-    </script>
+    // 7. Отменить запись
+    async function cancelAppointment() {
+        const patientCode = localStorage.getItem('id');
+        if(!patientCode) { showResult('Не авторизован'); return; }
+        const doctorId = document.getElementById('cancelDoctorId').value;
+        const slotDateTime = document.getElementById('cancelDateTime').value;
+        const whyCancelled = document.getElementById('cancelReason').value;
+        if(!doctorId || !slotDateTime) { showResult('Заполните поля'); return; }
+        try {
+            const res = await fetch('/appointments/cancel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ doctorId, patientCode, slotDateTime, whyCancelled })
+            });
+            const data = await res.json();
+            showResult(data, res.status);
+        } catch(e) { showResult('Ошибка: '+e.message); }
+    }
+</script>
 </body>
-
 </html>

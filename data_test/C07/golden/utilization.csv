@@ -1,0 +1,4 @@
+doctor_id,date,slots_total,slots_booked,slots_cancelled,slots_done,utilization
+"doc_1","2024-10-21",21,2,1,0,0.095
+"doc_2","2024-10-22",8,1,0,1,0.1
+"doc_3","2024-10-23",8,2,0,0,0.25
