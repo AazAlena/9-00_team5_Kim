@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main screan</title>
+    <link rel="stylesheet" href="Main_screen_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" 
+        rel="stylesheet"
+    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="">Записаться на приём</a></li>
+                <li><a href="">Личный кабинет</a></li>
+            </ul>
+            <button type="button" id="but_enter">Вход</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hd">
+            <img id="Main_img" src="./img/Main_picture.png" alt="">
+        </section>
+        <div id="main_xyi">
+            <div id="main_fill">
+                <h1>КрейзиМед</h1>
+                <p>
+                    Адрес нашей поликлиники:
+                    <br>
+                    Москва, ул.Первомайская 19с5
+                    <br><br>
+                    Связаться с нами:
+                    <br>
+                    +7 666 555 67 69
+                    <br><br>
+                    ne@pishite.nam
+                </p>
+            </div>
+        </div>
+
+        <section class="appt_b">
+            <button type="button" class="appt_but">Записаться на приём</button>
+            <img src="./img/xyi.svg" alt="">
+        </section>
+
+        <section id="doc">
+            <h1>Наши врачи</h1>
+            <div id="Carousel-slider">
+                <div class="Carousel-slider">
+                    <div class="slider-item superHero superHero1" data-href="#">
+                        <div class="podpis"><p>Иванов Иван Альбертович</p></div>
+                    </div>
+                    <div class="slider-item superHero superHero2" data-href="#">
+                        <div class="podpis"><p>Пупкин Антон Ильич</p></div>
+                    </div>
+                    <div class="slider-item superHero superHero3" data-href="#">
+                        <div class="podpis"><p>Караев Захар Иванович</p></div>
+                    </div>
+                    <div class="slider-item superHero superHero4" data-href="#">
+                        <div class="podpis"><p>Семёнов Иван Альбертович</p></div>
+                    </div>
+                    <div class="slider-item superHero superHero5" data-href="#">
+                        <div class="podpis"><p>Вольфман Иван Альбертович</p></div>
+                    </div>
+                    <div class="slider-item superHero superHero6" data-href="#">
+                        <div class="podpis"><p>Шик Иван Альбертович</p></div>
+                    </div>
+                    <div class="slider-item superHero superHero7" data-href="#">
+                        <div class="podpis"><p>Лук Иван Альбертович</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="stat">
+            <div class="item1">1</div>
+            <div class="stat_cont">
+                <div class="item item2">2</div>
+                <div class="item item3">3</div>
+            </div>
+            <div class="stat_cont">
+                <div class="item item4">4</div>
+                <div class="item item5">5</div>
+            </div>
+        </section>
+
+        <section id="Registration">
+            <div class="regfill_bg">
+                <div class="regfill">
+                    <h2>Создать Аккаунт</h2>
+                    <form action="" id="reg_form">
+                        <label for="fio">Фио</label>
+                        <input 
+                            type="text"
+                            placeholder="Иванов Иван Иванович"
+                            id="fio"
+                            name="fio"
+                        >
+                        <label for="email">Почта</label>
+                        <input 
+                            type="email"
+                            placeholder="your@mail.com"
+                            id="email"
+                            name="email"
+                        >
+                        <label for="password">Пароль</label>
+                        <input 
+                            type="password"
+                            id="password"
+                            name="password"
+                        >
+                        <label for="repass">Повторите пароль</label>
+                        <input 
+                            type="password"
+                            id="repass" 
+                            name="repass"
+                        >
+                        <button id="reg_butt">Подтвердить</button>
+                    </form>
+                </div>
+                <button type="button" id="eye_close1" class="eye_butt">
+                    <img src="./img/eye_close.svg" alt="" id="eye1">
+                </button>
+                <button type="button" id="eye_close2" class="eye_butt">
+                    <img src="./img/eye_close.svg" alt="" id="eye2">
+                </button>
+            </div>
+            <a href="" id="a">Уже есть аккаунт?</a>
+        </section>
+
+        <section id="map">
+            <script type="text/javascript" charset="utf-8" async
+                src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Af140b4de5c939de457e4e1d5a18934ead7545eaa1c00a4f47902874024dd46b6&amp;width=1280&amp;height=720&amp;lang=ru_RU&amp;scroll=true">
+            </script>
+        </section>
+    </main>
+
+    <footer>
+        <p id="f1">+7 666 555 67 69</p>
+        <p>ne@pishite.nam</p>
+    </footer>
+    <script src="./Main_screen_app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/micro-slider@1.0.9/dist/micro-slider.min.js"></script>
+</body>
+</html>
