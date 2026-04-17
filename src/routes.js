@@ -3,6 +3,7 @@ const fs = require('fs');
 const db = require('./db');
 const importFunctions = require('./import');
 const validation = require('./validation');
+const { validateAll } = require('../data/validate');
 
 module.exports = function (app) {
 
@@ -581,6 +582,7 @@ module.exports = function (app) {
             });
         });
     */
+   
     //7)поступает фио, почту, пароль пациента (регистрироваться могут исключительно пациенты, эту роль им нужно при регистрации ставить автоматически) - нужно записать нового пациента в бд
     //на главной странице есть форма регистрации и есть просто форма регистрации:
     //отдаю фио, почту, пароль пациента (роль: пациент тоже могу если надо)
@@ -724,7 +726,7 @@ module.exports = function (app) {
         });
     });
 
-    
+
     // Получение данных пациента
     app.get('/patient/:code', (req, res) => {
         db.get(
@@ -765,49 +767,66 @@ module.exports = function (app) {
     */
 
     // POST /import - загрузить все CSV
-    app.post('/import', (req, res) => {
-        //на всякий случай очищаем все таблицы в безопасном порядке
-        db.serialize(() => {
-            db.run('DELETE FROM cancelled_appointment');
-            db.run('DELETE FROM appointment');
-            db.run('DELETE FROM work_slot');
-            db.run('DELETE FROM speciality');
-            db.run('DELETE FROM user');
-        });
-        const { specialityPath, userPath, workSlotPath, appointmentPath, canceledAppointmentPath } = req.body;
-        const specPath = specialityPath || path.join(__dirname, '..', 'data', 'speciality.csv');
-        const userPathFinal = userPath || path.join(__dirname, '..', 'data', 'user.csv');
-        const workSlotPathFinal = workSlotPath || path.join(__dirname, '..', 'data', 'work_slot.csv');
-        const appointmentPathFinal = appointmentPath || path.join(__dirname, '..', 'data', 'appointment.csv');
-        const canceledPathFinal = canceledAppointmentPath || path.join(__dirname, '..', 'data', 'canceled_appointment.csv');
+    app.post('/import', async (req, res) => {
+        try {
+            // 1. Получаем пути к файлам
+            const { specialityPath, userPath, workSlotPath, appointmentPath, canceledAppointmentPath } = req.body;
+            const specPath = specialityPath || path.join(__dirname, '..', 'data', 'speciality.csv');
+            const userPathFinal = userPath || path.join(__dirname, '..', 'data', 'user.csv');
+            const workSlotPathFinal = workSlotPath || path.join(__dirname, '..', 'data', 'work_slot.csv');
+            const appointmentPathFinal = appointmentPath || path.join(__dirname, '..', 'data', 'appointment.csv');
+            const canceledPathFinal = canceledAppointmentPath || path.join(__dirname, '..', 'data', 'canceled_appointment.csv');
 
-        if (!fs.existsSync(specPath)) return res.status(400).json({ error: `Файл не найден: ${specPath}` });
-        if (!fs.existsSync(userPathFinal)) return res.status(400).json({ error: `Файл не найден: ${userPathFinal}` });
-        if (!fs.existsSync(workSlotPathFinal)) return res.status(400).json({ error: `Файл не найден: ${workSlotPathFinal}` });
-        if (!fs.existsSync(appointmentPathFinal)) return res.status(400).json({ error: `Файл не найден: ${appointmentPathFinal}` });
-        if (!fs.existsSync(canceledPathFinal)) return res.status(400).json({ error: `Файл не найден: ${canceledPathFinal}` });
+            // 2. Проверяем существование файлов
+            if (!fs.existsSync(specPath)) return res.status(400).json({ error: `Файл не найден: ${specPath}` });
+            if (!fs.existsSync(userPathFinal)) return res.status(400).json({ error: `Файл не найден: ${userPathFinal}` });
+            if (!fs.existsSync(workSlotPathFinal)) return res.status(400).json({ error: `Файл не найден: ${workSlotPathFinal}` });
+            if (!fs.existsSync(appointmentPathFinal)) return res.status(400).json({ error: `Файл не найден: ${appointmentPathFinal}` });
+            if (!fs.existsSync(canceledPathFinal)) return res.status(400).json({ error: `Файл не найден: ${canceledPathFinal}` });
 
-        importFunctions.importUsers(userPathFinal, (err) => {
-            if (err) return res.status(500).json({ error: 'Ошибка импорта пользователей' });
-            importFunctions.importSpeciality(specPath, (err) => {
-                if (err) return res.status(500).json({ error: 'Ошибка импорта специальностей ' });
-                importFunctions.importWorkSlots(workSlotPathFinal, (err) => {
-                    if (err) return res.status(500).json({ error: 'Ошибка импорта рабочих слотов' });
-                    importFunctions.importAppointments(appointmentPathFinal, (err) => {
-                        if (err) return res.status(500).json({ error: 'Ошибка импорта записей' });
-                        importFunctions.importCancelledAppointments(canceledPathFinal, (err) => {
-                            if (err) return res.status(500).json({ error: 'Ошибка импорта отменённых записей' });
-                            res.json({ message: '✅ Все данные успешно импортированы' });
+            // 3. Валидация данных (читает из стандартных путей data/)
+            console.log('🔍 Запуск валидации данных...');
+            const validationResult = await validateAll();
+
+            if (!validationResult.valid) {
+                return res.status(400).json({
+                    error: 'Ошибка валидации данных',
+                    details: validationResult.errors
+                });
+            }
+
+            console.log('✅ Данные прошли валидацию');
+
+            // 4. Очищаем таблицы (только после всех проверок)
+            db.serialize(() => {
+                db.run('DELETE FROM cancelled_appointment');
+                db.run('DELETE FROM appointment');
+                db.run('DELETE FROM work_slot');
+                db.run('DELETE FROM speciality');
+                db.run('DELETE FROM user');
+            });
+
+            // 5. Импорт
+            importFunctions.importUsers(userPathFinal, (err) => {
+                if (err) return res.status(500).json({ error: 'Ошибка импорта пользователей' });
+                importFunctions.importSpeciality(specPath, (err) => {
+                    if (err) return res.status(500).json({ error: 'Ошибка импорта специальностей' });
+                    importFunctions.importWorkSlots(workSlotPathFinal, (err) => {
+                        if (err) return res.status(500).json({ error: 'Ошибка импорта рабочих слотов' });
+                        importFunctions.importAppointments(appointmentPathFinal, (err) => {
+                            if (err) return res.status(500).json({ error: 'Ошибка импорта записей' });
+                            importFunctions.importCancelledAppointments(canceledPathFinal, (err) => {
+                                if (err) return res.status(500).json({ error: 'Ошибка импорта отменённых записей' });
+                                res.json({ message: '✅ Все данные успешно импортированы' });
+                            });
                         });
                     });
                 });
             });
-        });
+
+        } catch (error) {
+            console.error('Ошибка импорта:', error);
+            res.status(500).json({ error: error.message });
+        }
     });
-
-
-
-
-};
-
-
+}

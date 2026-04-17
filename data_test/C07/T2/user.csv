@@ -1,66 +1,27 @@
 id,fio,email,password,role
-"doc_001","Иванов Иван Иванович","doc_001@clinic.com","pass_doctor","doctor"
-"doc_002","Петров Пётр Петрович","doc_002@clinic.com","pass_doctor","doctor"
-"doc_003","Сидорова Анна Сергеевна","doc_003@clinic.com","pass_doctor","doctor"
-"doc_004","Кузнецова Мария Андреевна","doc_004@clinic.com","pass_doctor","doctor"
-"doc_005","Смирнов Дмитрий Владимирович","doc_005@clinic.com","pass_doctor","doctor"
-"doc_006","Волкова Елена Ивановна","doc_006@clinic.com","pass_doctor","doctor"
-"doc_007","Морозов Алексей Петрович","doc_007@clinic.com","pass_doctor","doctor"
-"doc_008","Новикова Ольга Сергеевна","doc_008@clinic.com","pass_doctor","doctor"
-"doc_009","Фёдорова Татьяна Андреевна","doc_009@clinic.com","pass_doctor","doctor"
-"doc_010","Васильев Иван Владимирович","doc_010@clinic.com","pass_doctor","doctor"
-"doc_011","Иванова Мария Ивановна","doc_011@clinic.com","pass_doctor","doctor"
-"doc_012","Петрова Анна Петровна","doc_012@clinic.com","pass_doctor","doctor"
-"doc_013","Сидоров Сергей Сергеевич","doc_013@clinic.com","pass_doctor","doctor"
-"doc_014","Кузнецов Дмитрий Андреевич","doc_014@clinic.com","pass_doctor","doctor"
-"doc_015","Смирнова Елена Владимировна","doc_015@clinic.com","pass_doctor","doctor"
-"doc_016","Волков Алексей Иванович","doc_016@clinic.com","pass_doctor","doctor"
-"doc_017","Морозова Ольга Петровна","doc_017@clinic.com","pass_doctor","doctor"
-"doc_018","Новиков Иван Сергеевич","doc_018@clinic.com","pass_doctor","doctor"
-"doc_019","Фёдоров Пётр Андреевич","doc_019@clinic.com","pass_doctor","doctor"
-"doc_020","Васильева Анна Владимировна","doc_020@clinic.com","pass_doctor","doctor"
-"doc_021","Иванов Сергей Иванович","doc_021@clinic.com","pass_doctor","doctor"
-"doc_022","Петрова Мария Петровна","doc_022@clinic.com","pass_doctor","doctor"
-"doc_023","Сидоров Дмитрий Сергеевич","doc_023@clinic.com","pass_doctor","doctor"
-"doc_024","Кузнецова Елена Андреевна","doc_024@clinic.com","pass_doctor","doctor"
-"doc_025","Смирнов Алексей Владимирович","doc_025@clinic.com","pass_doctor","doctor"
-"doc_026","Волкова Ольга Ивановна","doc_026@clinic.com","pass_doctor","doctor"
-"doc_027","Морозов Иван Петрович","doc_027@clinic.com","pass_doctor","doctor"
-"doc_028","Новикова Анна Сергеевна","doc_028@clinic.com","pass_doctor","doctor"
-"doc_029","Фёдорова Мария Андреевна","doc_029@clinic.com","pass_doctor","doctor"
-"doc_030","Васильев Дмитрий Владимирович","doc_030@clinic.com","pass_doctor","doctor"
-"doc_031","Иванова Елена Ивановна","doc_031@clinic.com","pass_doctor","doctor"
-"doc_032","Петров Алексей Петрович","doc_032@clinic.com","pass_doctor","doctor"
-"doc_033","Сидорова Ольга Сергеевна","doc_033@clinic.com","pass_doctor","doctor"
-"doc_034","Кузнецов Иван Андреевич","doc_034@clinic.com","pass_doctor","doctor"
-"doc_035","Смирнова Анна Владимировна","doc_035@clinic.com","pass_doctor","doctor"
-"doc_036","Волков Пётр Иванович","doc_036@clinic.com","pass_doctor","doctor"
-"doc_037","Морозова Дмитрий Петровна","doc_037@clinic.com","pass_doctor","doctor"
-"doc_038","Новиков Сергей Сергеевич","doc_038@clinic.com","pass_doctor","doctor"
-"doc_039","Фёдоров Алексей Андреевич","doc_039@clinic.com","pass_doctor","doctor"
-"doc_040","Васильева Елена Владимировна","doc_040@clinic.com","pass_doctor","doctor"
-"pat_0001","Иванов Иван","pat_0001@mail.com","pass_patient","patient"
-"pat_0002","Петрова Анна","pat_0002@mail.com","pass_patient","patient"
-"pat_0003","Сидоров Пётр","pat_0003@mail.com","pass_patient","patient"
-"pat_0004","Кузнецова Мария","pat_0004@mail.com","pass_patient","patient"
-"pat_0005","Смирнов Дмитрий","pat_0005@mail.com","pass_patient","patient"
-"pat_0006","Волкова Елена","pat_0006@mail.com","pass_patient","patient"
-"pat_0007","Морозов Алексей","pat_0007@mail.com","pass_patient","patient"
-"pat_0008","Новикова Ольга","pat_0008@mail.com","pass_patient","patient"
-"pat_0009","Фёдоров Сергей","pat_0009@mail.com","pass_patient","patient"
-"pat_0010","Васильева Татьяна","pat_0010@mail.com","pass_patient","patient"
-"pat_0011","Иванова Анна","pat_0011@mail.com","pass_patient","patient"
-"pat_0012","Петров Иван","pat_0012@mail.com","pass_patient","patient"
-"pat_0013","Сидорова Мария","pat_0013@mail.com","pass_patient","patient"
-"pat_0014","Кузнецов Дмитрий","pat_0014@mail.com","pass_patient","patient"
-"pat_0015","Смирнова Елена","pat_0015@mail.com","pass_patient","patient"
-"pat_0016","Волков Алексей","pat_0016@mail.com","pass_patient","patient"
-"pat_0017","Морозова Ольга","pat_0017@mail.com","pass_patient","patient"
-"pat_0018","Новиков Иван","pat_0018@mail.com","pass_patient","patient"
-"pat_0019","Фёдорова Анна","pat_0019@mail.com","pass_patient","patient"
-"pat_0020","Васильев Пётр","pat_0020@mail.com","pass_patient","patient"
-"admin_001","Петрова Анна Сергеевна","admin_001@clinic.com","pass_admin","admin"
-"admin_002","Сидоров Дмитрий Иванович","admin_002@clinic.com","pass_admin","admin"
-"admin_003","Кузнецова Елена Петровна","admin_003@clinic.com","pass_admin","admin"
-"admin_004","Смирнов Алексей Владимирович","admin_004@clinic.com","pass_admin","admin"
-"admin_005","Васильева Ольга Андреевна","admin_005@clinic.com","pass_admin","admin"
+D1,Иванов Иван Иванович,ivanov@clinic.ru,123,doctor
+D2,Петрова Мария Сергеевна,petrova@clinic.ru,123,doctor
+D3,Сидоров Алексей Петрович,sidorov@clinic.ru,123,doctor
+D4,Кузнецова Елена Владимировна,kuznetsova@clinic.ru,123,doctor
+D5,Смирнов Андрей Андреевич,smirnov@clinic.ru,123,doctor
+D6,Васильева Ольга Дмитриевна,vasilyeva@clinic.ru,123,doctor
+D7,Федоров Игорь Павлович,fedorov@clinic.ru,123,doctor
+D8,Михайлова Татьяна Сергеевна,mikhailova@clinic.ru,123,doctor
+D9,Новиков Дмитрий Алексеевич,novikov@clinic.ru,123,doctor
+D10,Соколова Анна Владимировна,sokolova@clinic.ru,123,doctor
+P001,Пациент 001,patient001@mail.ru,123,patient
+P002,Пациент 002,patient002@mail.ru,123,patient
+P003,Пациент 003,patient003@mail.ru,123,patient
+P004,Пациент 004,patient004@mail.ru,123,patient
+P005,Пациент 005,patient005@mail.ru,123,patient
+P006,Пациент 006,patient006@mail.ru,123,patient
+P007,Пациент 007,patient007@mail.ru,123,patient
+P008,Пациент 008,patient008@mail.ru,123,patient
+P009,Пациент 009,patient009@mail.ru,123,patient
+P010,Пациент 010,patient010@mail.ru,123,patient
+P011,Пациент 011,patient011@mail.ru,123,patient
+P012,Пациент 012,patient012@mail.ru,123,patient
+P013,Пациент 013,patient013@mail.ru,123,patient
+P014,Пациент 014,patient014@mail.ru,123,patient
+P015,Пациент 015,patient015@mail.ru,123,patient
+A1,Администратор,admin@clinic.ru,123,admin

@@ -68,7 +68,7 @@
     <!-- Врачи по специальности -->
     <div class="section">
         <h3>👨‍⚕️ 2. Врачи по специальности</h3>
-        <input type="text" id="specName" placeholder="Название специальности" value="speciality1">
+        <input type="text" id="specName" placeholder="Название специальности" value="Терапевт">
         <button onclick="getDoctorsBySpeciality()">Найти врачей</button>
     </div>
 
@@ -76,7 +76,7 @@
     <div class="section">
         <h3>📅 3. Слоты на дату по специальности</h3>
         <input type="date" id="slotDate" value="2025-05-20">
-        <input type="text" id="slotSpec" placeholder="Специальность" value="speciality1">
+        <input type="text" id="slotSpec" placeholder="Специальность" value="Терапевт">
         <button onclick="getSlotsByDateAndSpec()">Показать слоты</button>
     </div>
 
@@ -92,7 +92,7 @@
     <div class="section">
         <h3>📝 5. Создать запись</h3>
         <input type="text" id="appDoctorId" placeholder="ID врача" value="D1">
-        <input type="text" id="appDateTime" placeholder="Дата время" value="2025-05-20 10:00">
+        <input type="text" id="appDateTime" placeholder="Дата время" value="2025-05-20 14:00">
         <button onclick="createAppointment()">Записаться</button>
         <p style="color:gray">patientCode берётся из localStorage (после входа)</p>
     </div>
@@ -107,8 +107,8 @@
     <!-- Отмена записи -->
     <div class="section">
         <h3>❌ 7. Отменить запись</h3>
-        <input type="text" id="cancelDoctorId" placeholder="ID врача" value="1">
-        <input type="text" id="cancelDateTime" placeholder="Дата время" value="2025-05-20 10:00">
+        <input type="text" id="cancelDoctorId" placeholder="ID врача" value="D1">
+        <input type="text" id="cancelDateTime" placeholder="Дата время" value="2025-05-20 14:00">
         <input type="text" id="cancelReason" placeholder="Причина" value="Тест отмены">
         <button onclick="cancelAppointment()">Отменить</button>
     </div>
@@ -245,6 +245,7 @@
             } catch (e) { showResult('Ошибка: ' + e.message); }
         }
 
+        // 11. Записи врача на дату
         async function getDoctorAppointments() {
             const doctorId = document.getElementById('doctorAppointmentsId').value;
             const date = document.getElementById('doctorAppointmentsDate').value;
@@ -256,6 +257,7 @@
             } catch (e) { showResult('Ошибка: ' + e.message); }
         }
 
+        // 12. Врачи, работающие в дату
         async function getWorkingDoctors() {
             const date = document.getElementById('workingDoctorsDate').value;
             if (!date) { showResult('Выберите дату'); return; }

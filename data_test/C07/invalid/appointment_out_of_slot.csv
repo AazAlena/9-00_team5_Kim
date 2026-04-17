@@ -1,2 +1,0 @@
-appt_id,doctor_id,patient_code,slot_datetime,status
-"appt_999","doc_1","pat_101","2024-10-21 18:00:00","booked"

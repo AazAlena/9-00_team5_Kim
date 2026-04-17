@@ -1,10 +1,27 @@
 id,fio,email,password,role
-"doc_1","Иванова Анна Петровна","doctor1@clinic.com","pass1","doctor"
-"doc_2","Петров Сергей Иванович","doctor2@clinic.com","pass2","doctor"
-"doc_3","Сидорова Мария Владимировна","doctor3@clinic.com","pass3","doctor"
-"doc_4","Сидорова Мария Владимировна2","doctor4@clinic.com","pass4","doctor"
-"pat_101","Алексеев Дмитрий Викторович","pat1@mail.com","userpass1","patient"
-"pat_102","Борисова Елена Андреевна","pat2@mail.com","userpass2","patient"
-"pat_103","Васильев Игорь Павлович","pat3@mail.com","userpass3","patient"
-"pat_104","Григорьева Светлана Олеговна","pat4@mail.com","userpass4","patient"
-"pat_105","Дмитриев Алексей Николаевич","pat5@mail.com","userpass5","patient"
+D1,Иванов Иван Иванович,ivanov@clinic.ru,123,doctor
+D2,Петрова Мария Сергеевна,petrova@clinic.ru,123,doctor
+D3,Сидоров Алексей Петрович,sidorov@clinic.ru,123,doctor
+D4,Кузнецова Елена Владимировна,kuznetsova@clinic.ru,123,doctor
+D5,Смирнов Андрей Андреевич,smirnov@clinic.ru,123,doctor
+D6,Васильева Ольга Дмитриевна,vasilyeva@clinic.ru,123,doctor
+D7,Федоров Игорь Павлович,fedorov@clinic.ru,123,doctor
+D8,Михайлова Татьяна Сергеевна,mikhailova@clinic.ru,123,doctor
+D9,Новиков Дмитрий Алексеевич,novikov@clinic.ru,123,doctor
+D10,Соколова Анна Владимировна,sokolova@clinic.ru,123,doctor
+P001,Пациент 001,patient001@mail.ru,123,patient
+P002,Пациент 002,patient002@mail.ru,123,patient
+P003,Пациент 003,patient003@mail.ru,123,patient
+P004,Пациент 004,patient004@mail.ru,123,patient
+P005,Пациент 005,patient005@mail.ru,123,patient
+P006,Пациент 006,patient006@mail.ru,123,patient
+P007,Пациент 007,patient007@mail.ru,123,patient
+P008,Пациент 008,patient008@mail.ru,123,patient
+P009,Пациент 009,patient009@mail.ru,123,patient
+P010,Пациент 010,patient010@mail.ru,123,patient
+P011,Пациент 011,patient011@mail.ru,123,patient
+P012,Пациент 012,patient012@mail.ru,123,patient
+P013,Пациент 013,patient013@mail.ru,123,patient
+P014,Пациент 014,patient014@mail.ru,123,patient
+P015,Пациент 015,patient015@mail.ru,123,patient
+A1,Администратор,admin@clinic.ru,123,admin
