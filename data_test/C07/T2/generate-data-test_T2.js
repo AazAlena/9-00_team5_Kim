@@ -4,7 +4,7 @@ const path = require('path');
 // ============================================
 // НАСТРОЙКИ T2
 // ============================================
-const DATA_DIR = path.join(__dirname, 'data');
+const DATA_DIR = path.join(__dirname);
 
 // Количество
 const DOCTOR_COUNT = 30;      // 30 врачей
