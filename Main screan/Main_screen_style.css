@@ -328,7 +328,7 @@ nav>a:hover{
     transition: background-color 0.5s, color 0.5s;
 }
 #reg_butt:hover{
-    background-color: #070062;
+    background-color: #6277bc;
     color: #efefff;
 }
 #a{
@@ -422,6 +422,9 @@ footer>p{
     }
     #main_fill{
         margin-top: calc(185px * (1280 / 1420));
+    }
+    #main_fill>h1{
+        font-size: 96px;
     }
     .appt_but{
         width: 1280px;
