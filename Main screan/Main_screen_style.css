@@ -362,6 +362,11 @@ footer>p{
     margin: 0px 60px 10px;
 }
 
+::selection{
+    background-color: #6277bc;
+    color: #efefff;
+}
+
 
 
 @media (max-width: 1280px) {
