@@ -1,0 +1,102 @@
+#Registration{
+    height: 900px;
+    margin: 65px auto;
+    font-family: 'Comic relief', monospace;
+    font-size: 32px;
+}
+.regfill_bg{
+    background-color: #B2C8FF;
+    color: #070062;
+    width: 750px;
+    height: 900px;
+    border-radius: 20px;
+    margin: 0px auto;
+    text-align: center;
+}
+.regfill{
+    width: 700px;
+    height: 800px;
+    margin: 50px auto;
+    position: relative;
+    top: 50px;
+}
+.regfill>h1{
+    height: 85px;
+    font-size: 64px;
+    margin: 50px auto 0px;
+}
+#reg_form>input{
+    background-color: #efefff;
+    width: 660px;
+    height: 75px;
+    font-family: 'Comic relief', monospace;
+    font-size: 24px;
+    padding: 0px 20px;
+    margin-bottom: 35px;
+    border-radius: 10px;
+    border-style: none;
+}
+#reg_form>input:focus{
+    background-color: white;
+}
+#reg_form>label{
+    height: 45px;
+    display: block;
+    text-align: start;
+}
+.eye_butt{
+    width: 55px;
+    height: 55px;
+    background-color: rgba(1, 1, 1, 0);
+    border-style: none;
+    padding: 0px;
+    display: block;
+}
+.eye_butt>img{
+    width: 55px;
+    height: 55px;
+}
+#eye_close1{
+    position: relative;
+    bottom: 350px;
+    left: 650px;
+    cursor: pointer;
+}
+#eye_close2{
+    position: relative;
+    bottom: 250px;
+    left: 650px;
+    cursor: pointer;
+}
+#reg_butt{
+    background-color: #070062;
+    color: #efefff;
+    width: 350px;
+    height: 80px;
+    font-family: 'Comic relief', monospace;
+    font-size: 32px;
+    border-radius: 10px;
+    border-style: none;
+    display: block;
+    margin: 15px auto 0px;
+    transition: background-color 0.5s, color 0.5s;
+}
+#reg_butt:hover{
+    background-color: #6277bc;
+    color: #efefff;
+}
+#a{
+    width: 300px;
+    display: block;
+    margin: 10px auto 0px;
+    text-decoration: none;
+    text-align: center;
+}
+#a:hover{
+    color: #6277bc;
+}
+
+::selection{
+    background-color: #6277bc;
+    color: #efefff;
+}

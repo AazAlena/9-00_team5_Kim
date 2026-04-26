@@ -1,0 +1,141 @@
+body, main, button{
+    font-family: 'Comic Relief', monospace;
+    margin: 0px;
+}
+
+#nav{
+    width: 160px;
+    height: 345px;
+    position: absolute;
+    top: 50px;
+    left: 50px;
+}
+#nav_butt{
+    width: 60px;
+    height: 48px;
+    background-color: rgba(1, 1, 0, 0);
+    border-style: none;
+    padding: 0px;
+    margin-bottom: 25px;
+    cursor: pointer;
+}
+#nav_butt>img{
+    width: 60px;
+    height: 48px;
+}
+#nav_fill>button{
+    background-color: rgba(1, 1, 0, 0);
+    color: #070062;
+    width: 160px;
+    font-size: 32px;
+    border: none;
+    padding: 0px;
+    margin-top: 25px;
+    text-align: start;
+    cursor: pointer;
+
+}
+/* #nav_fill{
+    display: none;
+} */
+
+#bg{
+    background-color: #b2c8ff;
+    width: 1420px;
+    height: 100vh;
+    margin: 0px auto;
+    display: flex;
+    flex-direction: row;
+}
+
+.sec{
+    width: 650px;
+    height: 900px;
+    margin: 65px 30px 0px;
+    display: inline-block;
+}
+
+.first{
+    color: #070062;
+    width: 600px;
+    height: 790px;
+    border: 2px solid #070062;
+    border-radius: 10px;
+    padding: 55px 25px 55px;
+    margin-bottom: 65px;
+}
+label{
+    height: 60px;
+    font-size: 40px;
+}
+select{
+    background-color: #efefff;
+    color: #070062;
+    width: 600px;
+    height: 80px;
+    font-size: 32px;
+    border-radius: 10px;
+    border-style: none;
+    padding: 0px 20px;
+    appearance: none;
+    cursor: pointer;
+}
+select:hover{
+    background-color: #ffffff;
+}
+.item>button{
+    background-color: #b2c8ff;
+    color: #070062;
+    width: 60px;
+    height: 60px;
+    font-family: 'Comic Relief', monospace;
+    font-size: 40px;
+    border-radius: 5px;
+    border-style: none;
+}
+.day{
+    width: 60px;
+    height: 50px;
+    font-size: 40px;
+    padding-top: 10px;
+}
+.item{
+    width: 60px;
+    height: 58px;
+    font-size: 40px;
+}
+#calendar{
+    width: 600px;
+    height: 596px;
+    border-top: 2px solid #070062;
+    border-bottom: 2px solid #070062;
+    margin: 55px 0px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.second{
+    background-color: #6277bc;
+    height: calc(100vh - 65px);
+    margin-top: 65px;
+    border-radius: 10px 10px 0px 0px;
+}
+h1{
+    color: #efefff;
+    height: 67px;
+    font-family: 'Comic Relief', monospace;
+    font-size: 48px;
+    margin: 55px 25px 23px;
+}
+hr{
+    background-color: #efefff;
+    height: 2px;
+    border-style: none;
+}
+
+::selection{
+    background-color: #6277bc;
+    color: #efefff;
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="ch2_date_style.css">
+    <title>Choice_2_date</title>
+</head>
+
+<body>
+    <main>
+        <div class="conteiner">
+            <div class="h1">Выберите время</div>
+            <input
+                type="text"
+                class="search"
+                id="date"
+                placeholder="ДД.ММ" 
+                pattern="(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])" 
+                title="Введите дату в формате ДД.ММ"
+            >
+            <div class="alltimes">
+                <button class="alltimes-item">8:00</button>
+                <button class="alltimes-item">9:00</button>
+                <button class="alltimes-item">10:00</button>
+                <button class="alltimes-item">11:00</button>
+                <button class="alltimes-item">12:00</button>
+                <button class="alltimes-item">13:00</button>
+                <button class="alltimes-item">14:00</button>
+                <button class="alltimes-item">15:00</button>
+                <button class="alltimes-item">16:00</button>
+                <button class="alltimes-item">17:00</button>
+                <button class="alltimes-item">18:00</button>
+                <button class="alltimes-item">19:00</button>
+            </div>
+        </div>
+    </main>
+    <script src="./app.js"></script>
+</body>
+
+</html>

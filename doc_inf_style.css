@@ -1,0 +1,92 @@
+body{
+    max-width: 1920px;
+    min-width: 375px;
+    font-family: 'Comic Relief', monospace;
+    margin: 0px auto;
+}
+main{
+    background-color: #b2c8ff;
+    width: 1420px;
+    height: 2620px;
+    margin: 0px auto;
+}
+#title{
+    color: #070062;
+    font-size: 96px;
+    margin: 0px;
+    padding: 80px 30px 37px;
+}
+hr{
+    background-color: #6277bc;
+    width: 1270px;
+    height: 6px;
+    border-radius: 8px;
+    border-style: none;
+    margin: 0px auto;
+}
+#first{
+    margin: 39px 30px 80px;
+}
+#first>h2{
+    margin-top: 37px;
+}
+section{
+    margin: 80px 30px;
+}
+h2{
+    color: #070062;
+    font-size: 64px;
+}
+section>div{
+    color: #6277bc;
+    font-size: 48px;
+}
+
+
+.comments{
+    font-size: 32px;
+    display: flex;
+    justify-content: start;
+    gap: 50px;
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+.comment-item{
+    flex-shrink: 0;
+    background-color: #efefff;
+    color: #070062;
+    border-radius: 10px;
+    width: 700px;
+    height: 350px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#arrow{
+    background-color: rgba(1, 1, 1, 0);
+    width: 60px;
+    height: 50px;
+    border-style: none;
+    position: absolute;
+    top: calc(2520px);
+    right: 110px;
+    cursor: pointer;
+}
+#arrow>img{
+    width: 62px;
+    height: 50px;
+}
+
+::selection{
+    background-color: #6277bc;
+    color: #efefff;
+}
+
+@media (max-width: 1420px) {
+    main{
+        width: 100%;
+    }
+}

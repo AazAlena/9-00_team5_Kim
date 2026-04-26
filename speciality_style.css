@@ -1,0 +1,85 @@
+*{
+    box-sizing: border-box;
+}
+body{
+    font-family: 'Comic Relief', monospace;
+    margin: 0px;
+}
+main{
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.conteiner{
+    background-color: #b2c8ff;
+    width: 1420px;
+    height: 100vh;
+    padding: 100px 205px 0px 205px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: column;
+    gap:50px;
+}
+
+.h1{
+    color: #070062;
+    width: 1010px;
+    font-size: 64px;
+    text-align: center;
+}
+
+.search{
+    background-color: #efefff;
+    width: 100%;
+    height: 80px;
+    font-family: 'Comic Relief', monospace;
+    font-size: 32px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    padding: 10px 20px 10px 67px;
+    background-image: url(./images/poisk.svg);
+    background-size: 47px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+.search:focus{
+    background-color: #ffffff;
+}
+
+.allspecialties{
+    background-color: #6277bc;
+    width: 100%;
+    height: 660px;
+    border-radius: 10px 10px 0px 0px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+.allspecialties-item{
+    background-color: #efefff;
+    color: #070062;
+    width: 100%;
+    font-family: 'Comic Relief', monospace;
+    font-size: 40px;
+    padding: 30px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+.allspecialties-item:hover{
+    background-color: #ffffff;
+}
+
+::selection{
+    background-color: #6277bc;
+    color: #efefff;
+}

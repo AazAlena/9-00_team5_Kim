@@ -1,0 +1,59 @@
+body, button{
+    font-family: 'Comic Relief', monospace;
+    margin: 0px;
+}
+
+#comment{
+    background-color: #B2C8FF;
+    width: 1420px;
+    height: calc(100vh - 125px);
+    padding: 125px 0px 0px;
+    margin: 0px auto;
+}
+
+label{
+    color: #070062;
+    height: 180px;
+    font-size: 64px;
+    margin: 0px 100px 50px;
+    display: block;
+}
+
+textarea{
+    background-color: #efefff;
+    color: #6277bc;
+    width: 1060px;
+    height: 390px;
+    font-size: 32px;
+    border-radius: 20px;
+    border-style: none;
+    padding: 30px;
+    margin: 0px 150px 50px;
+    resize: none;
+}
+textarea:focus{
+    background-color: #ffffff;
+}
+::placeholder{
+    color: #6277bc;
+}
+
+button{
+    background-color: #6277bc;
+    color: #efefff;
+    width: 500px;
+    height: 80px;
+    font-size: 32px;
+    border-radius: 10px;
+    border-style: none;
+    margin: 0px auto;
+    display: block;
+}
+button:hover{
+    background-color: #070062;
+}
+
+::selection{
+    background-color: #6277bc;
+    color: #efefff;
+}
