@@ -1,14 +1,14 @@
 id,fio,email,password,role
-D1,Иванов Иван Иванович,ivanov@clinic.ru,123,doctor
-D2,Петрова Мария Сергеевна,petrova@clinic.ru,123,doctor
-D3,Сидоров Алексей Петрович,sidorov@clinic.ru,123,doctor
-D4,Кузнецова Елена Владимировна,kuznetsova@clinic.ru,123,doctor
-D5,Смирнов Андрей Андреевич,smirnov@clinic.ru,123,doctor
-D6,Васильева Ольга Дмитриевна,vasilyeva@clinic.ru,123,doctor
-D7,Федоров Игорь Павлович,fedorov@clinic.ru,123,doctor
-D8,Михайлова Татьяна Сергеевна,mikhailova@clinic.ru,123,doctor
-D9,Новиков Дмитрий Алексеевич,novikov@clinic.ru,123,doctor
-D10,Соколова Анна Владимировна,sokolova@clinic.ru,123,doctor
+D1,Врач 1,doctor1@clinic.ru,123,doctor
+D2,Врач 2,doctor2@clinic.ru,123,doctor
+D3,Врач 3,doctor3@clinic.ru,123,doctor
+D4,Врач 4,doctor4@clinic.ru,123,doctor
+D5,Врач 5,doctor5@clinic.ru,123,doctor
+D6,Врач 6,doctor6@clinic.ru,123,doctor
+D7,Врач 7,doctor7@clinic.ru,123,doctor
+D8,Врач 8,doctor8@clinic.ru,123,doctor
+D9,Врач 9,doctor9@clinic.ru,123,doctor
+D10,Врач 10,doctor10@clinic.ru,123,doctor
 P001,Пациент 001,patient001@mail.ru,123,patient
 P002,Пациент 002,patient002@mail.ru,123,patient
 P003,Пациент 003,patient003@mail.ru,123,patient
@@ -24,4 +24,19 @@ P012,Пациент 012,patient012@mail.ru,123,patient
 P013,Пациент 013,patient013@mail.ru,123,patient
 P014,Пациент 014,patient014@mail.ru,123,patient
 P015,Пациент 015,patient015@mail.ru,123,patient
+P016,Пациент 016,patient016@mail.ru,123,patient
+P017,Пациент 017,patient017@mail.ru,123,patient
+P018,Пациент 018,patient018@mail.ru,123,patient
+P019,Пациент 019,patient019@mail.ru,123,patient
+P020,Пациент 020,patient020@mail.ru,123,patient
+P021,Пациент 021,patient021@mail.ru,123,patient
+P022,Пациент 022,patient022@mail.ru,123,patient
+P023,Пациент 023,patient023@mail.ru,123,patient
+P024,Пациент 024,patient024@mail.ru,123,patient
+P025,Пациент 025,patient025@mail.ru,123,patient
+P026,Пациент 026,patient026@mail.ru,123,patient
+P027,Пациент 027,patient027@mail.ru,123,patient
+P028,Пациент 028,patient028@mail.ru,123,patient
+P029,Пациент 029,patient029@mail.ru,123,patient
+P030,Пациент 030,patient030@mail.ru,123,patient
 A1,Администратор,admin@clinic.ru,123,admin

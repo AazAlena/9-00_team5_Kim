@@ -1,37 +1,45 @@
 const fs = require('fs');
 const path = require('path');
 
- 
+// ============================================
 // НАСТРОЙКИ
- 
+// ============================================
 const DATA_DIR = path.join(__dirname);
 
-// Специальности (id совпадает с id врача)
+const DOCTOR_COUNT = 10;
+const PATIENT_COUNT = 30;          // 30 пациентов
+const APPOINTMENT_COUNT = 300;     // 300 записей
+const WORK_DAYS = 4;               // 4 дня
+
+// Специальности
 const specialities = [
     { id: 'D1', name: 'Терапевт' },
     { id: 'D2', name: 'Кардиолог' },
     { id: 'D3', name: 'Хирург' },
     { id: 'D4', name: 'Невролог' },
-    { id: 'D5', name: 'Офтальмолог' }
+    { id: 'D5', name: 'Офтальмолог' },
+    { id: 'D6', name: 'Терапевт' },
+    { id: 'D7', name: 'Кардиолог' },
+    { id: 'D8', name: 'Хирург' },
+    { id: 'D9', name: 'Невролог' },
+    { id: 'D10', name: 'Офтальмолог' }
 ];
 
 // Врачи
-const doctors = [
-    { id: 'D1', fio: 'Иванов Иван Иванович', email: 'ivanov@clinic.ru', password: '123', role: 'doctor' },
-    { id: 'D2', fio: 'Петрова Мария Сергеевна', email: 'petrova@clinic.ru', password: '123', role: 'doctor' },
-    { id: 'D3', fio: 'Сидоров Алексей Петрович', email: 'sidorov@clinic.ru', password: '123', role: 'doctor' },
-    { id: 'D4', fio: 'Кузнецова Елена Владимировна', email: 'kuznetsova@clinic.ru', password: '123', role: 'doctor' },
-    { id: 'D5', fio: 'Смирнов Андрей Андреевич', email: 'smirnov@clinic.ru', password: '123', role: 'doctor' },
-    { id: 'D6', fio: 'Васильева Ольга Дмитриевна', email: 'vasilyeva@clinic.ru', password: '123', role: 'doctor' },
-    { id: 'D7', fio: 'Федоров Игорь Павлович', email: 'fedorov@clinic.ru', password: '123', role: 'doctor' },
-    { id: 'D8', fio: 'Михайлова Татьяна Сергеевна', email: 'mikhailova@clinic.ru', password: '123', role: 'doctor' },
-    { id: 'D9', fio: 'Новиков Дмитрий Алексеевич', email: 'novikov@clinic.ru', password: '123', role: 'doctor' },
-    { id: 'D10', fio: 'Соколова Анна Владимировна', email: 'sokolova@clinic.ru', password: '123', role: 'doctor' }
-];
+const doctors = [];
+for (let i = 1; i <= DOCTOR_COUNT; i++) {
+    doctors.push({
+        id: `D${i}`,
+        fio: `Врач ${i}`,
+        email: `doctor${i}@clinic.ru`,
+        password: '123',
+        role: 'doctor'
+    });
+}
 
-// Пациенты
+// Пациенты (30 штук)
 const patients = [];
-for (let i = 1; i <= 15; i++) {
+for (let i = 1; i <= PATIENT_COUNT; i++) {
     const num = i.toString().padStart(3, '0');
     patients.push({
         id: `P${num}`,
@@ -47,10 +55,19 @@ const admin = [
     { id: 'A1', fio: 'Администратор', email: 'admin@clinic.ru', password: '123', role: 'admin' }
 ];
 
-// Рабочие дни (даты)
-const workDates = ['2025-05-20', '2025-05-21', '2025-05-22', '2025-05-23'];
+// Рабочие дни
+const workDates = [];
+const startDate = new Date(2025, 4, 20); // 20 мая 2025
+for (let i = 0; i < WORK_DAYS; i++) {
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + i);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    workDates.push(`${year}-${month}-${day}`);
+}
 
-// Расписание для каждого врача
+// Расписание для каждого врача (30-минутные слоты)
 const doctorSchedules = {
     D1: { start: '09:00', end: '17:00', break_start: '13:00', break_end: '14:00' },
     D2: { start: '10:00', end: '18:00', break_start: '14:00', break_end: '15:00' },
@@ -74,38 +91,52 @@ const cancelReasons = [
     'Болезнь врача'
 ];
 
- 
+// ============================================
 // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
- 
+// ============================================
 
-function getAllAvailableHoursForDoctor(doctorId, date, workSlots) {
-    // Находим слот для этого врача на эту дату
-    const slot = workSlots.find(ws => ws.id === doctorId && ws.date === date);
-    if (!slot) return [];
-    
-    const startHour = parseInt(slot.start_time.split(':')[0]);
-    const endHour = parseInt(slot.end_time.split(':')[0]);
-    const slotMinutes = slot.slots_minutes;
-    const stepHours = slotMinutes / 60;
-    
-    const breakStartHour = slot.break_start ? parseInt(slot.break_start.split(':')[0]) : null;
-    const breakEndHour = slot.break_end ? parseInt(slot.break_end.split(':')[0]) : null;
-    
-    const hours = [];
-    for (let hour = startHour; hour < endHour; hour += stepHours) {
-        // Пропускаем перерыв
-        if (breakStartHour !== null && hour >= breakStartHour && hour < breakEndHour) {
-            continue;
-        }
-        const timeStr = `${Math.floor(hour).toString().padStart(2, '0')}:00`;
-        hours.push(timeStr);
-    }
-    return hours;
+// Переводит время в минуты от начала дня
+function toMinutes(timeStr) {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
 }
 
- 
+// Переводит минуты в формат HH:MM
+function toTimeStr(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
+
+// Генерирует все возможные слоты для врача на дату (с учётом перерыва и длительности слота)
+function generateTimeSlotsForDoctor(doctorId, date, schedules, slotMinutes = 30) {
+    const schedule = schedules[doctorId];
+    if (!schedule) return [];
+    
+    const startMin = toMinutes(schedule.start);
+    const endMin = toMinutes(schedule.end);
+    const breakStartMin = schedule.break_start ? toMinutes(schedule.break_start) : null;
+    const breakEndMin = schedule.break_end ? toMinutes(schedule.break_end) : null;
+    
+    const slots = [];
+    for (let current = startMin; current < endMin; current += slotMinutes) {
+        // Пропускаем перерыв
+        if (breakStartMin !== null && current >= breakStartMin && current < breakEndMin) {
+            continue;
+        }
+        slots.push({
+            doctor_id: doctorId,
+            date: date,
+            time: toTimeStr(current),
+            slot_datetime: `${date} ${toTimeStr(current)}`
+        });
+    }
+    return slots;
+}
+
+// ============================================
 // ГЕНЕРАЦИЯ ФАЙЛОВ
- 
+// ============================================
 
 // 1. speciality.csv
 function generateSpeciality() {
@@ -125,10 +156,10 @@ function generateUsers() {
         csv += `${u.id},${u.fio},${u.email},${u.password},${u.role}\n`;
     });
     fs.writeFileSync(path.join(DATA_DIR, 'user.csv'), csv, 'utf8');
-    console.log('✅ user.csv');
+    console.log(`✅ user.csv (${allUsers.length} пользователей)`);
 }
 
-// 3. work_slot.csv
+// 3. work_slot.csv (30-минутные слоты)
 function generateWorkSlots() {
     let csv = 'id,date,start_time,end_time,slots_minutes,break_start,break_end\n';
     
@@ -137,66 +168,46 @@ function generateWorkSlots() {
         if (!schedule) continue;
         
         for (const date of workDates) {
-            csv += `${doctor.id},${date},${schedule.start},${schedule.end},60,${schedule.break_start},${schedule.break_end}\n`;
+            // В work_slot хранится шаблон рабочего дня, а не каждый слот отдельно
+            // slots_minutes = 30 означает, что слоты будут по 30 минут
+            csv += `${doctor.id},${date},${schedule.start},${schedule.end},30,${schedule.break_start},${schedule.break_end}\n`;
         }
     }
     
     fs.writeFileSync(path.join(DATA_DIR, 'work_slot.csv'), csv, 'utf8');
-    console.log('✅ work_slot.csv');
+    console.log(`✅ work_slot.csv (${doctors.length * workDates.length} записей)`);
 }
 
-// 4. appointment.csv (200 записей) и canceled_appointment.csv
+// 4. appointment.csv и canceled_appointment.csv
 function generateAppointmentsAndCancelled() {
-    // Сначала генерируем work_slot, чтобы знать доступные часы
-    const workSlots = [];
+    // Генерируем все возможные слоты (30-минутные)
+    const allPossibleSlots = [];
+    
     for (const doctor of doctors) {
-        const schedule = doctorSchedules[doctor.id];
-        if (!schedule) continue;
         for (const date of workDates) {
-            workSlots.push({
-                id: doctor.id,
-                date: date,
-                start_time: schedule.start,
-                end_time: schedule.end,
-                slots_minutes: 60,
-                break_start: schedule.break_start,
-                break_end: schedule.break_end
-            });
+            const slots = generateTimeSlotsForDoctor(doctor.id, date, doctorSchedules, 30);
+            allPossibleSlots.push(...slots);
         }
     }
     
-    // Собираем все возможные варианты записи (врач, дата, время)
-    const allPossibleAppointments = [];
-    for (const slot of workSlots) {
-        const hours = getAllAvailableHoursForDoctor(slot.id, slot.date, workSlots);
-        for (const hour of hours) {
-            allPossibleAppointments.push({
-                doctor_id: slot.id,
-                date: slot.date,
-                time: hour,
-                slot_datetime: `${slot.date} ${hour}`
-            });
-        }
-    }
+    console.log(`   Всего возможных слотов: ${allPossibleSlots.length}`);
     
-    console.log(`   Возможных слотов для записи: ${allPossibleAppointments.length}`);
-    
-    // Берём случайные 200 записей (или меньше, если недостаточно)
-    const targetCount = Math.min(200, allPossibleAppointments.length);
-    const shuffled = [...allPossibleAppointments];
+    // Перемешиваем и выбираем APPOINTMENT_COUNT слотов
+    const shuffled = [...allPossibleSlots];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    const selectedAppointments = shuffled.slice(0, targetCount);
     
-    // Генерируем статусы (80% booked, 20% cancelled)
+    const selectedSlots = shuffled.slice(0, Math.min(APPOINTMENT_COUNT, shuffled.length));
+    
+    // Генерируем записи (15% cancelled)
     const appointments = [];
     const cancelledList = [];
     let nextId = 1;
     
-    for (const apt of selectedAppointments) {
-        const isCancelled = Math.random() < 0.2; // 20% cancelled
+    for (const slot of selectedSlots) {
+        const isCancelled = Math.random() < 0.15; // 15% cancelled
         const status = isCancelled ? 'cancelled' : 'booked';
         
         // Случайный пациент
@@ -204,9 +215,9 @@ function generateAppointmentsAndCancelled() {
         
         appointments.push({
             appt_id: nextId,
-            doctor_id: apt.doctor_id,
+            doctor_id: slot.doctor_id,
             patient_code: patient.id,
-            slot_datetime: apt.slot_datetime,
+            slot_datetime: slot.slot_datetime,
             status: status
         });
         
@@ -237,11 +248,12 @@ function generateAppointmentsAndCancelled() {
     fs.writeFileSync(path.join(DATA_DIR, 'canceled_appointment.csv'), cancelledCsv, 'utf8');
     console.log(`✅ canceled_appointment.csv (${cancelledList.length} записей)`);
 }
- 
-// ЗАПУСК
- 
 
-console.log('\n🚀 Начинаем генерацию тестовых данных T1...\n');
+// ============================================
+// ЗАПУСК
+// ============================================
+
+console.log('\n🚀 Начинаем генерацию тестовых данных T1\n');
 
 if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -251,5 +263,13 @@ generateSpeciality();
 generateUsers();
 generateWorkSlots();
 generateAppointmentsAndCancelled();
+
+console.log('\n✅ Генерация T1 завершена! Файлы сохранены в папку data/\n');
+console.log('📊 Статистика T1:');
+console.log(`   - Врачей: ${DOCTOR_COUNT}`);
+console.log(`   - Пациентов: ${PATIENT_COUNT}`);
+console.log(`   - Рабочих дней: ${WORK_DAYS}`);
+console.log(`   - Длительность слота: 30 минут`);
+console.log(`   - Записей: ~${APPOINTMENT_COUNT} (15% отменённых)`);
 
 console.log('\n✅ Генерация завершена! Файлы сохранены в папку data/\n');

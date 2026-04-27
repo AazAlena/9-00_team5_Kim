@@ -93,7 +93,7 @@ module.exports = function (app) {
     });
 
 
-    // Вспомогательная функция генерации слотов
+    /*// Вспомогательная функция генерации слотов ПРОШЛАЯ
     function generateSlotsForDay(start_time, end_time, slot_minutes, break_start, break_end, hasBooking) {
         const slots = [];
         const startHour = parseInt(start_time.split(':')[0]);
@@ -108,6 +108,47 @@ module.exports = function (app) {
             const timeStr = `${hour.toString().padStart(2, '0')}:00`;
             slots.push({ time: timeStr, available: !hasBooking });
         }
+        return slots;
+    }*/
+    // Вспомогательная функция генерации слотов НоОВАЯ
+    function generateSlotsForDay(start_time, end_time, slot_minutes, break_start, break_end, hasBooking) {
+        const slots = [];
+
+        // Переводим время в минуты от начала дня
+        function toMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        // Переводим минуты обратно в формат HH:MM
+        function toTimeStr(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+        }
+
+        const startMin = toMinutes(start_time);
+        const endMin = toMinutes(end_time);
+        const slotStep = slot_minutes;
+
+        let breakStartMin = null;
+        let breakEndMin = null;
+        if (break_start && break_end) {
+            breakStartMin = toMinutes(break_start);
+            breakEndMin = toMinutes(break_end);
+        }
+
+        // Генерируем слоты с шагом slot_minutes
+        for (let current = startMin; current < endMin; current += slotStep) {
+            // Пропускаем перерыв
+            if (breakStartMin !== null && current >= breakStartMin && current < breakEndMin) {
+                continue;
+            }
+
+            const timeStr = toTimeStr(current);
+            slots.push({ time: timeStr, available: !hasBooking });
+        }
+
         return slots;
     }
 
@@ -190,36 +231,57 @@ module.exports = function (app) {
         if (!dateValidation.valid) {
             return res.status(400).json({ error: dateValidation.message });
         }
+
         db.get(`SELECT * FROM work_slot WHERE id = ? AND date = ?`, [doctorId, date], (err, workSlot) => {
             if (err) return res.status(500).json({ error: err.message });
             if (!workSlot) {
                 return res.status(404).json({ error: 'Расписание не найдено', message: `Врач ${doctorId} не работает ${date}` });
             }
+
             db.all(`SELECT strftime('%H:%M', slot_datetime) as time FROM appointment WHERE doctor_id = ? AND date(slot_datetime) = ? AND status = 'booked'`, [doctorId, date], (err, bookedRows) => {
                 if (err) return res.status(500).json({ error: err.message });
+
                 const bookedTimes = new Set(bookedRows.map(row => row.time));
                 const slots = [];
-                const startHour = parseInt(workSlot.start_time.split(':')[0]);
-                const endHour = parseInt(workSlot.end_time.split(':')[0]);
-                const slotMinutes = workSlot.slots_minutes;
-                const hasBreak = workSlot.break_start && workSlot.break_end;
-                let breakStartHour = null, breakEndHour = null;
-                if (hasBreak) {
-                    breakStartHour = parseInt(workSlot.break_start.split(':')[0]);
-                    breakEndHour = parseInt(workSlot.break_end.split(':')[0]);
+
+                // Вспомогательные функции
+                function toMinutes(timeStr) {
+                    const [hours, minutes] = timeStr.split(':').map(Number);
+                    return hours * 60 + minutes;
                 }
-                const stepHours = slotMinutes / 60;
-                for (let hour = startHour; hour < endHour; hour += stepHours) {
-                    if (hasBreak && hour >= breakStartHour && hour < breakEndHour) continue;
-                    const timeStr = `${Math.floor(hour).toString().padStart(2, '0')}:00`;
+
+                function toTimeStr(minutes) {
+                    const hours = Math.floor(minutes / 60);
+                    const mins = minutes % 60;
+                    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+                }
+
+                const startMin = toMinutes(workSlot.start_time);
+                const endMin = toMinutes(workSlot.end_time);
+                const stepMinutes = workSlot.slots_minutes;
+
+                let breakStartMin = null, breakEndMin = null;
+                if (workSlot.break_start && workSlot.break_end) {
+                    breakStartMin = toMinutes(workSlot.break_start);
+                    breakEndMin = toMinutes(workSlot.break_end);
+                }
+
+                for (let current = startMin; current < endMin; current += stepMinutes) {
+                    // Пропускаем перерыв
+                    if (breakStartMin !== null && current >= breakStartMin && current < breakEndMin) {
+                        continue;
+                    }
+
+                    const timeStr = toTimeStr(current);
                     slots.push({ time: timeStr, isAvailable: !bookedTimes.has(timeStr) });
                 }
+
                 res.json({
                     doctor: {
                         id: doctorId, date,
                         workHours: `${workSlot.start_time} - ${workSlot.end_time}`,
-                        break: hasBreak ? `${workSlot.break_start} - ${workSlot.break_end}` : null,
-                        slotDuration: `${slotMinutes} минут`
+                        break: (workSlot.break_start && workSlot.break_end) ? `${workSlot.break_start} - ${workSlot.break_end}` : null,
+                        slotDuration: `${workSlot.slots_minutes} минут`
                     },
                     slots
                 });
@@ -582,7 +644,7 @@ module.exports = function (app) {
             });
         });
     */
-   
+
     //7)поступает фио, почту, пароль пациента (регистрироваться могут исключительно пациенты, эту роль им нужно при регистрации ставить автоматически) - нужно записать нового пациента в бд
     //на главной странице есть форма регистрации и есть просто форма регистрации:
     //отдаю фио, почту, пароль пациента (роль: пациент тоже могу если надо)
