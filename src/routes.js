@@ -517,140 +517,155 @@ module.exports = function (app) {
             });
         });
     */
-    /*
-        // GET /report/utilization - отчет по утилизацииx
-        app.get('/report/utilization', (req, res) => {
-            const { startDate, endDate } = req.query;
-    
-            if (!startDate || !endDate) {
-                return res.status(400).json({ error: 'Нужны startDate и endDate' });
+    // GET /report/utilization - отчет по утилизации
+    app.get('/report/utilization', (req, res) => {
+        const { startDate, endDate } = req.query;
+
+        if (!startDate || !endDate) {
+            return res.status(400).json({ error: 'Нужны startDate и endDate' });
+        }
+
+        // 1. Получаем всех врачей (role = 'doctor')
+        db.all('SELECT id, fio FROM user WHERE role = ?', ['doctor'], (err, doctors) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
             }
-    
-            // 1. Получаем всех врачей
-            db.all('SELECT doctor_id, doctor_full_name, specialty FROM doctors', [], (err, doctors) => {
-                if (err) {
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-    
-                let result = [];
-                let totalSlotsAll = 0;
-                let totalBookedAll = 0;
-                let completed = 0;
-    
-                if (doctors.length === 0) {
-                    return res.json({
-                        doctors: [],
-                        summary: { total_slots: 0, total_booked: 0, total_utilization: 0 }
+
+            let result = [];
+            let totalSlotsAll = 0;
+            let totalBookedAll = 0;
+            let completed = 0;
+
+            if (doctors.length === 0) {
+                return res.json({
+                    doctors: [],
+                    summary: { total_slots: 0, total_booked: 0, total_utilization: 0 }
+                });
+            }
+
+            // Для каждого врача считаем статистику
+            doctors.forEach((doctor, index) => {
+                const doctorId = doctor.id;
+                const doctorName = doctor.fio;
+
+                // 2. Получаем все рабочие слоты врача за период
+                db.all(`
+                SELECT * FROM work_slot 
+                WHERE id = ? AND date BETWEEN ? AND ?
+            `, [doctorId, startDate, endDate], (err, workSlots) => {
+                    if (err) {
+                        res.status(500).json({ error: err.message });
+                        return;
+                    }
+
+                    // Считаем общее количество слотов (с учётом длительности)
+                    let totalSlots = 0;
+                    workSlots.forEach(slot => {
+                        // Вспомогательные функции для минут
+                        function toMinutes(timeStr) {
+                            const [hours, minutes] = timeStr.split(':').map(Number);
+                            return hours * 60 + minutes;
+                        }
+
+                        const startMin = toMinutes(slot.start_time);
+                        const endMin = toMinutes(slot.end_time);
+                        const slotMinutes = slot.slots_minutes;
+
+                        let breakStartMin = null;
+                        let breakEndMin = null;
+                        if (slot.break_start && slot.break_end) {
+                            breakStartMin = toMinutes(slot.break_start);
+                            breakEndMin = toMinutes(slot.break_end);
+                        }
+
+                        let workMinutes = endMin - startMin;
+                        if (breakStartMin !== null && breakEndMin !== null) {
+                            workMinutes -= (breakEndMin - breakStartMin);
+                        }
+
+                        const slotsPerDay = Math.floor(workMinutes / slotMinutes);
+                        totalSlots += slotsPerDay;
                     });
-                }
-    
-                // Для каждого врача считаем статистику
-                doctors.forEach((doctor, index) => {
-    
-                    // 2. Получаем все слоты врача за период
-                    db.all(`
-                    SELECT * FROM work_slots 
-                    WHERE doctor_id = ? AND work_date BETWEEN ? AND ?
-                `, [doctor.doctor_id, startDate, endDate], (err, workSlots) => {
+
+                    // 3. Получаем количество занятых записей врача за период
+                    db.get(`
+                    SELECT COUNT(*) as count FROM appointment 
+                    WHERE doctor_id = ? 
+                        AND date(slot_datetime) BETWEEN ? AND ? 
+                        AND status = 'booked'
+                `, [doctorId, startDate, endDate], (err, row) => {
                         if (err) {
                             res.status(500).json({ error: err.message });
                             return;
                         }
-    
-                        // Считаем общее количество слотов
-                        let totalSlots = 0;
-                        workSlots.forEach(slot => {
-                            // Парсим время
-                            const startHour = parseInt(slot.start_time.split(':')[0]);
-                            const endHour = parseInt(slot.end_time.split(':')[0]);
-                            const breakStartHour = slot.break_start ? parseInt(slot.break_start.split(':')[0]) : 0;
-                            const breakEndHour = slot.break_end ? parseInt(slot.break_end.split(':')[0]) : 0;
-    
-                            // Часы работы = конец - начало
-                            let workHours = endHour - startHour;
-    
-                            // Вычитаем перерыв
-                            if (slot.break_start && slot.break_end) {
-                                workHours = workHours - (breakEndHour - breakStartHour);
-                            }
-    
-                            // Переводим в минуты и делим на длительность слота
-                            const slotsPerDay = (workHours * 60) / slot.slot_duration_minutes;
-                            totalSlots += slotsPerDay;
-                        });
-    
-                        // 3. Получаем количество записей врача за период
-                        db.get(`
-                        SELECT COUNT(*) as count FROM appointments 
-                        WHERE doctor_id = ? 
-                            AND date(slot_datetime) BETWEEN ? AND ? 
-                            AND status = 'booked'
-                    `, [doctor.doctor_id, startDate, endDate], (err, row) => {
-                            if (err) {
-                                res.status(500).json({ error: err.message });
-                                return;
-                            }
-                            console.log(row);
-                            const bookedSlots = row.count;
-    
-                            totalSlotsAll += totalSlots;
-                            totalBookedAll += bookedSlots;
-    
-                            // Сохраняем результат
-                            result[index] = {
-                                doctor_id: doctor.doctor_id,
-                                doctor_full_name: doctor.doctor_full_name,
-                                specialty: doctor.specialty,
-                                total_slots: Math.round(totalSlots),
-                                booked_slots: bookedSlots,
-                                utilization: totalSlots > 0
-                                    ? Math.round((bookedSlots / totalSlots) * 100)
-                                    : 0
-                            };
-    
-                            completed++;
-    
-                            // Когда все врачи обработаны - отправляем ответ
-                            if (completed === doctors.length) {
-                                // Убираем пустые элементы (если были)
-                                result = result.filter(r => r);
-    
-                                res.json({
-                                    doctors: result,
-                                    summary: {
-                                        total_slots: totalSlotsAll,
-                                        total_booked: totalBookedAll,
-                                        total_utilization: totalSlotsAll > 0
-                                            ? Math.round((totalBookedAll / totalSlotsAll) * 100)
-                                            : 0
-                                    }
-                                });
-                            }
-                        });
+
+                        const bookedSlots = row?.count || 0;
+
+                        totalSlotsAll += totalSlots;
+                        totalBookedAll += bookedSlots;
+
+                        // Сохраняем результат
+                        result[index] = {
+                            doctor_id: doctorId,
+                            doctor_full_name: doctorName,
+                            total_slots: Math.round(totalSlots),
+                            booked_slots: bookedSlots,
+                            utilization: totalSlots > 0
+                                ? Math.round((bookedSlots / totalSlots) * 100)
+                                : 0
+                        };
+
+                        completed++;
+
+                        // Когда все врачи обработаны – отправляем ответ
+                        if (completed === doctors.length) {
+                            result = result.filter(r => r);
+                            res.json({
+                                doctors: result,
+                                summary: {
+                                    total_slots: totalSlotsAll,
+                                    total_booked: totalBookedAll,
+                                    total_utilization: totalSlotsAll > 0
+                                        ? Math.round((totalBookedAll / totalSlotsAll) * 100)
+                                        : 0
+                                }
+                            });
+                        }
                     });
                 });
             });
         });
-    */
-    /*
-        // POST /report/cancel - причины отмены записей
-        app.post('/report/cancel', (req, res) => {
-            const { startDate, endDate, doctorId } = req.body;
-            if (!startDate || !endDate || !doctorId) {
-                return res.status(400).json({ error: 'Нужны startDate, endDate и doctorId' });
+    });
+    // POST /report/cancel - причины отмены записей
+    app.post('/report/cancel', (req, res) => {
+        const { startDate, endDate, doctorId } = req.body;
+
+        if (!startDate || !endDate || !doctorId) {
+            return res.status(400).json({ error: 'Нужны startDate, endDate и doctorId' });
+        }
+
+        db.all(`
+        SELECT 
+            a.appt_id, 
+            a.doctor_id, 
+            a.patient_code, 
+            a.slot_datetime, 
+            a.status, 
+            c.why_cancelled
+        FROM appointment a
+        LEFT JOIN cancelled_appointment c ON a.appt_id = c.appt_id
+        WHERE a.doctor_id = ? 
+            AND a.status = 'cancelled' 
+            AND date(a.slot_datetime) BETWEEN ? AND ?
+        ORDER BY a.slot_datetime
+    `, [doctorId, startDate, endDate], (err, rows) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
             }
-            db.all(`
-                SELECT a.appt_id, a.doctor_id, a.patient_code, a.slot_datetime, a.status, c.why_cancelled
-                FROM appointment a
-                LEFT JOIN cancelled_appointment c ON a.appt_id = c.appt_id
-                WHERE a.doctor_id = ? AND a.status = 'cancelled' AND date(a.slot_datetime) BETWEEN ? AND ?
-            `, [doctorId, startDate, endDate], (err, rows) => {
-                if (err) return res.status(500).json({ error: err.message });
-                res.json(rows);
-            });
+            res.json(rows);
         });
-    */
+    });
 
     //7)поступает фио, почту, пароль пациента (регистрироваться могут исключительно пациенты, эту роль им нужно при регистрации ставить автоматически) - нужно записать нового пациента в бд
     //на главной странице есть форма регистрации и есть просто форма регистрации:

@@ -128,6 +128,24 @@
         <button onclick="getWorkingDoctors()">Показать врачей</button>
     </div>
 
+    <div class="section">
+        <h3>📊 13. Отчёт по утилизации</h3>
+        <input type="date" id="utilStartDate" value="2025-05-20">
+        <input type="date" id="utilEndDate" value="2025-05-23">
+        <button onclick="getUtilizationReport()">Показать утилизацию</button>
+        <p style="color: #666; font-size: 12px;">GET /report/utilization?startDate=...&endDate=...</p>
+    </div>
+
+    <!-- Отчёт по отменам -->
+    <div class="section">
+        <h3>❌ 14. Отчёт по отменам (по врачу)</h3>
+        <input type="text" id="cancelReportDoctorId" placeholder="ID врача" value="D1">
+        <input type="date" id="cancelReportStartDate" value="2025-05-20">
+        <input type="date" id="cancelReportEndDate" value="2025-05-23">
+        <button onclick="getCancelReport()">Показать отмены</button>
+        <p style="color: #666; font-size: 12px;">POST /report/cancel</p>
+    </div>
+
     <!-- Результат -->
     <div class="section">
         <h3>📋 Результат:</h3>
@@ -266,6 +284,45 @@
                 const data = await res.json();
                 showResult(data, res.status);
             } catch (e) { showResult('Ошибка: ' + e.message); }
+        }
+
+        // 13. Отчёт по утилизации
+        async function getUtilizationReport() {
+            const startDate = document.getElementById('utilStartDate').value;
+            const endDate = document.getElementById('utilEndDate').value;
+            if (!startDate || !endDate) {
+                showResult('Выберите даты', 400);
+                return;
+            }
+            try {
+                const res = await fetch(`/report/utilization?startDate=${startDate}&endDate=${endDate}`);
+                const data = await res.json();
+                showResult(data, res.status);
+            } catch (e) {
+                showResult('Ошибка: ' + e.message);
+            }
+        }
+
+        // 14. Отчёт по отменам
+        async function getCancelReport() {
+            const doctorId = document.getElementById('cancelReportDoctorId').value;
+            const startDate = document.getElementById('cancelReportStartDate').value;
+            const endDate = document.getElementById('cancelReportEndDate').value;
+            if (!doctorId || !startDate || !endDate) {
+                showResult('Заполните все поля', 400);
+                return;
+            }
+            try {
+                const res = await fetch('/report/cancel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ doctorId, startDate, endDate })
+                });
+                const data = await res.json();
+                showResult(data, res.status);
+            } catch (e) {
+                showResult('Ошибка: ' + e.message);
+            }
         }
 
     </script>
