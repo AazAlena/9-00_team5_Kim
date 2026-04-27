@@ -4,7 +4,7 @@ const db = require('./db');
 const importFunctions = require('./import');
 const validation = require('./validation');
 const { validateAll } = require('../data/validate');
-
+const CURRENT_DATE = '2025-05-21';
 module.exports = function (app) {
 
     //1)запрос на получение списка специальностей
@@ -84,7 +84,8 @@ module.exports = function (app) {
                 }
                 const slots = generateSlotsForDay(
                     row.start_time, row.end_time, row.slots_minutes,
-                    row.break_start, row.break_end, row.is_booked > 0
+                    row.break_start, row.break_end, row.is_booked > 0,
+                    row.date  // ← добавить дату слота
                 );
                 result[row.doctor_id].slots = slots;
             });
@@ -111,16 +112,14 @@ module.exports = function (app) {
         return slots;
     }*/
     // Вспомогательная функция генерации слотов НоОВАЯ
-    function generateSlotsForDay(start_time, end_time, slot_minutes, break_start, break_end, hasBooking) {
+    function generateSlotsForDay(start_time, end_time, slot_minutes, break_start, break_end, hasBooking, slotDate) {
         const slots = [];
 
-        // Переводим время в минуты от начала дня
         function toMinutes(timeStr) {
             const [hours, minutes] = timeStr.split(':').map(Number);
             return hours * 60 + minutes;
         }
 
-        // Переводим минуты обратно в формат HH:MM
         function toTimeStr(minutes) {
             const hours = Math.floor(minutes / 60);
             const mins = minutes % 60;
@@ -138,15 +137,21 @@ module.exports = function (app) {
             breakEndMin = toMinutes(break_end);
         }
 
-        // Генерируем слоты с шагом slot_minutes
+        // Проверяем, просрочен ли день
+        const isDatePast = slotDate < CURRENT_DATE;
+
         for (let current = startMin; current < endMin; current += slotStep) {
-            // Пропускаем перерыв
             if (breakStartMin !== null && current >= breakStartMin && current < breakEndMin) {
                 continue;
             }
 
             const timeStr = toTimeStr(current);
-            slots.push({ time: timeStr, available: !hasBooking });
+            // Слот недоступен, если:
+            // 1. Уже есть запись (hasBooking) ИЛИ
+            // 2. Дата слота уже прошла (isDatePast)
+            const isAvailable = !hasBooking && !isDatePast;
+
+            slots.push({ time: timeStr, available: isAvailable });
         }
 
         return slots;
@@ -244,7 +249,6 @@ module.exports = function (app) {
                 const bookedTimes = new Set(bookedRows.map(row => row.time));
                 const slots = [];
 
-                // Вспомогательные функции
                 function toMinutes(timeStr) {
                     const [hours, minutes] = timeStr.split(':').map(Number);
                     return hours * 60 + minutes;
@@ -266,14 +270,17 @@ module.exports = function (app) {
                     breakEndMin = toMinutes(workSlot.break_end);
                 }
 
+                const isDatePast = date < CURRENT_DATE;  // ← проверка даты
+
                 for (let current = startMin; current < endMin; current += stepMinutes) {
-                    // Пропускаем перерыв
                     if (breakStartMin !== null && current >= breakStartMin && current < breakEndMin) {
                         continue;
                     }
 
                     const timeStr = toTimeStr(current);
-                    slots.push({ time: timeStr, isAvailable: !bookedTimes.has(timeStr) });
+                    const isAvailable = !bookedTimes.has(timeStr) && !isDatePast;  // ← недоступно, если дата прошла
+
+                    slots.push({ time: timeStr, isAvailable: isAvailable });
                 }
 
                 res.json({
@@ -891,4 +898,39 @@ module.exports = function (app) {
             res.status(500).json({ error: error.message });
         }
     });
+
+
+
+    function updateCompletedAppointments() {
+        console.log(`\n🔄 Проверка записей (сегодня: ${CURRENT_DATE})`);
+
+        db.run(`
+        UPDATE appointment 
+        SET status = 'completed' 
+        WHERE status = 'booked'
+        AND date(slot_datetime) < ?
+    `, [CURRENT_DATE], function (err) {
+            if (err) {
+                console.error('❌ Ошибка:', err.message);
+            } else if (this.changes > 0) {
+                console.log(`✅ Обновлено ${this.changes} записей до 'completed'`);
+            } else {
+                console.log(`ℹ️ Нет записей для обновления`);
+            }
+        });
+    }
+
+    // Обновляем при запуске (через 1 секунду)
+    setTimeout(() => {
+        updateCompletedAppointments();
+    }, 1000);
+
+    // Обновляем каждые 24 часа
+    setInterval(() => {
+        console.log('\n⏰ Плановое обновление (каждые 24 часа)...');
+        updateCompletedAppointments();
+    }, 24 * 60 * 60 * 1000);
+
+
+
 }
