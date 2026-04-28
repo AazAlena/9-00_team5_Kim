@@ -129,21 +129,18 @@
     </div>
 
     <div class="section">
-        <h3>📊 13. Отчёт по утилизации</h3>
-        <input type="date" id="utilStartDate" value="2025-05-20">
-        <input type="date" id="utilEndDate" value="2025-05-23">
-        <button onclick="getUtilizationReport()">Показать утилизацию</button>
-        <p style="color: #666; font-size: 12px;">GET /report/utilization?startDate=...&endDate=...</p>
+        <h3>📊 Статистика врача за день</h3>
+        <input type="text" id="dailyDoctorId" placeholder="ID врача" value="D1">
+        <input type="date" id="dailyDate" value="2025-05-20">
+        <button onclick="getDoctorDailyReport()">Показать</button>
     </div>
 
     <!-- Отчёт по отменам -->
     <div class="section">
-        <h3>❌ 14. Отчёт по отменам (по врачу)</h3>
-        <input type="text" id="cancelReportDoctorId" placeholder="ID врача" value="D1">
-        <input type="date" id="cancelReportStartDate" value="2025-05-20">
-        <input type="date" id="cancelReportEndDate" value="2025-05-23">
-        <button onclick="getCancelReport()">Показать отмены</button>
-        <p style="color: #666; font-size: 12px;">POST /report/cancel</p>
+        <h3>📊 Статистика врача за день</h3>
+        <input type="text" id="dailyStatsDoctorId" placeholder="ID врача" value="D1">
+        <input type="date" id="dailyStatsDate" value="2025-05-20">
+        <button onclick="getDailyStats()">Показать</button>
     </div>
 
     <!-- Результат -->
@@ -287,15 +284,15 @@
         }
 
         // 13. Отчёт по утилизации
-        async function getUtilizationReport() {
-            const startDate = document.getElementById('utilStartDate').value;
-            const endDate = document.getElementById('utilEndDate').value;
-            if (!startDate || !endDate) {
-                showResult('Выберите даты', 400);
+        async function getDoctorDailyReport() {
+            const doctorId = document.getElementById('dailyDoctorId').value;
+            const date = document.getElementById('dailyDate').value;
+            if (!doctorId || !date) {
+                showResult('Заполните поля', 400);
                 return;
             }
             try {
-                const res = await fetch(`/report/utilization?startDate=${startDate}&endDate=${endDate}`);
+                const res = await fetch(`/report/doctor/daily?doctorId=${doctorId}&date=${date}`);
                 const data = await res.json();
                 showResult(data, res.status);
             } catch (e) {
@@ -304,19 +301,18 @@
         }
 
         // 14. Отчёт по отменам
-        async function getCancelReport() {
-            const doctorId = document.getElementById('cancelReportDoctorId').value;
-            const startDate = document.getElementById('cancelReportStartDate').value;
-            const endDate = document.getElementById('cancelReportEndDate').value;
-            if (!doctorId || !startDate || !endDate) {
-                showResult('Заполните все поля', 400);
+        async function getDailyStats() {
+            const doctorId = document.getElementById('dailyStatsDoctorId').value;
+            const date = document.getElementById('dailyStatsDate').value;
+            if (!doctorId || !date) {
+                showResult('Заполните поля', 400);
                 return;
             }
             try {
-                const res = await fetch('/report/cancel', {
+                const res = await fetch('/report/daily-stats', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ doctorId, startDate, endDate })
+                    body: JSON.stringify({ doctorId, date })
                 });
                 const data = await res.json();
                 showResult(data, res.status);

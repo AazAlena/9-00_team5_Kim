@@ -517,7 +517,7 @@ module.exports = function (app) {
             });
         });
     */
-    // GET /report/utilization - отчет по утилизации
+    /*// GET /report/utilization - отчет по утилизации
     app.get('/report/utilization', (req, res) => {
         const { startDate, endDate } = req.query;
 
@@ -636,8 +636,92 @@ module.exports = function (app) {
                 });
             });
         });
+    });*/
+
+    ///report/doctor/daily?doctorId=${doctorId}&date=${date}
+    app.get('/report/doctor/daily', (req, res) => {
+        const { doctorId, date } = req.query;
+
+        if (!doctorId || !date) {
+            return res.status(400).json({ error: 'Нужны doctorId и date' });
+        }
+
+        // Проверяем существование врача
+        db.get('SELECT id, fio FROM user WHERE id = ? AND role = ?', [doctorId, 'doctor'], (err, doctor) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            if (!doctor) {
+                return res.status(404).json({ error: 'Врач не найден' });
+            }
+
+            // 1. Получаем расписание врача на эту дату
+            db.get(`
+            SELECT * FROM work_slot 
+            WHERE id = ? AND date = ?
+        `, [doctorId, date], (err, workSlot) => {
+                if (err) {
+                    return res.status(500).json({ error: err.message });
+                }
+                if (!workSlot) {
+                    return res.status(404).json({
+                        error: 'Расписание не найдено',
+                        message: `Врач ${doctorId} не работает ${date}`
+                    });
+                }
+
+                // 2. Считаем общее количество слотов на этот день
+                function toMinutes(timeStr) {
+                    const [hours, minutes] = timeStr.split(':').map(Number);
+                    return hours * 60 + minutes;
+                }
+
+                const startMin = toMinutes(workSlot.start_time);
+                const endMin = toMinutes(workSlot.end_time);
+                const slotMinutes = workSlot.slots_minutes;
+
+                let breakStartMin = null;
+                let breakEndMin = null;
+                if (workSlot.break_start && workSlot.break_end) {
+                    breakStartMin = toMinutes(workSlot.break_start);
+                    breakEndMin = toMinutes(workSlot.break_end);
+                }
+
+                let workMinutes = endMin - startMin;
+                if (breakStartMin !== null && breakEndMin !== null) {
+                    workMinutes -= (breakEndMin - breakStartMin);
+                }
+
+                const totalSlots = Math.floor(workMinutes / slotMinutes);
+
+                // 3. Получаем статистику по записям
+                db.get(`
+                SELECT 
+                    COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count,
+                    COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_count
+                FROM appointment 
+                WHERE doctor_id = ? AND date(slot_datetime) = ?
+            `, [doctorId, date], (err, stats) => {
+                    if (err) {
+                        return res.status(500).json({ error: err.message });
+                    }
+
+                    const cancelledCount = stats?.cancelled_count || 0;
+                    const completedCount = stats?.completed_count || 0;
+
+                    const completedPercent = totalSlots > 0
+                        ? Math.round((completedCount / totalSlots) * 100)
+                        : 0;
+
+                    res.json({
+                        cancelled_count: cancelledCount,
+                        completed_percent: completedPercent
+                    });
+                });
+            });
+        });
     });
-    // POST /report/cancel - причины отмены записей
+    /*// POST /report/cancel - причины отмены записей
     app.post('/report/cancel', (req, res) => {
         const { startDate, endDate, doctorId } = req.body;
 
@@ -666,6 +750,118 @@ module.exports = function (app) {
                 return res.status(500).json({ error: err.message });
             }
             res.json(rows);
+        });
+    });*/
+
+    // POST /report/daily-stats - статистика врача за день
+    app.post('/report/daily-stats', (req, res) => {
+        const { doctorId, date } = req.body;
+
+        if (!doctorId || !date) {
+            return res.status(400).json({ error: 'Нужны doctorId и date' });
+        }
+
+        // Проверяем существование врача
+        db.get('SELECT id FROM user WHERE id = ? AND role = ?', [doctorId, 'doctor'], (err, doctor) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            if (!doctor) {
+                return res.status(404).json({ error: 'Врач не найден' });
+            }
+
+            // 1. Получаем расписание врача на эту дату
+            db.get(`
+            SELECT * FROM work_slot 
+            WHERE id = ? AND date = ?
+        `, [doctorId, date], (err, workSlot) => {
+                if (err) {
+                    return res.status(500).json({ error: err.message });
+                }
+                if (!workSlot) {
+                    return res.status(404).json({
+                        error: 'Расписание не найдено',
+                        message: `Врач ${doctorId} не работает ${date}`
+                    });
+                }
+
+                // 2. Считаем общее количество слотов
+                function toMinutes(timeStr) {
+                    const [hours, minutes] = timeStr.split(':').map(Number);
+                    return hours * 60 + minutes;
+                }
+
+                const startMin = toMinutes(workSlot.start_time);
+                const endMin = toMinutes(workSlot.end_time);
+                const slotMinutes = workSlot.slots_minutes;
+
+                let breakStartMin = null;
+                let breakEndMin = null;
+                if (workSlot.break_start && workSlot.break_end) {
+                    breakStartMin = toMinutes(workSlot.break_start);
+                    breakEndMin = toMinutes(workSlot.break_end);
+                }
+
+                let workMinutes = endMin - startMin;
+                if (breakStartMin !== null && breakEndMin !== null) {
+                    workMinutes -= (breakEndMin - breakStartMin);
+                }
+
+                const totalSlots = Math.floor(workMinutes / slotMinutes);
+
+                // 3. Получаем статистику по записям
+                db.get(`
+                SELECT 
+                    COUNT(CASE WHEN status = 'booked' THEN 1 END) as booked_count,
+                    COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count,
+                    COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_count
+                FROM appointment 
+                WHERE doctor_id = ? AND date(slot_datetime) = ?
+            `, [doctorId, date], (err, stats) => {
+                    if (err) {
+                        return res.status(500).json({ error: err.message });
+                    }
+
+                    const bookedCount = stats?.booked_count || 0;
+                    const cancelledCount = stats?.cancelled_count || 0;
+                    const completedCount = stats?.completed_count || 0;
+
+                    const completedPercent = totalSlots > 0
+                        ? Math.round((completedCount / totalSlots) * 100)
+                        : 0;
+
+                    // 4. Получаем список отмен
+                    db.all(`
+                    SELECT 
+                        a.appt_id, 
+                        p.fio as patient_fio,
+                        c.why_cancelled
+                    FROM appointment a
+                    JOIN user p ON a.patient_code = p.id
+                    JOIN cancelled_appointment c ON a.appt_id = c.appt_id
+                    WHERE a.doctor_id = ? 
+                        AND a.status = 'cancelled' 
+                        AND date(a.slot_datetime) = ?
+                    ORDER BY a.slot_datetime
+                `, [doctorId, date], (err, cancelledList) => {
+                        if (err) {
+                            return res.status(500).json({ error: err.message });
+                        }
+
+                        res.json({
+                            total_slots: totalSlots,
+                            booked_slots: bookedCount,
+                            completed_percent: completedPercent,
+                            cancelled_count: cancelledCount,
+                            cancelled_list: cancelledList.map(item => ({
+                                appointment_id: item.appt_id,
+                                patient_fio: item.patient_fio,
+                                reason: item.why_cancelled
+                            }))
+                        });
+                    });
+                });
+            });
         });
     });
 
