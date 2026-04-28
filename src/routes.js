@@ -650,10 +650,12 @@ module.exports = function (app) {
             a.appt_id, 
             a.doctor_id, 
             a.patient_code, 
+            p.fio as patient_fio,
             a.slot_datetime, 
             a.status, 
             c.why_cancelled
         FROM appointment a
+        JOIN user p ON a.patient_code = p.id
         LEFT JOIN cancelled_appointment c ON a.appt_id = c.appt_id
         WHERE a.doctor_id = ? 
             AND a.status = 'cancelled' 
