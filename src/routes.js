@@ -45,53 +45,112 @@ module.exports = function (app) {
             return res.status(400).json({ error: dateValidation.message });
         }
 
+        // 1. Получаем всех врачей этой специальности с их расписанием на этот день
         db.all(`
-            SELECT 
-                u.id as doctor_id,
-                u.fio as doctor_name,
-                ws.id as slot_id,
-                ws.start_time,
-                ws.end_time,
-                ws.slots_minutes,
-                ws.break_start,
-                ws.break_end,
-                (
-                    SELECT COUNT(*) FROM appointment a 
-                    WHERE a.doctor_id = u.id 
-                    AND a.slot_datetime = ws.date || ' ' || ?
-                    AND a.status = 'booked'
-                ) as is_booked
-            FROM user u
-            JOIN speciality s ON u.id = s.id
-            JOIN work_slot ws ON u.id = ws.id
-            WHERE u.role = 'doctor' 
-                AND s.speciality = ?
-                AND ws.date = ?
-            ORDER BY u.fio, ws.start_time
-        `, [`${date} `, speciality, date], (err, rows) => {
+        SELECT 
+            u.id as doctor_id,
+            u.fio as doctor_name,
+            ws.start_time,
+            ws.end_time,
+            ws.slots_minutes,
+            ws.break_start,
+            ws.break_end,
+            ws.date as slot_date
+        FROM user u
+        JOIN speciality s ON u.id = s.id
+        JOIN work_slot ws ON u.id = ws.id
+        WHERE u.role = 'doctor' 
+            AND s.speciality = ?
+            AND ws.date = ?
+        ORDER BY u.fio, ws.start_time
+    `, [speciality, date], (err, doctors) => {
             if (err) {
-                res.status(500).json({ error: err.message });
-                return;
+                return res.status(500).json({ error: err.message });
             }
-            const result = {};
-            rows.forEach(row => {
-                if (!result[row.doctor_id]) {
-                    result[row.doctor_id] = {
-                        doctor_id: row.doctor_id,
-                        doctor_name: row.doctor_name,
-                        slots: []
-                    };
+
+            if (doctors.length === 0) {
+                return res.json([]);
+            }
+
+            // 2. Получаем все занятые слоты (booked) для этих врачей на эту дату
+            const doctorIds = doctors.map(d => d.doctor_id);
+            const placeholders = doctorIds.map(() => '?').join(',');
+
+            db.all(`
+            SELECT doctor_id, strftime('%H:%M', slot_datetime) as time
+            FROM appointment
+            WHERE doctor_id IN (${placeholders}) 
+                AND date(slot_datetime) = ? 
+                AND status = 'booked'
+        `, [...doctorIds, date], (err, bookedRows) => {
+                if (err) {
+                    return res.status(500).json({ error: err.message });
                 }
-                const slots = generateSlotsForDay(
-                    row.start_time, row.end_time, row.slots_minutes,
-                    row.break_start, row.break_end, row.is_booked > 0,
-                    row.date  // ← добавить дату слота
-                );
-                result[row.doctor_id].slots = slots;
+
+                // Создаём Set занятых слотов (ключ: doctor_id|время)
+                const bookedSet = new Set();
+                bookedRows.forEach(b => {
+                    bookedSet.add(`${b.doctor_id}|${b.time}`);
+                });
+
+                // 3. Генерируем слоты для каждого врача
+                const result = {};
+
+                doctors.forEach(doctor => {
+                    const doctorId = doctor.doctor_id;
+                    if (!result[doctorId]) {
+                        result[doctorId] = {
+                            doctor_id: doctorId,
+                            doctor_name: doctor.doctor_name,
+                            slots: []
+                        };
+                    }
+
+                    // Генерируем слоты на основе расписания
+                    function toMinutes(timeStr) {
+                        const [hours, minutes] = timeStr.split(':').map(Number);
+                        return hours * 60 + minutes;
+                    }
+
+                    function toTimeStr(minutes) {
+                        const hours = Math.floor(minutes / 60);
+                        const mins = minutes % 60;
+                        return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+                    }
+
+                    const startMin = toMinutes(doctor.start_time);
+                    const endMin = toMinutes(doctor.end_time);
+                    const stepMinutes = doctor.slots_minutes;
+
+                    let breakStartMin = null, breakEndMin = null;
+                    if (doctor.break_start && doctor.break_end) {
+                        breakStartMin = toMinutes(doctor.break_start);
+                        breakEndMin = toMinutes(doctor.break_end);
+                    }
+
+                    const isDatePast = date < CURRENT_DATE;
+
+                    for (let current = startMin; current < endMin; current += stepMinutes) {
+                        if (breakStartMin !== null && current >= breakStartMin && current < breakEndMin) {
+                            continue;
+                        }
+
+                        const timeStr = toTimeStr(current);
+                        const isBooked = bookedSet.has(`${doctorId}|${timeStr}`);
+                        const isAvailable = !isBooked && !isDatePast;
+
+                        result[doctorId].slots.push({
+                            time: timeStr,
+                            available: isAvailable
+                        });
+                    }
+                });
+
+                res.json(Object.values(result));
             });
-            res.json(Object.values(result));
         });
     });
+
 
 
     /*// Вспомогательная функция генерации слотов ПРОШЛАЯ
@@ -110,7 +169,7 @@ module.exports = function (app) {
             slots.push({ time: timeStr, available: !hasBooking });
         }
         return slots;
-    }*/
+    }
     // Вспомогательная функция генерации слотов НоОВАЯ
     function generateSlotsForDay(start_time, end_time, slot_minutes, break_start, break_end, hasBooking, slotDate) {
         const slots = [];
@@ -155,7 +214,7 @@ module.exports = function (app) {
         }
 
         return slots;
-    }
+    }*/
 
     //3)с фронтенда поступает специальность, нужно отдать всех врачей этой специальности
     //на странице с выбором врача:
@@ -305,6 +364,13 @@ module.exports = function (app) {
         if (!doctorId || !slotDateTime || !patientCode) {
             return res.status(400).json({ error: 'Все поля обязательны' });
         }
+
+        const [datePart, timePart] = slotDateTime.split(' ');
+        const currentDate = CURRENT_DATE;
+        if (datePart < currentDate) {
+            return res.status(400).json({ error: 'Нельзя записаться на прошедшую дату' });
+        }
+
         const workDate = slotDateTime.split(' ')[0];
         db.get(`SELECT * FROM work_slot WHERE id = ? AND date = ?`, [doctorId, workDate], (err, workSlot) => {
             if (err) return res.status(500).json({ error: err.message });
