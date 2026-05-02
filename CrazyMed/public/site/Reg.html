@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Reg_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
+    <title>Registration</title>
+</head>
+<body>
+    <main>
+        <section id="Registration">
+            <div class="regfill_bg">
+                <div class="regfill">
+                    <h1>Создать Аккаунт</h1>
+                    <form action="" id="reg_form">
+                        <label for="fio">Фио</label>
+                        <input 
+                            type="text"
+                            placeholder="Иванов Иван Иванович"
+                            id="fio"
+                            name="fio"
+                            required
+                        >
+                        <label for="email">Почта</label>
+                        <input 
+                            type="email"
+                            value="your@mail.com"
+                            id="email"
+                            name="email"
+                            required
+                        >
+                        <label for="password">Пароль</label>
+                        <input 
+                            type="password"
+                            id="password"
+                            name="password"
+                            required
+                        >
+                        <label for="repass">Повторите пароль</label>
+                        <input 
+                            type="password"
+                            id="repass" 
+                            name="repass"
+                            required
+                        >
+                        <button id="reg_butt">Подтвердить</button>
+                    </form>
+                </div>
+                <button type="button" id="eye_close1" class="eye_butt">
+                    <img src="./img/eye_close.svg" alt="" id="eye1">
+                </button>
+                <button type="button" id="eye_close2" class="eye_butt">
+                    <img src="./img/eye_close.svg" alt="" id="eye2">
+                </button>
+            </div>
+        </section>
+    </main>
+    <script src="./Reg_app.js"></script>
+</body>
+</html>

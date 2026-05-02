@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Lk_admin2_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
+    <title>admin doc</title>
+</head>
+<body>
+    <section id="bg">
+        <section class="sec first">
+            <label for="month">Выберите месяц</label>
+            <select name="month" id="month" disabled>
+                <option value="1">Январь</option>
+                <option value="2">Февраль</option>
+                <option value="3">Март</option>
+                <option value="4">Апрель</option>
+                <option value="5">Май</option>
+                <option value="6">Июнь</option>
+                <option value="7">Июль</option>
+                <option value="8">Август</option>
+                <option value="9">Сентябрь</option>
+                <option value="10">Октябрь</option>
+                <option value="11">Ноябрь</option>
+                <option value="12">Декабрь</option>
+            </select>
+            <section id="calendar"></section>
+        </section>
+        <section class="sec second">
+            <h1 id="fio_data"></h1>
+            <div id="doc_fill">
+                <div id="doc_txt">
+                    <div id="util"></div>
+                    <br>
+                    <div id="canceled"></div>
+                    <br>
+                    <div id="redo"></div>
+                </div>
+                <button type="button" id="more_butt">Подробнее</button>
+            </div>
+        </section>
+    </section>
+    <button id="arrow" type="button">
+        <img src="./img/Arrow.svg" alt="">
+    </button>
+    <script src="./Lk_admin2_app.js"></script>
+</body>
+</html>

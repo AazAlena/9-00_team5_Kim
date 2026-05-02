@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
+    <title>Disposal</title>
+    <link rel="stylesheet" href="./doc_inf_style.css">
+</head>
+<body>
+    <main>
+        <h1 id="title"></h1>
+        <hr>
+        <section id="first">
+            <h2>Общее состояние</h2>
+            <div id="sum_work_slots"></div>
+            <div id="sum_appt"></div>
+            <div id="disposal"></div>
+        </section>
+        <section>
+            <h2>Отмена</h2>
+            <div id="sum_canceled"></div>
+            <div>
+                <p>Комментарии:</p>
+                <div class="comments comments-cancellation"></div>
+            </div>
+        </section>
+        <section>
+            <h2>Перенос</h2>
+            <div id="sum_reappt"></div>
+            <div>
+                <p>Комментарии:</p>
+                <div class="comments comments-transfer"></div>
+            </div>
+        </section>
+            <button type="button" id="arrow">
+                <img src="./img/Arrow.svg" alt="">
+            </button>
+    </main>
+    <script src="./doc_inf_app.js"></script>
+</body>
+</html>
