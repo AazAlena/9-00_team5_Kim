@@ -106,9 +106,12 @@ async function getDoctorDailyStats(doctorId, date) {
 }
 
 async function loadDoctorInfo(){
-    let fio = localStorage.getItem('doctorFio');
+    let fio = localStorage.getItem('doctorFio').split(' ');
     let date = localStorage.getItem('dateTime').split('-').reverse().join('.');
-    page.utilization.fioData.innerHTML = `${fio}<br>${date}`;
+    let doctorSurname = fio[0];
+    let doctorFirstName = (fio[1])[0];
+    let doctorSecondName = (fio[2])[0];
+    page.utilization.fioData.innerHTML = `${doctorSurname} ${doctorFirstName}.${doctorSecondName}.<br>${date}`;
     try {
         let result = await getDoctorDailyStats(localStorage.getItem('doctorId'), localStorage.getItem('dateTime'));
         console.log(result);

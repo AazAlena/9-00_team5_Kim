@@ -49,6 +49,7 @@ async function getAvailableSlots(date, speciality) {
         const data = await response.json();
 
         if (response.status === 200) {
+            console.log(data)
             return data;
         }
         
@@ -215,7 +216,7 @@ document.querySelector('.search').addEventListener('input', () =>{
         let text = document.querySelector('#date').value;
         if (text.length === 5 && 0<Number(text.split('.')[0])<32 && 0<Number(text.split('.')[1])<13){
             document.querySelector('.alltimes').innerHTML = '';
-            loadSlots('2025'+ '-' + text.split('.')[1] + '-' + text.split('.')[0], localStorage.getItem('speciality'));
+            loadSlots('2025'+ '-' + text.split('.')[1] + '-' + text.split('.')[0], localStorage.getItem('doctorSpecialty'));
         
         };
     }
