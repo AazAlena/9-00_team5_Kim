@@ -65,7 +65,7 @@ function loadDays(emptyLen,daysLen){
 function getFirstDay(){
     let month = Number(page.calendar.monthInput.value) - 1;
     let yearNow = (new Date()).getFullYear();
-    let firstDayIndex = (new Date(yearNow, month, 1, 0, 0, 0)).getDay()
+    let firstDayIndex = (new Date(yearNow, month, 1, 0, 0, 0)).getDay();
     let firstDay =  firstDayIndex === 0 ? 6 : firstDayIndex - 1;
     let lastDay = new Date(yearNow, month+1, 0).getDate();
     loadDays(firstDay,lastDay);
@@ -96,9 +96,10 @@ page.calendar.section.addEventListener('click', async (e) => {
             button.style.backgroundColor = '';
         });
         e.target.style.backgroundColor = '#EFEFFF';
+        let selectedYear = new Date().getFullYear();
         let selectedMonth = String(page.calendar.monthInput.value).padStart(2, '0');
         let selectedDayNumber = String(e.target.textContent).padStart(2, '0');
-        let selectedDate = `2026-${selectedMonth}-${selectedDayNumber}`;
+        let selectedDate = `${selectedYear}-${selectedMonth}-${selectedDayNumber}`;
         try {
             const appointments = await getDoctorAppointments(localStorage.getItem('userId'), selectedDate);
             loadAppointments(appointments);
@@ -112,19 +113,26 @@ page.calendar.section.addEventListener('click', async (e) => {
 
 //Загрузка записей
 function loadAppointments(arrAppt){
+    let dateNow = new Date();
     for (let i = 0; i < arrAppt.length; i++) {
-        let item = document.createElement('div');
-        item.setAttribute('class','appt_item');
-        let content = document.createElement('div');
-        content.setAttribute('class', 'text_content');
-        let patientFio = (arrAppt[i]).patientName.split(' ');
-        let patientSurname = patientFio[0];
-        let patientFirstName = (patientFio[1])[0];
-        let patientSecondName = (patientFio[2])[0];
-        let time = (((arrAppt[i]).datetime).split(' '))[1];
-        content.innerText = `${patientSurname} ${patientFirstName}.${patientSecondName}. ${time}`;
-        item.appendChild(content);
-        page.appt.appendChild(item);
+        if ((arrAppt[i]).status != 'canceled'){
+            let item = document.createElement('div');
+            item.setAttribute('class','appt_item');
+            let content = document.createElement('div');
+            content.setAttribute('class', 'text_content');
+            let patientFio = (arrAppt[i]).patientName.split(' ');
+            let patientSurname = patientFio[0];
+            let patientFirstName = (patientFio[1])[0];
+            let patientSecondName = (patientFio[2])[0];
+            let time = (((arrAppt[i]).datetime).split(' '))[1];
+            content.innerText = `${patientSurname} ${patientFirstName}.${patientSecondName}. ${time}`;
+            if ((arrAppt[i]).status === 'completed'){
+                content.style.textDecoration = 'line-through';
+            }
+            item.appendChild(content);
+            page.appt.appendChild(item);
+        }
+        
     }
 }
 
@@ -143,6 +151,7 @@ async function getDoctorAppointments(doctorId, date) {
         const data = await response.json();
 
         if (response.status === 200) {
+            console.log(data.appointments)
             return data.appointments;
         }
         
@@ -173,5 +182,6 @@ function CheckEnter(){
 
 (()=>{
     CheckEnter();
+    page.calendar.monthInput.value = new Date().getMonth()+1;
     getFirstDay();
 })()

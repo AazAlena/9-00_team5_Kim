@@ -216,8 +216,7 @@ document.querySelector('.search').addEventListener('input', () =>{
         let text = document.querySelector('#date').value;
         if (text.length === 5 && 0<Number(text.split('.')[0])<32 && 0<Number(text.split('.')[1])<13){
             document.querySelector('.alltimes').innerHTML = '';
-            loadSlots('2025'+ '-' + text.split('.')[1] + '-' + text.split('.')[0], localStorage.getItem('doctorSpecialty'));
-        
+            loadSlots(new Date().getFullYear() + '-' + text.split('.')[1] + '-' + text.split('.')[0], localStorage.getItem('doctorSpecialty'));
         };
     }
 });
@@ -225,7 +224,7 @@ document.querySelector('.search').addEventListener('input', () =>{
 document.querySelector('.alltimes').addEventListener('click', (e) => {
     if (e.target.type === "submit"){
         let dateSearch = (document.querySelector('.search').value).split('.');
-        localStorage.setItem('date','2025' + '-' + dateSearch[1] + '-' + dateSearch[0]);
+        localStorage.setItem('date',new Date().getFullYear() + '-' + dateSearch[1] + '-' + dateSearch[0]);
         localStorage.setItem('time', e.target.textContent);
         localStorage.setItem('doctorsAvailable', JSON.stringify(appts[Number(e.target.id)]));
         window.location.href = './ch2_fio.html';

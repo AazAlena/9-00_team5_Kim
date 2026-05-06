@@ -38,16 +38,16 @@ db.serialize(() => {
             doctor_id TEXT NOT NULL,
             patient_code TEXT NOT NULL,
             slot_datetime TEXT NOT NULL,
-            status TEXT CHECK(status IN ('booked', 'cancelled', 'completed')) DEFAULT 'booked',
+            status TEXT CHECK(status IN ('booked', 'canceled', 'completed')) DEFAULT 'booked',
             FOREIGN KEY (doctor_id) REFERENCES user(id)
             FOREIGN KEY (patient_code) REFERENCES user(id)
         )
     `);
 
     db.run(`
-        CREATE TABLE IF NOT EXISTS cancelled_appointment (
+        CREATE TABLE IF NOT EXISTS canceled_appointment (
             appt_id INTEGER,
-            why_cancelled TEXT NOT NULL,
+            why_canceled TEXT NOT NULL,
             FOREIGN KEY (appt_id) REFERENCES appointment(appt_id)
         )
     `);

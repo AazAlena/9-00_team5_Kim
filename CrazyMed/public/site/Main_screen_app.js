@@ -55,11 +55,8 @@ function appointment(element){
         if (loginFlag && localStorage.getItem('role') === 'patient'){
             window.location.href = './speciality.html';
         }
-        else if (loginFlag && (localStorage.getItem('role') === 'admin') || (localStorage.getItem('role') === 'doctor')){
-            alert('Войдите как пациент');
-        }
         else{
-             window.location.href = './Enter.html';
+            window.location.href = './Enter.html';
         }
     });
 }
@@ -136,8 +133,12 @@ function CheckEnter(){
         document.querySelectorAll('input').forEach(input => input.disabled = true);
         document.querySelector('#a').href = '';
         page.register.registerBtn.disabled = true;
+        if (role != 'patient'){
+            page.nav.appt.parentElement.style.display = 'none';
+        }
     }
     else {
+        page.nav.appt.parentElement.style.display = 'inline-block';
         loginFlag = false;
         page.nav.enterExitBtn.textContent = 'Войти';
         document.querySelectorAll('input').forEach(input => input.disabled = false);

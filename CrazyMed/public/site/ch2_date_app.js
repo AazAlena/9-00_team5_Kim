@@ -31,7 +31,7 @@ async function getDoctorSlots(doctorId, date) {
         throw new Error(data.error || 'Ошибка получения слотов врача');
         
     } catch (error) {
-        console.error('❌ Ошибка получения слотов врача:', error.message);
+        console.error(' Ошибка получения слотов врача:', error.message);
         throw error;
     }
 }
@@ -85,21 +85,26 @@ document.querySelector('.search').addEventListener('input', () =>{
     let text = document.querySelector('#date').value;
     if (text.length === 5 && 0<Number(text.split('.')[0])<32 && 0<Number(text.split('.')[1])<13){
         document.querySelector('.alltimes').innerHTML = '';
-        loadSlots('2025'+ '-' + text.split('.')[1] + '-' + text.split('.')[0]);
+        loadSlots(new Date().getFullYear() + '-' + text.split('.')[1] + '-' + text.split('.')[0]);
     };
 });
 
 document.querySelector('.alltimes').addEventListener('click', (e) => {
     if (e.target.type === "submit"){
         let dateSearch = (document.querySelector('.search').value).split('.');
-        localStorage.setItem('date','2025' + '-' + dateSearch[1] + '-' + dateSearch[0]);
+        localStorage.setItem('date', new Date().getFullYear() + '-' + dateSearch[1] + '-' + dateSearch[0]);
         localStorage.setItem('time', e.target.textContent);
         window.location.href = './proof.html';
     };
 });
 
 (() => {
+    if (localStorage.getItem('doctorId') && localStorage.getItem('flag') === 'transfer'){
+        let dateTime = (localStorage.getItem('dateTime').split(' ')[0]).split('-');
+        document.querySelector('.search').value =`${dateTime[2]}.${dateTime[1]}`;
+    }
     if (document.querySelector('.search').value != ''){
-        document.querySelector('.search').input();
-    };
+        let text = document.querySelector('#date').value;
+        loadSlots(new Date().getFullYear() + '-' + text.split('.')[1] + '-' + text.split('.')[0]);
+    };  
 })();

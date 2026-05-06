@@ -4,7 +4,7 @@ const db = require('./db');
 const importFunctions = require('./import');
 const validation = require('./validation');
 const { validateAll } = require('../data/validate');
-const CURRENT_DATE = '2025-05-21';
+const CURRENT_DATE = new Date();
 module.exports = function (app) {
 
     //1)запрос на получение списка специальностей
@@ -399,11 +399,11 @@ module.exports = function (app) {
                 a.appt_id, a.doctor_id, a.slot_datetime, a.status,
                 d.fio as doctor_name,
                 s.speciality as doctor_specialty,
-                c.why_cancelled
+                c.why_canceled
             FROM appointment a
             JOIN user d ON a.doctor_id = d.id
             LEFT JOIN speciality s ON d.id = s.id
-            LEFT JOIN cancelled_appointment c ON a.appt_id = c.appt_id
+            LEFT JOIN canceled_appointment c ON a.appt_id = c.appt_id
             WHERE a.patient_code = ? AND date(a.slot_datetime) = ?
             ORDER BY a.slot_datetime
         `, [patientId, date], (err, rows) => {
@@ -415,7 +415,7 @@ module.exports = function (app) {
                 doctorSpecialty: row.doctor_specialty,
                 datetime: row.slot_datetime,
                 status: row.status,
-                cancelReason: row.why_cancelled
+                cancelReason: row.why_canceled
             }));
             res.json({ patientId, date, count: appointments.length, appointments });
         });
@@ -423,20 +423,20 @@ module.exports = function (app) {
     //10)при отмене с фронтенда поступает айди пациента, айди врача, дата, время, комментарий - нужно поменять в бд статус записи на отмененную и добавить в canceled_appontment причину отмены этой записи
     // POST /appointments/cancel - отменить запись
     app.post('/appointments/cancel', (req, res) => {
-        const { doctorId, patientCode, slotDateTime, whyCancelled } = req.body;
-        if (!doctorId || !patientCode || !slotDateTime || !whyCancelled) {
+        const { doctorId, patientCode, slotDateTime, whycanceled } = req.body;
+        if (!doctorId || !patientCode || !slotDateTime || !whycanceled) {
             return res.status(400).json({ error: 'Все поля обязательны' });
         }
         db.get(`SELECT appt_id FROM appointment WHERE doctor_id = ? AND slot_datetime = ? AND patient_code = ? AND status = 'booked'`, [doctorId, slotDateTime, patientCode], (err, row) => {
             if (err) return res.status(500).json({ error: err.message });
             if (!row) return res.status(404).json({ error: 'Запись не найдена' });
             const appt_id = row.appt_id;
-            db.run(`UPDATE appointment SET status = 'cancelled' WHERE appt_id = ?`, [appt_id], function (err) {
+            db.run(`UPDATE appointment SET status = 'canceled' WHERE appt_id = ?`, [appt_id], function (err) {
                 if (err) return res.status(500).json({ error: err.message });
                 if (this.changes === 0) return res.status(404).json({ error: 'Запись не найдена' });
-                db.run(`INSERT INTO cancelled_appointment (appt_id, why_cancelled) VALUES (?, ?)`, [appt_id, whyCancelled], (err) => {
+                db.run(`INSERT INTO canceled_appointment (appt_id, why_canceled) VALUES (?, ?)`, [appt_id, whycanceled], (err) => {
                     if (err) return res.status(500).json({ error: err.message });
-                    res.json({ message: 'Запись успешно отменена', appointmentId: appt_id, status: 'cancelled' });
+                    res.json({ message: 'Запись успешно отменена', appointmentId: appt_id, status: 'canceled' });
                 });
             });
         });
@@ -444,20 +444,20 @@ module.exports = function (app) {
     /*
         //10.1)перенос
         app.post('/appointments/transfer', (req, res) => {
-            const { transferDoctorId, transferFromDateTime, transferToDateTime, whyCancelled, patientCode } = req.body;
+            const { transferDoctorId, transferFromDateTime, transferToDateTime, whycanceled, patientCode } = req.body;
             // Валидация всех полей
             const doctorValidation = validation.validateDoctorId(transferDoctorId);
             const dateFromTimeValidation = validation.validateDateTime(transferFromDateTime);
             const dateToTimeValidation = validation.validateDateTime(transferToDateTime);
             const patientValidation = validation.validatePatientCode(patientCode);
-            const whyCancelledValidation = validation.validateWhyCancelled(whyCancelled);
+            const whycanceledValidation = validation.validateWhycanceled(whycanceled);
     
             const errors = [];
             if (!doctorValidation.valid) errors.push(doctorValidation.message);
             if (!dateFromTimeValidation.valid) errors.push(dateFromTimeValidation.message);
             if (!dateToTimeValidation.valid) errors.push(dateToTimeValidation.message);
             if (!patientValidation.valid) errors.push(patientValidation.message);
-            if (!whyCancelledValidation.valid) errors.push(whyCancelledValidation.message);
+            if (!whycanceledValidation.valid) errors.push(whycanceledValidation.message);
     
             if (errors.length > 0) {
                 return res.status(400).json({
@@ -506,14 +506,14 @@ module.exports = function (app) {
                             return res.status(404).json({ error: 'Запись не найдена' });
                         }
     
-                        const cancelledAppointmentId = row.appointment_id;
+                        const canceledAppointmentId = row.appointment_id;
     
                         //отменить прошлую запис
                         db.run(`
                         UPDATE appointment
-                        SET status = 'cancelled' 
+                        SET status = 'canceled' 
                         WHERE appointment_id = ?
-                    `, [cancelledAppointmentId], function (err) {
+                    `, [canceledAppointmentId], function (err) {
                             if (err) {
                                 res.status(500).json({ error: err.message });
                                 return;
@@ -541,9 +541,9 @@ module.exports = function (app) {
     
                             //добавить в список отмененных записей + причина
                             db.run(`
-                            INSERT INTO cancelled_appointment (appointment_id, why_cancelled) 
+                            INSERT INTO canceled_appointment (appointment_id, why_canceled) 
                             VALUES (?,?)
-                        `, [cancelledAppointmentId, whyCancelledValidation.value], function (err) {
+                        `, [canceledAppointmentId, whycanceledValidation.value], function (err) {
                                 if (err) {
                                     res.status(500).json({ error: err.message });
                                     return;
@@ -561,11 +561,11 @@ module.exports = function (app) {
                                     res.status(201).json({
                                         message: 'Запись успешно перенесена',
                                         oldAppointment: {
-                                            appointmentId: cancelledAppointmentId,
+                                            appointmentId: canceledAppointmentId,
                                             doctorId: doctorValidation.value,
                                             slotDateTime: dateFromTimeValidation.value,
-                                            whyCancelled: whyCancelledValidation.value,
-                                            status: 'cancelled'
+                                            whycanceled: whycanceledValidation.value,
+                                            status: 'canceled'
                                         },
                                         newAppointment: {
                                             appointmentId: this.lastID,
@@ -763,7 +763,7 @@ module.exports = function (app) {
                 // 3. Получаем статистику по записям
                 db.get(`
                 SELECT 
-                    COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count,
+                    COUNT(CASE WHEN status = 'canceled' THEN 1 END) as canceled_count,
                     COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_count
                 FROM appointment 
                 WHERE doctor_id = ? AND date(slot_datetime) = ?
@@ -772,7 +772,7 @@ module.exports = function (app) {
                         return res.status(500).json({ error: err.message });
                     }
 
-                    const cancelledCount = stats?.cancelled_count || 0;
+                    const canceledCount = stats?.canceled_count || 0;
                     const completedCount = stats?.completed_count || 0;
 
                     const completedPercent = totalSlots > 0
@@ -780,7 +780,7 @@ module.exports = function (app) {
                         : 0;
 
                     res.json({
-                        cancelled_count: cancelledCount,
+                        canceled_count: canceledCount,
                         completed_percent: completedPercent
                     });
                 });
@@ -803,12 +803,12 @@ module.exports = function (app) {
             p.fio as patient_fio,
             a.slot_datetime, 
             a.status, 
-            c.why_cancelled
+            c.why_canceled
         FROM appointment a
         JOIN user p ON a.patient_code = p.id
-        LEFT JOIN cancelled_appointment c ON a.appt_id = c.appt_id
+        LEFT JOIN canceled_appointment c ON a.appt_id = c.appt_id
         WHERE a.doctor_id = ? 
-            AND a.status = 'cancelled' 
+            AND a.status = 'canceled' 
             AND date(a.slot_datetime) BETWEEN ? AND ?
         ORDER BY a.slot_datetime
     `, [doctorId, startDate, endDate], (err, rows) => {
@@ -879,7 +879,7 @@ module.exports = function (app) {
                 db.get(`
                 SELECT 
                     COUNT(CASE WHEN status = 'booked' THEN 1 END) as booked_count,
-                    COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count,
+                    COUNT(CASE WHEN status = 'canceled' THEN 1 END) as canceled_count,
                     COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_count
                 FROM appointment 
                 WHERE doctor_id = ? AND date(slot_datetime) = ?
@@ -889,7 +889,7 @@ module.exports = function (app) {
                     }
 
                     const bookedCount = stats?.booked_count || 0;
-                    const cancelledCount = stats?.cancelled_count || 0;
+                    const canceledCount = stats?.canceled_count || 0;
                     const completedCount = stats?.completed_count || 0;
 
                     const completedPercent = totalSlots > 0
@@ -901,15 +901,15 @@ module.exports = function (app) {
                     SELECT 
                         a.appt_id, 
                         p.fio as patient_fio,
-                        c.why_cancelled
+                        c.why_canceled
                     FROM appointment a
                     JOIN user p ON a.patient_code = p.id
-                    JOIN cancelled_appointment c ON a.appt_id = c.appt_id
+                    JOIN canceled_appointment c ON a.appt_id = c.appt_id
                     WHERE a.doctor_id = ? 
-                        AND a.status = 'cancelled' 
+                        AND a.status = 'canceled' 
                         AND date(a.slot_datetime) = ?
                     ORDER BY a.slot_datetime
-                `, [doctorId, date], (err, cancelledList) => {
+                `, [doctorId, date], (err, canceledList) => {
                         if (err) {
                             return res.status(500).json({ error: err.message });
                         }
@@ -918,11 +918,11 @@ module.exports = function (app) {
                             total_slots: totalSlots,
                             booked_slots: completedCount, //Поменяли
                             completed_percent: completedPercent,
-                            cancelled_count: cancelledCount,
-                            cancelled_list: cancelledList.map(item => ({
+                            canceled_count: canceledCount,
+                            canceled_list: canceledList.map(item => ({
                                 appointment_id: item.appt_id,
                                 patient_fio: item.patient_fio,
-                                reason: item.why_cancelled
+                                reason: item.why_canceled
                             }))
                         });
                     });
@@ -988,10 +988,10 @@ module.exports = function (app) {
             a.slot_datetime,
             a.status,
             p.fio as patient_name,
-            c.why_cancelled
+            c.why_canceled
         FROM appointment a
         JOIN user p ON a.patient_code = p.id
-        LEFT JOIN cancelled_appointment c ON a.appt_id = c.appt_id
+        LEFT JOIN canceled_appointment c ON a.appt_id = c.appt_id
         WHERE a.doctor_id = ? AND date(a.slot_datetime) = ?
         ORDER BY a.slot_datetime
     `, [doctorId, date], (err, rows) => {
@@ -1006,7 +1006,7 @@ module.exports = function (app) {
                 patientName: row.patient_name,
                 datetime: row.slot_datetime,
                 status: row.status,
-                cancelReason: row.why_cancelled || null
+                cancelReason: row.why_canceled || null
             }));
 
             res.json({
@@ -1147,7 +1147,7 @@ module.exports = function (app) {
 
             // 4. Очищаем таблицы (только после всех проверок)
             db.serialize(() => {
-                db.run('DELETE FROM cancelled_appointment');
+                db.run('DELETE FROM canceled_appointment');
                 db.run('DELETE FROM appointment');
                 db.run('DELETE FROM work_slot');
                 db.run('DELETE FROM speciality');
@@ -1163,7 +1163,7 @@ module.exports = function (app) {
                         if (err) return res.status(500).json({ error: 'Ошибка импорта рабочих слотов' });
                         importFunctions.importAppointments(appointmentPathFinal, (err) => {
                             if (err) return res.status(500).json({ error: 'Ошибка импорта записей' });
-                            importFunctions.importCancelledAppointments(canceledPathFinal, (err) => {
+                            importFunctions.importcanceledAppointments(canceledPathFinal, (err) => {
                                 if (err) return res.status(500).json({ error: 'Ошибка импорта отменённых записей' });
                                 res.json({ message: '✅ Все данные успешно импортированы' });
                             });
@@ -1187,8 +1187,8 @@ module.exports = function (app) {
         UPDATE appointment 
         SET status = 'completed' 
         WHERE status = 'booked'
-        AND date(slot_datetime) < ?
-    `, [CURRENT_DATE], function (err) {
+        AND datetime(slot_datetime) < datetime('now')
+    `, function (err) {
             if (err) {
                 console.error('❌ Ошибка:', err.message);
             } else if (this.changes > 0) {
@@ -1204,12 +1204,9 @@ module.exports = function (app) {
         updateCompletedAppointments();
     }, 1000);
 
-    // Обновляем каждые 24 часа
+    // Обновляем каждую минуту
     setInterval(() => {
-        console.log('\n⏰ Плановое обновление (каждые 24 часа)...');
+        console.log('\n⏰ Плановое обновление (каждую минуту)...');
         updateCompletedAppointments();
-    }, 24 * 60 * 60 * 1000);
-
-
-
+    }, 60000);
 }

@@ -37,6 +37,14 @@ function loadDoctors(availableDoctors){
     });
 }
 
+document.querySelector('.allfio').addEventListener('click', (e) => {
+    if (e.target.type === "submit"){
+        localStorage.setItem('doctorId', e.target.id);
+        localStorage.setItem('doctorFio', e.target.textContent);
+        window.location.href = './proof.html';
+    };
+});
+
 (() => {
     getDoctors();
 })()

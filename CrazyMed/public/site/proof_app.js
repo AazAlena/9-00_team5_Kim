@@ -8,7 +8,7 @@ const page = {
 
 function loadData(){
     let fio = localStorage.getItem('doctorFio').split(' ');
-    let spec = localStorage.getItem('speciality');
+    let spec = localStorage.getItem('doctorSpecialty');
     let date = localStorage.getItem('date').split('-').reverse().join('.');
     let time = localStorage.getItem('time');
     page.content.innerHTML = `Ф.И.О.:<p>${fio[0]} ${fio[1]}<br>${fio[2]}</p><br>
@@ -74,7 +74,7 @@ page.buttonProof.addEventListener('click', async () => {
 });
 
 page.return.addEventListener('click', () => {
-    window.history.back();
+    window.location.href = './speciality.html';
 });
 
 (() => {

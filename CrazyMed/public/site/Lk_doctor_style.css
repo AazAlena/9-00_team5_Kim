@@ -170,10 +170,6 @@ hr{
     padding: 30px 20px;
 }
 
-.appt_item:hover {
-    background-color: #b2c8ff;
-}
-
 .text_content {
     font-family: 'Comic Relief', monospace;
     font-size: 40px;

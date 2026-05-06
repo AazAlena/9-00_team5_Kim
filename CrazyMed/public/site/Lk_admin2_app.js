@@ -27,6 +27,7 @@ page.back.addEventListener('click', () => {
 
 //Загрузка календаря
 function loadDays(emptyLen,daysLen){
+    page.calendar.monthInput.value = new Date().getMonth()+1;
     const namesDays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
     for (let i = 0; i < 7; i++){
         let elem = document.createElement('div');
@@ -54,7 +55,7 @@ function loadDays(emptyLen,daysLen){
 
 function getFirstDay(){
     let month = localStorage.getItem('dateTime').split('-')[1] - 1;
-    let yearNow = '2025';//(new Date()).getFullYear();
+    let yearNow = (new Date()).getFullYear();
     let firstDayIndex = (new Date(yearNow, month, 1, 0, 0, 0)).getDay();
     let firstDay =  firstDayIndex === 0 ? 6 : firstDayIndex - 1;
     let lastDay = new Date(yearNow, month+1, 0).getDate();
@@ -116,7 +117,7 @@ async function loadDoctorInfo(){
         let result = await getDoctorDailyStats(localStorage.getItem('doctorId'), localStorage.getItem('dateTime'));
         console.log(result);
         page.utilization.percent.innerText = 'Утилизация: ' + result.completed_percent + '%';
-        let arr = result.cancelled_list;
+        let arr = result.canceled_list;
         let totalArr = result;
         let transferArr = [];
         let cancelArr = [];
@@ -128,8 +129,8 @@ async function loadDoctorInfo(){
                 transferArr.push(el)
             }
         });
-        delete totalArr.cancelled_count;
-        delete totalArr.cancelled_list;
+        delete totalArr.canceled_count;
+        delete totalArr.canceled_list;
         totalArr.cancel_arr = cancelArr;
         totalArr.transfer_arr = transferArr;
         console.log(totalArr);
@@ -145,6 +146,7 @@ async function loadDoctorInfo(){
 
 (()=>{
     CheckEnter();
+    page.calendar.monthInput.value = new Date().getMonth()+1;
     getFirstDay();
     loadDoctorInfo();
 })();

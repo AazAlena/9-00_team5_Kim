@@ -73,33 +73,33 @@ function importWorkSlots(filePath, callback) {
 }
 
 // Импорт отмененных записей
-function importCancelledAppointments(filePath, callback) {
-    const cancelled_appointments = [];
+function importcanceledAppointments(filePath, callback) {
+    const canceled_appointments = [];
     
     fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (row) => {
-            cancelled_appointments.push({
+            canceled_appointments.push({
                 appt_id: parseInt(row.appt_id),
-                why_cancelled: row.why_cancelled
+                why_canceled: row.why_canceled
             });
         })
         .on('end', () => {
             db.serialize(() => {
-                db.run('DELETE FROM cancelled_appointment');
+                db.run('DELETE FROM canceled_appointment');
                 
                 const stmt = db.prepare(`
-                    INSERT INTO cancelled_appointment (appt_id, why_cancelled) 
+                    INSERT INTO canceled_appointment (appt_id, why_canceled) 
                     VALUES (?, ?)
                 `);
                 
-                cancelled_appointments.forEach(a => {
-                    stmt.run(a.appt_id, a.why_cancelled);
+                canceled_appointments.forEach(a => {
+                    stmt.run(a.appt_id, a.why_canceled);
                 });
                 stmt.finalize();
                 
-                console.log(`✅ Импортировано отмененных записей: ${cancelled_appointments.length}`);
-                if (callback) callback(null, cancelled_appointments);
+                console.log(`✅ Импортировано отмененных записей: ${canceled_appointments.length}`);
+                if (callback) callback(null, canceled_appointments);
             });
         });
 }
@@ -210,7 +210,7 @@ function importAdmins(filePath, callback) {
 module.exports = {
     importUsers,
     importWorkSlots,
-    importCancelledAppointments,
+    importcanceledAppointments,
     importAppointments,
     importSpeciality
 };

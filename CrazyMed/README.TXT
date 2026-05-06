@@ -3,7 +3,7 @@
 appointmernts:
 appointment_id -> appt_id
 
-cancelled_appointments:
+canceled_appointments:
 appointment_id -> appt_id
 
 admins, doctors, patients deleted

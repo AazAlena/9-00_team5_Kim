@@ -74,9 +74,10 @@ function loadDays(emptyLen,daysLen){
 function getFirstDay(){
     let month = Number(page.calendar.monthInput.value) - 1;
     let yearNow = (new Date()).getFullYear();
-    let firstDayIndex = (new Date(yearNow, month, 1, 0, 0, 0)).getDay()
+    let firstDayIndex = (new Date(yearNow, month, 1, 0, 0, 0)).getDay();
     let firstDay =  firstDayIndex === 0 ? 6 : firstDayIndex - 1;
     let lastDay = new Date(yearNow, month+1, 0).getDate();
+    console.log(firstDay,lastDay);
     loadDays(firstDay,lastDay);
 }
 
@@ -105,9 +106,10 @@ page.calendar.section.addEventListener('click', async (e) => {
             button.style.backgroundColor = '';
         });
         e.target.style.backgroundColor = '#EFEFFF';
+        let selectedYear = new Date().getFullYear();
         let selectedMonth = String(page.calendar.monthInput.value).padStart(2, '0');
         let selectedDayNumber = String(e.target.textContent).padStart(2, '0');
-        let selectedDate = `2025-${selectedMonth}-${selectedDayNumber}`;
+        let selectedDate = `${selectedYear}-${selectedMonth}-${selectedDayNumber}`;
         try {
             appointments = await getPatientAppointments(localStorage.getItem('userId'), selectedDate);
             loadAppointments(appointments);
@@ -122,7 +124,7 @@ page.calendar.section.addEventListener('click', async (e) => {
 //Загрузка записей
 function loadAppointments(arrAppt){
     for (let i = 0; i < arrAppt.length; i++) {
-        if (arrAppt[i].status != "cancelled"){
+        if (arrAppt[i].status != "canceled"){
             let item = document.createElement('div');
             item.setAttribute('class','appt_item');
             item.setAttribute('id',String(i))
@@ -131,6 +133,9 @@ function loadAppointments(arrAppt){
             let specialty = (arrAppt[i]).doctorSpecialty;
             let time = (((arrAppt[i]).datetime).split(' '))[1];
             content.innerText = `${specialty} ${time}`;
+            if ((arrAppt[i]).status === 'completed'){
+                content.style.textDecoration = 'line-through';
+            }
             item.appendChild(content);
             let buttons = document.createElement('div');
             buttons.setAttribute('class','buttons');
@@ -216,6 +221,7 @@ function CheckEnter(){
 
 (()=>{
     CheckEnter();
+    page.calendar.monthInput.value = new Date().getMonth()+1;
     getFirstDay();
     if (localStorage.getItem('dateTime')){
         page.calendar.monthInput.value = String(Number(localStorage.getItem('dateTime').split('-')[1]));
@@ -225,6 +231,9 @@ function CheckEnter(){
                 elem.firstChild.click();
             }
         });
+    }
+    if(localStorage.getItem('flag')){
+        localStorage.removeItem('flag');
     }
 })()
 

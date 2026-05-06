@@ -179,7 +179,7 @@ function generateWorkSlots() {
 }
 
 // 4. appointment.csv и canceled_appointment.csv
-function generateAppointmentsAndCancelled() {
+function generateAppointmentsAndcanceled() {
     // Генерируем все возможные слоты (30-минутные)
     const allPossibleSlots = [];
     
@@ -201,14 +201,14 @@ function generateAppointmentsAndCancelled() {
     
     const selectedSlots = shuffled.slice(0, Math.min(APPOINTMENT_COUNT, shuffled.length));
     
-    // Генерируем записи (15% cancelled)
+    // Генерируем записи (15% canceled)
     const appointments = [];
-    const cancelledList = [];
+    const canceledList = [];
     let nextId = 1;
     
     for (const slot of selectedSlots) {
-        const isCancelled = Math.random() < 0.15; // 15% cancelled
-        const status = isCancelled ? 'cancelled' : 'booked';
+        const iscanceled = Math.random() < 0.15; // 15% canceled
+        const status = iscanceled ? 'canceled' : 'booked';
         
         // Случайный пациент
         const patient = patients[Math.floor(Math.random() * patients.length)];
@@ -221,11 +221,11 @@ function generateAppointmentsAndCancelled() {
             status: status
         });
         
-        if (isCancelled) {
+        if (iscanceled) {
             const reason = cancelReasons[Math.floor(Math.random() * cancelReasons.length)];
-            cancelledList.push({
+            canceledList.push({
                 appt_id: nextId,
-                why_cancelled: reason
+                why_canceled: reason
             });
         }
         
@@ -241,12 +241,12 @@ function generateAppointmentsAndCancelled() {
     console.log(`✅ appointment.csv (${appointments.length} записей)`);
     
     // Сохраняем canceled_appointment.csv
-    let cancelledCsv = 'appt_id,why_cancelled\n';
-    cancelledList.forEach(c => {
-        cancelledCsv += `${c.appt_id},${c.why_cancelled}\n`;
+    let canceledCsv = 'appt_id,why_canceled\n';
+    canceledList.forEach(c => {
+        canceledCsv += `${c.appt_id},${c.why_canceled}\n`;
     });
-    fs.writeFileSync(path.join(DATA_DIR, 'canceled_appointment.csv'), cancelledCsv, 'utf8');
-    console.log(`✅ canceled_appointment.csv (${cancelledList.length} записей)`);
+    fs.writeFileSync(path.join(DATA_DIR, 'canceled_appointment.csv'), canceledCsv, 'utf8');
+    console.log(`✅ canceled_appointment.csv (${canceledList.length} записей)`);
 }
 
 // ============================================
@@ -262,7 +262,7 @@ if (!fs.existsSync(DATA_DIR)) {
 generateSpeciality();
 generateUsers();
 generateWorkSlots();
-generateAppointmentsAndCancelled();
+generateAppointmentsAndcanceled();
 
 console.log('\n✅ Генерация T1 завершена! Файлы сохранены в папку data/\n');
 console.log('📊 Статистика T1:');

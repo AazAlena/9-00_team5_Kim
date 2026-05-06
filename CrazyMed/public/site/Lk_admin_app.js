@@ -50,6 +50,7 @@ page.nav.exit.addEventListener('click', () => {
 
 //Загрузка календаря
 function loadDays(emptyLen,daysLen){
+    page.calendar.monthInput.value = new Date().getMonth()+1;
     const namesDays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
     for (let i = 0; i < 7; i++){
         let elem = document.createElement('div');
@@ -74,7 +75,7 @@ function loadDays(emptyLen,daysLen){
 
 function getFirstDay(){
     let month = Number(page.calendar.monthInput.value) - 1;
-    let yearNow = '2025'; //(new Date()).getFullYear();
+    let yearNow = (new Date()).getFullYear();
     let firstDayIndex = (new Date(yearNow, month, 1, 0, 0, 0)).getDay()
     let firstDay =  firstDayIndex === 0 ? 6 : firstDayIndex - 1;
     let lastDay = new Date(yearNow, month+1, 0).getDate();
@@ -106,9 +107,10 @@ page.calendar.section.addEventListener('click', async (e) => {
             button.style.backgroundColor = '';
         });
         e.target.style.backgroundColor = '#EFEFFF';
+        let selectedYear = new Date().getFullYear();
         let selectedMonth = String(page.calendar.monthInput.value).padStart(2, '0');
         let selectedDayNumber = String(e.target.textContent).padStart(2, '0');
-        selectedDate = `2025-${selectedMonth}-${selectedDayNumber}`;
+        selectedDate = `${selectedYear}-${selectedMonth}-${selectedDayNumber}`;
         console.log(selectedDate);
         try {
             doctors = await getWorkingDoctors(selectedDate);
@@ -189,6 +191,7 @@ function CheckEnter(){
 
 (()=>{
     CheckEnter();
+    page.calendar.monthInput.value = new Date().getMonth()+1;
     if (localStorage.getItem('dateTime')){
         page.calendar.monthInput.value = String(Number(localStorage.getItem('dateTime').split('-')[1]));
         getFirstDay();

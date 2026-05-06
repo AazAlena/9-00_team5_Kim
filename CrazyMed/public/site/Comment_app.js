@@ -1,12 +1,20 @@
 'use strict';
 
+let flag = localStorage.getItem('flag');
+if (flag === 'delete'){
+    document.querySelector('form').action = './Lk_patient.html';
+}
+else if (flag === 'transfer'){
+    document.querySelector('form').action = './ch2_date.html';
+}
+
 const page = {
     comm: document.querySelector('#comm'),
     button: document.querySelector('#comm_butt'),
 }
 
 // Функция отмены записи на прием
-async function cancelAppointment(doctorId, patientCode, slotDateTime, whyCancelled) {
+async function cancelAppointment(doctorId, patientCode, slotDateTime, whycanceled) {
     try {
         const response = await fetch('http://localhost:3000/appointments/cancel', {
             method: 'POST',
@@ -17,7 +25,7 @@ async function cancelAppointment(doctorId, patientCode, slotDateTime, whyCancell
                 doctorId: doctorId,
                 patientCode: patientCode,
                 slotDateTime: slotDateTime,  // формат "YYYY-MM-DD HH:MM"
-                whyCancelled: whyCancelled
+                whycanceled: whycanceled
             })
         });
 
@@ -44,7 +52,7 @@ async function cancelAppointment(doctorId, patientCode, slotDateTime, whyCancell
 }
 
 page.button.addEventListener('click', async () => {
-    let flag = localStorage.getItem('flag');
+    
     let comment = page.comm.value;
     if (flag === 'delete'){
         comment = 'Отмена: ' + comment;
@@ -56,17 +64,8 @@ page.button.addEventListener('click', async () => {
     let patientCode = localStorage.getItem('userId');
     let slotDateTime = localStorage.getItem('dateTime');
     try {
+        console.log(doctorId, patientCode, slotDateTime, comment);
         let result = await cancelAppointment(doctorId, patientCode, slotDateTime, comment);
-        localStorage.removeItem('doctorId');
-        if (flag === 'delete'){
-            localStorage.removeItem('flag');
-            window.location.href = './Lk_patient.html';
-        }
-        else{
-            localStorage.removeItem('flag');
-            window.location.href = './speciality.html';
-        }
-        
     }
     catch (error) {
         console.error('Ошибка:', error.message);

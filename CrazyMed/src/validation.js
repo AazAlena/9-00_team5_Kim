@@ -97,7 +97,7 @@ function validateDateTime(dateTimeStr) {
  * Проверка причины отмены / переноса
  * @param {string} text
  */
-function validateWhyCancelled(text) {
+function validateWhycanceled(text) {
     if (typeof text !== 'string') {
         return { valid: false, value: null, message: 'Причина отмены должна быть строкой' };
     }
@@ -144,7 +144,7 @@ function validatePatientCode(code) {
  * Проверка статуса записи (для фильтров или обновлений)
  */
 function validateAppointmentStatus(status) {
-    const allowed = ['booked', 'cancelled', 'served'];
+    const allowed = ['booked', 'canceled', 'served'];
     if (allowed.includes(status)) {
         return { valid: true, value: status, message: '' };
     }
@@ -186,7 +186,7 @@ module.exports = {
     validateDate,
     validateTime,
     validateDateTime,
-    validateWhyCancelled,
+    validateWhycanceled,
     validatePatientCode,
     validateAppointmentStatus,
     validateEmail,

@@ -58,15 +58,15 @@ const schemas = {
             doctor_id: 'string',
             patient_code: 'string',
             slot_datetime: 'datetime',
-            status: ['booked', 'cancelled', 'completed']
+            status: ['booked', 'canceled', 'completed']
         },
         unique: ['appt_id']
     },
     'canceled_appointment.csv': {
-        required: ['appt_id', 'why_cancelled'],
+        required: ['appt_id', 'why_canceled'],
         types: {
             appt_id: 'number',
-            why_cancelled: 'string'
+            why_canceled: 'string'
         },
         unique: ['appt_id']
     }
@@ -183,19 +183,19 @@ function validateAppointmentInWorkSlot(appointments, workSlots) {
     return errors;
 }
 
-function validateCancelledHasReason(appointments, cancelled) {
+function validatecanceledHasReason(appointments, canceled) {
     const errors = [];
-    const cancelledMap = new Map();
-    for (const c of cancelled) {
-        cancelledMap.set(c.appt_id, c);
+    const canceledMap = new Map();
+    for (const c of canceled) {
+        canceledMap.set(c.appt_id, c);
     }
 
     for (const apt of appointments) {
-        if (apt.status === 'cancelled' && !cancelledMap.has(apt.appt_id)) {
-            errors.push(`❌ appointment.csv: запись ${apt.appt_id} имеет статус 'cancelled', но нет причины в canceled_appointment.csv`);
+        if (apt.status === 'canceled' && !canceledMap.has(apt.appt_id)) {
+            errors.push(`❌ appointment.csv: запись ${apt.appt_id} имеет статус 'canceled', но нет причины в canceled_appointment.csv`);
         }
-        if (apt.status !== 'cancelled' && cancelledMap.has(apt.appt_id)) {
-            errors.push(`❌ canceled_appointment.csv: запись ${apt.appt_id} имеет причину отмены, но статус в appointment.csv не 'cancelled'`);
+        if (apt.status !== 'canceled' && canceledMap.has(apt.appt_id)) {
+            errors.push(`❌ canceled_appointment.csv: запись ${apt.appt_id} имеет причину отмены, но статус в appointment.csv не 'canceled'`);
         }
     }
     return errors;
@@ -316,7 +316,7 @@ async function validateAll() {
     }
 
     if (allData['appointment.csv'] && allData['canceled_appointment.csv']) {
-        const cancelErrors = validateCancelledHasReason(allData['appointment.csv'], allData['canceled_appointment.csv']);
+        const cancelErrors = validatecanceledHasReason(allData['appointment.csv'], allData['canceled_appointment.csv']);
         errors.push(...cancelErrors);
     }
 
