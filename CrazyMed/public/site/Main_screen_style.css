@@ -20,11 +20,17 @@ button, label, ::placeholder{
 }
 
 nav{
+    width: 100vw;
+    background-color: white;
     padding: 20px 0px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     box-sizing: border-box;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
 }
 nav>ul{
     height: 44px;
@@ -65,7 +71,7 @@ nav>a:hover{
     color: #6277bc;
 }
 
-#hd>img, #doc>div, #stat{
+#hd>img, #doc>div{
     width: 1420px;
     height: 850px;
     margin: 50px auto;
@@ -141,7 +147,13 @@ nav>a:hover{
     position: relative;
     width: 100%;
 }
-
+.Carousel-slider.fullwidth {
+    height: 100%;
+}
+.Carousel-slider.fullwidth .slider-item {
+    height: 100%;
+    width: 100%;
+}
 .slider-wrapper {
     overflow: hidden;
     position: relative;
@@ -205,55 +217,26 @@ nav>a:hover{
 }
 
 #stat{
+    width: 1420px;
     color: #070062;
     font-size: 36px;
     margin: 80px auto;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 40px;
 }
 .stat_cont{
     display: flex;
     flex-direction: row;
-    justify-content: center;
-}
-.high_p{
-    padding: 10px 30px;
-}
-.mid_p{
-    width: 630px;
-    padding: 20px;
-}
-.low_p{
-    width: 630px;
-    padding: 10px 30px;
+    gap: 40px;
 }
 .item{
     background-color: #B2C8FF;
     border-radius: 20px;
-    margin: 20px 0px 20px;
     display: flex;
-    justify-content: center;
-}
-.item1{
-    width: 1420px;
-    height: 200px;
-    background-color: #B2C8FF;
-    border-radius: 20px;
-    margin: 0px 0px 20px;
-    display: flex;
-    justify-content: center;
-}
-.item2, .item3{
-    width: 690px;
-    height: 370px;
-}
-.item2, .item4{
-    margin-right: 20px;
-}
-.item4, .item5{
-    width: 690px;
-    height: 200px;
-}
-.item3, .item5{
-    margin-left: 20px;
+    flex: 1 1 100%;
+    text-align: center;
 }
 
 #Registration{
