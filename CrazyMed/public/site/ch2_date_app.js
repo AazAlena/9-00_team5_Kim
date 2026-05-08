@@ -1,4 +1,6 @@
 'use strict';
+import * as chrono from 'https://cdn.jsdelivr.net/npm/chrono-node@2.9.0/dist/esm/locales/ru/index.js';
+
 let appointments = [];
 
 // Функция получения слотов врача на конкретную дату (с отметкой доступности)
@@ -62,17 +64,27 @@ function filtArray(arr){
 async function loadSlots(date){
     try {
         let result = await getDoctorSlots(localStorage.getItem('doctorId'), date);
-        console.log(result);
         let appt = filtArray(result.slots);
-        console.log(appt);
+        appt.sort((a, b) => a.time.localeCompare(b.time));
         let futureId = -1;
         appt.forEach(elem => {
             futureId++;
-            let el = document.createElement('button');
-            el.setAttribute('class', 'alltimes-item');
-            el.setAttribute('id', String(futureId));
-            el.innerText = elem.time;
-            document.querySelector('.alltimes').appendChild(el);
+            if (new Date(localStorage.getItem('date')).setHours(0,0,0,0) === new Date().setHours(0,0,0,0)){
+                if (new Date().setHours(Number((elem.time).split(':')[0]),Number((elem.time).split(':')[1]), 0, 0) > Number(new Date())){
+                    let el = document.createElement('button');
+                    el.setAttribute('class', 'alltimes-item');
+                    el.setAttribute('id', String(futureId));
+                    el.innerText = elem.time;
+                    document.querySelector('.alltimes').appendChild(el);
+                }
+            }else{
+                let el = document.createElement('button');
+                el.setAttribute('class', 'alltimes-item');
+                el.setAttribute('id', String(futureId));
+                el.innerText = elem.time;
+                document.querySelector('.alltimes').appendChild(el);
+            }
+            
         });
     }
     catch (error) {
@@ -81,18 +93,46 @@ async function loadSlots(date){
     }
 }
 
+function parseDayMonth(input, referenceDate = new Date()) {
+    // Проверяем формат ДД.ММ
+    const match = input.match(/^(\d{2})\.(\d{2})$/);
+    if (!match) {
+        // Если не подходит под ДД.ММ — пробуем распарсить chrono'м
+        return chrono.parseDate(input, new Date().setHours(0,0,0) , { forwardDate: true });
+    }
+    const day = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10) - 1;
+    const refDateOnly = new Date(referenceDate);
+    refDateOnly.setHours(0, 0, 0, 0); // отбрасываем время
+    let candidateDate = new Date(refDateOnly.getFullYear(), month, day);
+    if (candidateDate < refDateOnly) {
+        candidateDate = new Date(refDateOnly.getFullYear() + 1, month, day);
+    }
+    return candidateDate;
+}
+
+
 document.querySelector('.search').addEventListener('input', () =>{
-    let text = document.querySelector('#date').value;
-    if (text.length === 5 && 0<Number(text.split('.')[0])<32 && 0<Number(text.split('.')[1])<13){
+    if (document.querySelector('.alltimes').innerHTML != ''){
         document.querySelector('.alltimes').innerHTML = '';
-        loadSlots(new Date().getFullYear() + '-' + text.split('.')[1] + '-' + text.split('.')[0]);
     };
+    let text = document.querySelector('#date').value;
+    let date = parseDayMonth(text);
+    if (date != null && new Date(date).setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)){
+        let today = new Date();
+        if (date.getFullYear() != today.getFullYear() && date.getDate() === today.getDate() && date.getMonth() === today.getMonth()){
+            let d = new Date(date.setFullYear(today.getFullYear()));
+            date = d;
+        }
+        let dateSearch = String(date.getFullYear()) + '-' + String(date.getMonth()+1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+        localStorage.setItem('date', dateSearch);
+        console.log(dateSearch);
+        loadSlots(dateSearch);
+    }
 });
 
 document.querySelector('.alltimes').addEventListener('click', (e) => {
     if (e.target.type === "submit"){
-        let dateSearch = (document.querySelector('.search').value).split('.');
-        localStorage.setItem('date', new Date().getFullYear() + '-' + dateSearch[1] + '-' + dateSearch[0]);
         localStorage.setItem('time', e.target.textContent);
         window.location.href = './proof.html';
     };

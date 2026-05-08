@@ -135,6 +135,7 @@ function loadAppointments(arrAppt){
             content.innerText = `${specialty} ${time}`;
             if ((arrAppt[i]).status === 'completed'){
                 content.style.textDecoration = 'line-through';
+                item.style.pointerEvents = 'none';
             }
             item.appendChild(content);
             let buttons = document.createElement('div');
@@ -231,6 +232,7 @@ function CheckEnter(){
                 elem.firstChild.click();
             }
         });
+        localStorage.removeItem('dateTime');
     }
     if(localStorage.getItem('flag')){
         localStorage.removeItem('flag');

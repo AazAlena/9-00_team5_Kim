@@ -1181,7 +1181,7 @@ module.exports = function (app) {
 
 
     function updateCompletedAppointments() {
-        console.log(`\n🔄 Проверка записей (сегодня: ${CURRENT_DATE})`);
+        console.log(`\n🔄 Проверка записей (сейчас: ${new Date()})`);
 
         db.run(`
         UPDATE appointment 

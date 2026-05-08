@@ -53,16 +53,22 @@ page.registerBtn.addEventListener('click', async () => {
     const fio = page.fio.value;
     const email = page.email.value;
     const password = page.password.value;
-    try {
-        const result = await registerPatient(fio, email, password);
-        let userId = result.patient_id;
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('role', 'patient');
-        window.location.href = './Main_screen.html';
-    } catch (error) {
-        console.error('Ошибка регистрации:', error.message);
-        alert(error.message);
+    if (fio.split(' ').length != 3){
+        alert('Введите раздельно Фамилию Имя Отчество');
     }
+    else{
+        try {
+            const result = await registerPatient(fio, email, password);
+            let userId = result.patient_id;
+            localStorage.setItem('userId', userId);
+            localStorage.setItem('role', 'patient');
+            window.location.href = './Main_screen.html';
+        } catch (error) {
+            console.error('Ошибка регистрации:', error.message);
+            alert(error.message);
+        }
+    }
+
 });
 
 //Скрытие и открытие пароля

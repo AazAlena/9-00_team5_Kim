@@ -69,13 +69,12 @@ main {
     border-radius: 10px;
     border: none;
     outline: none;
-    padding: 10px 20px;
     flex-shrink: 0;
     padding: 10px 20px 10px 67px;
     background-image: url(./img/poisk.svg);
-    background-size: 47px;
-    background-repeat: no-repeat;
-    background-position: 10px center;
+    background-size: 47px !important;
+    background-repeat: no-repeat !important;
+    background-position: 10px center !important;
 }
 .search:focus{
     background-color: #ffffff;

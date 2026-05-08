@@ -11,6 +11,7 @@ const page = {
     nav: {
         appt: document.querySelector('#appt'),
         lk: document.querySelector('#lk'),
+        theme: document.querySelector('.theme'),
         enterExitBtn: document.querySelector('#but_enter'),
     },
     appoinmentBtn: document.querySelector('.appt_but'),
@@ -138,7 +139,7 @@ function CheckEnter(){
         }
     }
     else {
-        page.nav.appt.parentElement.style.display = 'inline-block';
+        page.nav.appt.parentElement.style.display = 'flex';
         loginFlag = false;
         page.nav.enterExitBtn.textContent = 'Войти';
         document.querySelectorAll('input').forEach(input => input.disabled = false);
@@ -148,16 +149,21 @@ function CheckEnter(){
             const fio = page.register.fio.value;
             const email = page.register.email.value;
             const password = page.register.password.value;
-            try {
-                const result = await registerPatient(fio, email, password);
-                userId = result.patient_id;
-                role = 'patient';
-                localStorage.setItem('userId', userId);
-                localStorage.setItem('role', role);
-                window.location.href = '';
-            } catch (error) {
-                console.error('Ошибка регистрации:', error.message);
-                alert(error.message);
+            if (fio.split(' ').length != 3){
+                alert('Введите раздельно Фамилию Имя Отчество');
+            }
+            else{
+                try {
+                    const result = await registerPatient(fio, email, password);
+                    userId = result.patient_id;
+                    role = 'patient';
+                    localStorage.setItem('userId', userId);
+                    localStorage.setItem('role', role);
+                    window.location.href = '';
+                } catch (error) {
+                    console.error('Ошибка регистрации:', error.message);
+                    alert(error.message);
+                }
             }
         });
     }
@@ -232,7 +238,48 @@ document.addEventListener('DOMContentLoaded', () => {
     
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  const items = document.querySelectorAll('.scroll-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Элемент появился в области видимости
+        entry.target.classList.add('visible');
+      } else {
+        // Элемент ушёл из области видимости
+        entry.target.classList.remove('visible');
+      }
+    });
+  }, {
+    threshold: 0.2
+  });
+
+  items.forEach(item => observer.observe(item));
+});
+
+page.nav.theme.addEventListener('click', () => {
+    if (document.querySelector('#sun')){
+        page.nav.theme.id = 'moon';
+        document.body.classList.add('dark-theme');
+        document.querySelector('.theme > img').src = './img/moon.svg';
+        localStorage.setItem('theme','dark');
+    }else if (document.querySelector('#moon')){
+        page.nav.theme.id = 'sun';
+        document.body.classList.remove('dark-theme');
+        document.querySelector('.theme > img').src = './img/sun.svg';
+        localStorage.setItem('theme', 'light');
+    };
+});
+
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        page.nav.theme.click();
+    }
+}
 
 (()=>{
     CheckEnter();
+    CheckTheme();
 })()
