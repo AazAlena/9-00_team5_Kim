@@ -1,4 +1,28 @@
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #070062;
+    --footer-bg: #070062;
+    --text-main: #070062;
+    --text-sub: #efefff;
+    --btn-bg: #070062;
+    --btn-text: #efefff;
+    --btn-hover: #5267af;
+}
+
+body.dark-theme {
+    --bg-color: #070062;
+    --bg-sub-color: #070062;
+    --footer-bg: #5267af;
+    --text-main: #efefff;
+    --text-sub: #070062;
+    --btn-bg: #efefff;
+    --btn-text: #070062;
+    --btn-hover: #070062;
+}
+
+
 body{
+    background-color: var(--bg-color);
     font-size: 32px;
     font-family: 'Comic Relief', monospace;
     margin: 0px;
@@ -9,10 +33,10 @@ main{
     margin: 0px auto;
 }
 header{
-    color: #070062;
+    color: var(--text-main);
     height: 100px;
     max-width: 1920px;
-    border-bottom: 1px solid #070062;
+    border-bottom: 1px solid var(--text-main);
 }
 
 button, label, ::placeholder{
@@ -21,8 +45,8 @@ button, label, ::placeholder{
 
 nav{
     width: 100vw;
-    background-color: white;
-    padding: 20px 0px;
+    background-color: var(--bg-color);
+    padding: 20px 70px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -33,42 +57,47 @@ nav{
     z-index: 1;
 }
 nav>ul{
-    height: 44px;
-    padding: 8px 0px;
+    height: 60px;
+    padding: 0px;
     margin: 0px;
-    margin-left: 70px;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    gap: 70px;
 }
 nav>ul>li, nav>ul>li>a{
-    color: #070062;
-    width: 370px;
-    height: 44px;
-    display: inline-block;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
     text-decoration: none;
-
+}
+#sun, #moon{
+    background-color: rgba(1, 1, 1, 0);
+    height: 60px;
+    border: none;
+    padding: 0px;
+    cursor: pointer;
 }
 a:hover{
-    color: #6277bc;
+    color: #5267af;
 }
 #but_enter, nav>button{
-    background-color: #070062;
-    color: #efefff;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
     font-size: 32px;
     width: 180px;
     height: 60px;
     text-align: center;
-    border: none #070062;
+    border: none var(--text-main);
     border-radius: 10px;
     display: inline-block;
     padding: 0px;
-    margin-right: 70px;
     cursor: pointer;
 }
 #but_enter:hover{
-    background-color: #6277bc;
+    background-color: #5267af;
 }
 nav>a:hover{
-    color: #6277bc;
+    color: #5267af;
 }
 
 #hd>img, #doc>div{
@@ -82,7 +111,7 @@ nav>a:hover{
     display: block;
 }
 #main_xyi{
-    background-color: white;
+    background-color: var(--bg-color);
     width: calc(1420px * 0.6);
     height: 852px;
     margin: 0px auto;
@@ -92,7 +121,7 @@ nav>a:hover{
     left: calc((100% - 1420px) / 2);
 }
 #main_fill{
-    color: #070062;
+    color: var(--text-main);
     margin: 153px 0px;
 }
 #main_fill>h1, h1{
@@ -107,8 +136,8 @@ nav>a:hover{
     height: 120px;
 }
 .appt_but{
-    color: #efefff;
-    background-color: #070062;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
     font-size: 64px;
     width: 1420px;
     height: 120px;
@@ -128,11 +157,11 @@ nav>a:hover{
     left: calc(((100vw - 1420px) / 2) + 1420px - 40px - 45px);
 }
 .appt_but:hover{
-    background-color: #6277bc;
+    background-color: #5267af;
 }
 
 #doc>h1{
-    color: #070062;
+    color: var(--text-main);
     font-size: 96px;
     margin-top: 80px;
     height: 110px;
@@ -175,7 +204,7 @@ nav>a:hover{
     border-radius: 20px;
 }
 .superHero{
-    background-color: #6277bc;
+    background-color: #5267af;
     background-size: 100% 100%;
     background-position: center;
 }
@@ -204,7 +233,7 @@ nav>a:hover{
     display: none;
 }
 .podpis {
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
     font-size: 40px;
     height: 100px;
@@ -218,7 +247,7 @@ nav>a:hover{
 
 #stat{
     width: 1420px;
-    color: #070062;
+    color: #efefff;
     font-size: 36px;
     margin: 80px auto;
     display: flex;
@@ -232,7 +261,7 @@ nav>a:hover{
     gap: 40px;
 }
 .item{
-    background-color: #B2C8FF;
+    background-color: #5267af;
     border-radius: 20px;
     display: flex;
     flex: 1 1 100%;
@@ -251,11 +280,11 @@ nav>a:hover{
     background-size: cover;
 }
 .regfill_bg{
+    background-color: var(--bg-sub-color);
+    color: #efefff;
     width: 750px;
     height: 900px;
     margin: 0px auto;
-    background-color: #070062;
-    color: #efefff;
     text-align: center;
     position: relative;
 }
@@ -282,7 +311,7 @@ nav>a:hover{
     border-style: none;
 }
 #reg_form>input:focus{
-    background-color: white;
+    background-color: #ffffff;
 }
 #reg_form>label{
     height: 45px;
@@ -323,13 +352,13 @@ nav>a:hover{
     border-style: none;
     display: block;
     margin: 15px auto 0px;
-    transition: background-color 0.5s, color 0.5s;
 }
 #reg_butt:hover{
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }
 #a{
+    color: var(--text-main);
     width: 300px;
     display: block;
     margin: 10px auto 0px;
@@ -337,7 +366,7 @@ nav>a:hover{
     text-align: center;
 }
 #a:hover{
-    color: #6277bc;
+    color: #5267af;
 }
 
 #map{
@@ -348,7 +377,7 @@ nav>a:hover{
 }
 
 footer{
-    background-color: #070062;
+    background-color: var(--footer-bg);
     color: #efefff;
     width: 100%;
     height: 90px;
@@ -368,9 +397,12 @@ footer>p{
 
 
 @media (max-width: 1280px) {
-    #hd>img, #doc>div, #stat, #map{
+    #hd>img, #doc>div, #map{
         width: 100%;
         height: 60vw;
+    }
+    #stat{
+        width: 100vw;
     }
     #main_xyi{
         width: 60vw;
@@ -391,32 +423,18 @@ footer>p{
         left: 10px;
         display: none;
     }
-    .item1{
-        width: calc(100% - 15px);
-        height: 14vw;
-        margin-left: 10px;
-        margin-right: 5px;
-    }
-    .item2, .item3{
-        width: calc((100% - 20px) / 2);
-        height: 26vw;
-    }
-    .item4, .item5{
-        width: calc((100% - 20px) / 2);
-        height: 14vw;
-    }
-    .item{
-        margin: 10px 5px 10px 10px;
-    }
     .regfill{
         width: 70vw;
     }
 }
 
 @media (max-width: 1470px) and (min-width: 1280px) {
-    #hd>img, #doc>div, #stat, #map{
+    #hd>img, #doc>div, #map{
         height: calc(1280px * 0.6);
         width: 1280px;
+    }
+    #stat{
+        width: 100vw;
     }
     #main_xyi{
         width: calc(1280px * 0.6);
@@ -434,18 +452,6 @@ footer>p{
     }
     .appt_b>img{
         left: calc(((100vw - 1420px) / 2) + 1280px - 40px - 45px);
-    }
-    .item1{
-        width: 1280px;
-        height: 190px;
-    }
-    .item2, .item3{
-        width: calc((1280px - 20px) / 2);
-        height: calc(370px - 40px);
-    }
-    .item4, .item5{
-        width: calc((1280px - 20px) / 2);
-        height: calc(200px - 30px);
     }
     .regfill{
         width: calc(750px * (1280 / 1420));
