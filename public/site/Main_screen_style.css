@@ -1,23 +1,23 @@
 :root {
     --bg-color: #ffffff;
-    --bg-sub-color: #070062;
-    --footer-bg: #070062;
-    --text-main: #070062;
+    --bg-sub-color: #171260;
+    --footer-bg: #171260;
+    --text-main: #171260;
     --text-sub: #efefff;
-    --btn-bg: #070062;
+    --btn-bg: #171260;
     --btn-text: #efefff;
     --btn-hover: #5267af;
 }
 
 body.dark-theme {
-    --bg-color: #070062;
-    --bg-sub-color: #070062;
+    --bg-color: #171260;
+    --bg-sub-color: #171260;
     --footer-bg: #5267af;
     --text-main: #efefff;
-    --text-sub: #070062;
+    --text-sub: #171260;
     --btn-bg: #efefff;
-    --btn-text: #070062;
-    --btn-hover: #070062;
+    --btn-text: #171260;
+    --btn-hover: #171260;
 }
 
 body {
@@ -145,17 +145,14 @@ nav>a:hover {
     border-radius: 20px;
     margin: 0px auto;
     padding: 0px 40px;
-    display: block;
-    text-align: start;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     cursor: pointer;
 }
-
-.appt_b>img {
+#light, #dark {
     width: 45px;
     height: 60px;
-    position: relative;
-    top: -90px;
-    left: calc(((100vw - 1420px) / 2) + 1420px - 40px - 45px);
 }
 .appt_but:hover {
     background-color: #5267af;
