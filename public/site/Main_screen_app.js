@@ -263,11 +263,15 @@ page.nav.theme.addEventListener('click', () => {
         page.nav.theme.id = 'moon';
         document.body.classList.add('dark-theme');
         document.querySelector('.theme > img').src = './img/moon.svg';
+        document.querySelector('#dark').style.display = 'inline';
+        document.querySelector('#light').style.display = 'none';
         localStorage.setItem('theme','dark');
     }else if (document.querySelector('#moon')){
         page.nav.theme.id = 'sun';
         document.body.classList.remove('dark-theme');
         document.querySelector('.theme > img').src = './img/sun.svg';
+        document.querySelector('#dark').style.display = 'none';
+        document.querySelector('#light').style.display = 'inline';
         localStorage.setItem('theme', 'light');
     };
 });
