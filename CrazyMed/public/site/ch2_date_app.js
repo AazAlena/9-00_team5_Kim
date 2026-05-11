@@ -134,6 +134,7 @@ document.querySelector('.search').addEventListener('input', () =>{
 document.querySelector('.alltimes').addEventListener('click', (e) => {
     if (e.target.type === "submit"){
         localStorage.setItem('time', e.target.textContent);
+        localStorage.setItem('date', document.querySelector('.search').value);
         window.location.href = './proof.html';
     };
 });

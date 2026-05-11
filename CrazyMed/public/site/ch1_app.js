@@ -14,6 +14,7 @@ document.querySelector('.button-time').addEventListener('click', () => {
     document.querySelector('.search').id = 'date';
     document.querySelector('.search').value = '';
     document.querySelector('.h1').textContent = 'Выберите время';
+    document.querySelector('.search').placeholder = 'Введите дату';
 });
 
 // для кнопочки выбора по фамилии

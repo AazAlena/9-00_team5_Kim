@@ -7,6 +7,7 @@ const page = {
 };
 
 function loadData(){
+    console.log(1);
     let fio = localStorage.getItem('doctorFio').split(' ');
     let spec = localStorage.getItem('doctorSpecialty');
     let date = localStorage.getItem('date').split('-').reverse().join('.');
@@ -74,9 +75,10 @@ page.buttonProof.addEventListener('click', async () => {
 });
 
 page.return.addEventListener('click', () => {
+    localStorage.removeItem('dateTime');
     window.location.href = './speciality.html';
 });
 
 (() => {
     loadData();
-})()
+})();
