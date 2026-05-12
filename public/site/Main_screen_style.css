@@ -19,7 +19,6 @@ body.dark-theme {
     --btn-text: #171260;
     --btn-hover: #171260;
 }
-
 body {
     background-color: var(--bg-color);
     font-size: 32px;
@@ -336,7 +335,7 @@ nav>a:hover {
 }
 #reg_butt {
     background-color: #efefff;
-    color: #070062;
+    color: #171260;
     width: 350px;
     height: 80px;
     font-size: 32px;
@@ -382,7 +381,7 @@ footer>p {
 }
 
 ::selection {
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }
 
