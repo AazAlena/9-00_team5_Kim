@@ -117,8 +117,11 @@ function CheckEnter(){
     if (localStorage.getItem('flag')){
         localStorage.removeItem('flag');
     }
-    if (localStorage.getItem('dateTime')){
-        localStorage.removeItem('dateTime');
+    if (localStorage.getItem('date')){
+        localStorage.removeItem('date');
+    }
+    if (localStorage.getItem('time')){
+        localStorage.removeItem('time');
     }
     if (localStorage.getItem('doctorId')){
         localStorage.removeItem('doctorId');

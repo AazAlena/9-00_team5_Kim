@@ -45,8 +45,14 @@ function loadDays(emptyLen,daysLen){
         elem.setAttribute('class','item');
         let but = document.createElement('button');
         but.innerText = String(i+1);
-        if (String(i+1) === localStorage.getItem('dateTime').split('-')[2]){
+        if (String(i+1) === String(Number(localStorage.getItem('date').split('-')[2]))){
             but.style.backgroundColor = '#EFEFFF';
+            if (localStorage.getItem('theme') === 'light'){
+                but.style.backgroundColor = '#EFEFFF';
+            }
+            else if (localStorage.getItem('theme') === 'dark'){
+                but.style.backgroundColor = '#5267af';
+            }
         }
         elem.appendChild(but);
         page.calendar.section.appendChild(elem);
@@ -54,7 +60,7 @@ function loadDays(emptyLen,daysLen){
 }
 
 function getFirstDay(){
-    let month = localStorage.getItem('dateTime').split('-')[1] - 1;
+    let month = Number(localStorage.getItem('date').split('-')[1]) - 1;
     let yearNow = (new Date()).getFullYear();
     let firstDayIndex = (new Date(yearNow, month, 1, 0, 0, 0)).getDay();
     let firstDay =  firstDayIndex === 0 ? 6 : firstDayIndex - 1;
@@ -108,13 +114,13 @@ async function getDoctorDailyStats(doctorId, date) {
 
 async function loadDoctorInfo(){
     let fio = localStorage.getItem('doctorFio').split(' ');
-    let date = localStorage.getItem('dateTime').split('-').reverse().join('.');
+    let date = localStorage.getItem('date').split('-').reverse().join('.');
     let doctorSurname = fio[0];
     let doctorFirstName = (fio[1])[0];
     let doctorSecondName = (fio[2])[0];
     page.utilization.fioData.innerHTML = `${doctorSurname} ${doctorFirstName}.${doctorSecondName}.<br>${date}`;
     try {
-        let result = await getDoctorDailyStats(localStorage.getItem('doctorId'), localStorage.getItem('dateTime'));
+        let result = await getDoctorDailyStats(localStorage.getItem('doctorId'), localStorage.getItem('date'));
         console.log(result);
         page.utilization.percent.innerText = 'Утилизация: ' + result.completed_percent + '%';
         let arr = result.canceled_list;
@@ -144,8 +150,18 @@ async function loadDoctorInfo(){
     }
 }
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+        document.querySelector('#dark').style.display = 'inline';
+        document.querySelector('#light').style.display = 'none';
+    }
+}
+
 (()=>{
     CheckEnter();
+    CheckTheme();
     page.calendar.monthInput.value = new Date().getMonth()+1;
     getFirstDay();
     loadDoctorInfo();

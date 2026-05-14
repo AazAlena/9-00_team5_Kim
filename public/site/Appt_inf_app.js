@@ -39,10 +39,10 @@ function getMonth(num){
 };
 
 function loadText(){
-    let date = localStorage.getItem('dateTime').split(' ');
-    let time = date[1];
-    let day = date[0].split('-')[2];
-    let month = getMonth(date[0].split('-')[1]);
+    let date = localStorage.getItem('date').split('-');
+    let time = localStorage.getItem('time');
+    let day = date[2];
+    let month = getMonth(date[1]);
     page.text.innerHTML = `
     <h1>Когда?</h1>
     <p>${day} ${month}, ${time}</p>

@@ -177,7 +177,7 @@ hr{
     color: #efefff;
 }
 
-.appointments {
+.doctors {
     height: 782px;
     padding: 38px 25px;
     box-sizing: border-box;
@@ -190,21 +190,22 @@ hr{
     scrollbar-width: none;
 }
 
-.appt_item {
-    box-sizing: border-box;
+.doctors_item {
+    background-color: #efefff;
+    color: #171260;
     width: 600px;
     height: 100px;
+    font-family: 'Comic Relief', monospace;
+    font-size: 40px;
+    padding: 30px 20px;
+    box-sizing: border-box;
     border-radius: 10px;
     flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #efefff;
-    padding: 30px 20px;
 }
 
-.text_content {
-    font-family: 'Comic Relief', monospace;
-    font-size: 40px;
-    color: #171260;
+.doctors_item:hover {
+    background-color: #b2c8ff;
 }

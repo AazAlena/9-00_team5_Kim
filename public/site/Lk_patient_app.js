@@ -105,7 +105,12 @@ page.calendar.section.addEventListener('click', async (e) => {
         allButtons.forEach(button => {
             button.style.backgroundColor = '';
         });
-        e.target.style.backgroundColor = '#EFEFFF';
+        if (localStorage.getItem('theme') === 'light'){
+            e.target.style.backgroundColor = '#EFEFFF';
+        }
+        else if (localStorage.getItem('theme') === 'dark'){
+            e.target.style.backgroundColor = '#5267af';
+        }
         let selectedYear = new Date().getFullYear();
         let selectedMonth = String(page.calendar.monthInput.value).padStart(2, '0');
         let selectedDayNumber = String(e.target.textContent).padStart(2, '0');
@@ -185,13 +190,15 @@ async function getPatientAppointments(patientId, date) {
 //Клик на слот
 page.appt.addEventListener('click', async (e) => {
     if (e.target.className === 'appt_item'){
-        localStorage.setItem('dateTime', appointments[e.target.id].datetime);
+        localStorage.setItem('date', (appointments[e.target.id].datetime).split(' ')[0]);
+        localStorage.setItem('time', (appointments[e.target.id].datetime).split(' ')[1]);
         localStorage.setItem('doctorId', appointments[e.target.id].doctorId);
         localStorage.setItem('doctorFio', appointments[e.target.id].doctorName);
         localStorage.setItem('doctorSpecialty', appointments[e.target.id].doctorSpecialty);
     }
     if (e.target.className === 'text_content'){
-        localStorage.setItem('dateTime', appointments[e.target.parentElement.id].datetime);
+        localStorage.setItem('date', (appointments[e.target.parentElement.id].datetime).split(' ')[0]);
+        localStorage.setItem('time', (appointments[e.target.parentElement.id].datetime).split(' ')[1]);
         localStorage.setItem('doctorId', appointments[e.target.parentElement.id].doctorId);
         localStorage.setItem('doctorFio', appointments[e.target.parentElement.id].doctorName);
         localStorage.setItem('doctorSpecialty', appointments[e.target.parentElement.id].doctorSpecialty);
@@ -200,14 +207,19 @@ page.appt.addEventListener('click', async (e) => {
         window.location.href = './Appt_inf.html';
     }
     else if (e.target.className === 'delete'){
-        localStorage.setItem('dateTime', appointments[e.target.parentElement.parentElement.id].datetime);
+        localStorage.setItem('date', (appointments[e.target.parentElement.parentElement.id].datetime).split(' ')[0]);
+        localStorage.setItem('time', (appointments[e.target.parentElement.parentElement.id].datetime).split(' ')[1]);
         localStorage.setItem('doctorId', appointments[e.target.parentElement.parentElement.id].doctorId);
+        
         localStorage.setItem('flag', 'delete');
         window.location.href = './Comment.html';
     }
     else if (e.target.className === 'transfer'){
-        localStorage.setItem('dateTime', appointments[e.target.parentElement.parentElement.id].datetime);
+        localStorage.setItem('date', (appointments[e.target.parentElement.parentElement.id].datetime).split(' ')[0]);
+        localStorage.setItem('time', (appointments[e.target.parentElement.parentElement.id].datetime).split(' ')[1]);
         localStorage.setItem('doctorId', appointments[e.target.parentElement.parentElement.id].doctorId);
+        localStorage.setItem('doctorFio', appointments[e.target.parentElement.parentElement.id].doctorName);
+        localStorage.setItem('doctorSpecialty', appointments[e.target.parentElement.parentElement.id].doctorSpecialty);
         localStorage.setItem('flag', 'transfer');
         window.location.href = './Comment.html';
     }
@@ -220,19 +232,33 @@ function CheckEnter(){
     }
 }
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+        page.nav.button.style.backgroundImage = 'url(./img/Union_light.svg)';
+    }
+}
+
 (()=>{
     CheckEnter();
+    CheckTheme();
     page.calendar.monthInput.value = new Date().getMonth()+1;
     getFirstDay();
-    if (localStorage.getItem('dateTime')){
-        page.calendar.monthInput.value = String(Number(localStorage.getItem('dateTime').split('-')[1]));
+    if (localStorage.getItem('date')){
+        page.calendar.monthInput.value = String(Number(localStorage.getItem('date').split('-')[1]));
         Array.from(page.calendar.section.children).forEach(elem => {
-            if (elem.innerText === String(Number(localStorage.getItem('dateTime').split(' ')[0].split('-')[2]))){
-                elem.firstChild.style.backgroundColor = '#EFEFFF';
+            if (elem.innerText === String(Number(localStorage.getItem('date').split('-')[2]))){
+                if (localStorage.getItem('theme') === 'light'){
+                    elem.firstChild.style.backgroundColor = '#EFEFFF';
+                }
+                else if (localStorage.getItem('theme') === 'dark'){
+                    elem.firstChild.style.backgroundColor = '#5267af';
+                }
                 elem.firstChild.click();
             }
         });
-        localStorage.removeItem('dateTime');
+        localStorage.removeItem('date');
     }
     if(localStorage.getItem('flag')){
         localStorage.removeItem('flag');

@@ -18,7 +18,7 @@ page.button.addEventListener('click', () => {
 
 function loadData(){
     let data = JSON.parse(localStorage.getItem('doctorUtil'));
-    let dateTime = localStorage.getItem('dateTime').split('-').reverse().join('.');
+    let dateTime = localStorage.getItem('date').split('-').reverse().join('.');
     page.fioDateDoctor.innerHTML = `${localStorage.getItem('doctorFio')}, <br> ${dateTime}`
     page.workSlotsCount.innerHTML = 'Кол-во рабочих слотов: ' + `<span style="color: #070062;">${data.total_slots}</span>`;
     page.apptCount.innerHTML = 'Кол-во отработанных слотов: ' + `<span style="color: #070062;">${data.booked_slots}</span>`;

@@ -273,7 +273,6 @@ document.querySelector('.allfio').addEventListener('click', (e) => {
     if (e.target.type === "submit"){
         localStorage.setItem('doctorFio',e.target.textContent);
         localStorage.setItem('doctorId', e.target.id);
-        localStorage.setItem('date', document.querySelector('.search').value);
         window.location.href = './ch2_date.html';
     };
 });

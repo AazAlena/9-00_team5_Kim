@@ -7,7 +7,6 @@ const page = {
 };
 
 function loadData(){
-    console.log(1);
     let fio = localStorage.getItem('doctorFio').split(' ');
     let spec = localStorage.getItem('doctorSpecialty');
     let date = localStorage.getItem('date').split('-').reverse().join('.');
@@ -63,8 +62,6 @@ page.buttonProof.addEventListener('click', async () => {
         const result = await createAppointment(doctorId, slotDateTime, patientCode);
         localStorage.removeItem('doctorFio');
         localStorage.removeItem('doctorId');
-        localStorage.removeItem('time');
-        localStorage.removeItem('date');
         localStorage.removeItem('doctorsAvailable');
         localStorage.removeItem('doctorSpecialty');
         window.location.href = './Lk_patient.html';
@@ -75,7 +72,8 @@ page.buttonProof.addEventListener('click', async () => {
 });
 
 page.return.addEventListener('click', () => {
-    localStorage.removeItem('dateTime');
+    localStorage.removeItem('date');
+    localStorage.removeItem('time');
     window.location.href = './speciality.html';
 });
 

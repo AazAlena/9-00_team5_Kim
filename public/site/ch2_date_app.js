@@ -134,14 +134,13 @@ document.querySelector('.search').addEventListener('input', () =>{
 document.querySelector('.alltimes').addEventListener('click', (e) => {
     if (e.target.type === "submit"){
         localStorage.setItem('time', e.target.textContent);
-        localStorage.setItem('date', document.querySelector('.search').value);
         window.location.href = './proof.html';
     };
 });
 
 (() => {
     if (localStorage.getItem('doctorId') && localStorage.getItem('flag') === 'transfer'){
-        let dateTime = (localStorage.getItem('dateTime').split(' ')[0]).split('-');
+        let dateTime = (localStorage.getItem('date')).split('-');
         document.querySelector('.search').value =`${dateTime[2]}.${dateTime[1]}`;
     }
     if (document.querySelector('.search').value != ''){
