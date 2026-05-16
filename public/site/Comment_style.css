@@ -1,10 +1,38 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+    --btn-bg: #5267af;
+    --btn-text: #efefff;
+    --btn-hover: #171260;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+}
+
 body, button{
+    background-color: var(--bg-color);
     font-family: 'Comic Relief', monospace;
     margin: 0px;
 }
 
 #comment{
-    background-color: #B2C8FF;
+    background-color: var(--bg-sub-color);
     width: 1420px;
     height: calc(100vh - 125px);
     padding: 125px 0px 0px;
@@ -12,7 +40,7 @@ body, button{
 }
 
 label{
-    color: #070062;
+    color: var(--text-main);
     height: 180px;
     font-size: 64px;
     margin: 0px 100px 50px;
@@ -21,7 +49,7 @@ label{
 
 textarea{
     background-color: #efefff;
-    color: #6277bc;
+    color: #5267af;
     width: 1060px;
     height: 390px;
     font-size: 32px;
@@ -35,12 +63,12 @@ textarea:focus{
     background-color: #ffffff;
 }
 ::placeholder{
-    color: #6277bc;
+    color: #5267af;
 }
 
 button{
-    background-color: #6277bc;
-    color: #efefff;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
     width: 500px;
     height: 80px;
     font-size: 32px;
@@ -50,10 +78,10 @@ button{
     display: block;
 }
 button:hover{
-    background-color: #070062;
+    background-color: var(--btn-hover);
 }
 
 ::selection{
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }
