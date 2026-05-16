@@ -1,23 +1,42 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+}
+
 body{
+    background-color: var(--bg-color);
     max-width: 1920px;
     min-width: 375px;
     font-family: 'Comic Relief', monospace;
     margin: 0px auto;
 }
 main{
-    background-color: #b2c8ff;
+    background-color: var(--bg-sub-color);
     width: 1420px;
     height: 2620px;
     margin: 0px auto;
 }
 #title{
-    color: #070062;
+    color: var(--text-main);
     font-size: 96px;
     margin: 0px;
     padding: 80px 30px 37px;
 }
 hr{
-    background-color: #6277bc;
+    background-color: #5267af;
     width: 1270px;
     height: 6px;
     border-radius: 8px;
@@ -34,11 +53,11 @@ section{
     margin: 80px 30px;
 }
 h2{
-    color: #070062;
+    color: var(--text-main);
     font-size: 64px;
 }
 section>div{
-    color: #6277bc;
+    color: #5267af;
     font-size: 48px;
 }
 
@@ -53,15 +72,15 @@ section>div{
 }
 
 .comment-item{
-    flex-shrink: 0;
     background-color: #efefff;
-    color: #070062;
-    border-radius: 10px;
+    color: #171260;
     width: 700px;
     height: 350px;
+    border-radius: 10px;
     padding: 20px;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
     gap: 20px;
 }
 
@@ -71,7 +90,7 @@ section>div{
     height: 50px;
     border-style: none;
     position: absolute;
-    top: calc(2520px);
+    top: 2520px;
     right: 110px;
     cursor: pointer;
 }
@@ -81,7 +100,7 @@ section>div{
 }
 
 ::selection{
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }
 
