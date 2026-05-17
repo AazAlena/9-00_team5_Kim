@@ -11,9 +11,9 @@
     --bg-color: #ffffff;
     --bg-sub-color: #b2c8ff;
     --text-main: #171260;
-    --btn-bg: #5267af;
+    --btn-bg: #171260;
     --btn-text: #efefff;
-    --btn-hover: #171260;
+    --btn-hover: #5267af;
 }
 
 body.dark-theme {
