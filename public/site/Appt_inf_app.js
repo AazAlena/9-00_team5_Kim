@@ -7,7 +7,7 @@ const page = {
     backBut: document.querySelector('#arrow'),
 };
 
-function getMonth(num){
+function getMonthNum(num){
     switch (num) {
         case '01':
             return 'Января';
@@ -42,7 +42,7 @@ function loadText(){
     let date = localStorage.getItem('date').split('-');
     let time = localStorage.getItem('time');
     let day = date[2];
-    let month = getMonth(date[1]);
+    let month = getMonthNum(date[1]);
     page.text.innerHTML = `
     <h1>Когда?</h1>
     <p>${day} ${month}, ${time}</p>
@@ -70,6 +70,16 @@ page.backBut.addEventListener('click', () => {
     window.location.href = './Lk_patient.html';
 });
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+        document.querySelector('#dark').style.display = 'inline';
+        document.querySelector('#light').style.display = 'none';
+    }
+}
+
 (()=>{
+    CheckTheme();
     loadText();
 })()

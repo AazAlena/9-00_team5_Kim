@@ -67,7 +67,6 @@ page.buttonProof.addEventListener('click', async () => {
         window.location.href = './Lk_patient.html';
     } catch (error) {
         console.error('Ошибка:', error.message);
-        alert(`Не удалось записаться: ${error.message}`);
     }
 });
 

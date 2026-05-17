@@ -52,6 +52,16 @@ function loadComments(comments, flag){
     });
 };
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+        document.querySelector('#dark').style.display = 'inline';
+        document.querySelector('#light').style.display = 'none';
+    }
+}
+
 (() => {
+    CheckTheme();
     loadData();
 })()

@@ -92,3 +92,14 @@ page.repass.addEventListener('change', () => {
         alert('Пароли не совпадают');
     }
 });
+
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
+(() => {
+    CheckTheme();
+})();

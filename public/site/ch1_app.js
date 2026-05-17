@@ -166,7 +166,6 @@ async function loadSlots(date, spec){
     }
     catch (error) {
         console.error('Ошибка загрузки записей:', error.message);
-        alert(error.message);
     }
 }
 
@@ -290,7 +289,6 @@ async function loadDoctors(){
     }
     catch (error) {
         console.error('Ошибка загрузки записей:', error.message);
-        alert(error.message);
     }
 }
 

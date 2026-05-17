@@ -111,7 +111,6 @@ page.calendar.section.addEventListener('click', async (e) => {
         }
         catch (error) {
             console.error('Ошибка загрузки записей:', error.message);
-            alert(error.message);
         }
     }
 });

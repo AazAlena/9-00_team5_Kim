@@ -68,6 +68,16 @@ page.button.addEventListener('click', async () => {
     }
     catch (error) {
         console.error('Ошибка:', error.message);
-        alert(error.message);
     }
 });
+
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
+(() => {
+    CheckTheme();
+})();

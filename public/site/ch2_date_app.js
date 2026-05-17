@@ -89,7 +89,6 @@ async function loadSlots(date){
     }
     catch (error) {
         console.error('Ошибка загрузки записей:', error.message);
-        alert(error.message);
     }
 }
 

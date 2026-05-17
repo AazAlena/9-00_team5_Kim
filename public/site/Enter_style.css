@@ -19,6 +19,7 @@
 body.dark-theme {
     --bg-color: #222676;
     --bg-sub-color: #171260;
+    --text-main: #efefff;
     --btn-bg: #efefff;
     --btn-text: #171260;
     --btn-hover: #5267af;
