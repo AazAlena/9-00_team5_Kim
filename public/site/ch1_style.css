@@ -1,9 +1,40 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #5267af;
+    --btn-line: #171260;
+    --btn-text: #171260;
+    --btn-hover: #efefff;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+    --btn-bg: #5267af;
+    --btn-line: #efefff;
+    --btn-text: #efefff;
+    --btn-hover: #171260;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-line: #171260;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+}
+
 * {
     box-sizing: border-box;
 }
 
 body {
-    color: #070062;
+    background-color: var(--bg-color);
+    color: var(--text-main);
     font-family: 'Comic Relief', monospace;
     margin: 0px;
 }
@@ -17,7 +48,7 @@ main {
 }
 
 .conteiner {
-    background-color: #b2c8ff;
+    background-color: var(--bg-sub-color);
     width: 1420px;
     height: 100vh;
     padding: 60px 205px 0px 205px;
@@ -34,8 +65,8 @@ main {
     gap: 0px;
 }
 .button{
-    background-color: #6277bc;
-    color: #efefff;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
     height: 80px;
     font-size: 48px;
     font-family: 'Comic Relief', monospace;
@@ -44,11 +75,11 @@ main {
     cursor: pointer;
 }
 .button:hover{
-    background-color: #070062;
+    background-color: var(--btn-hover);
 }
 .button-time{
     border-radius:10px 0px 0px 10px;
-    border-right: 2px #efefff solid;
+    border-right: 2px var(--btn-line) solid;
 }
 .button-fio{
     border-radius: 0px 10px 10px 0px;
@@ -81,7 +112,7 @@ main {
 }
 
 .alltimes, .allfio {
-    background-color: #6277bc;
+    background-color: #5267af;
     width: 100%;
     height: 660px;
     border-radius: 20px 20px 0px 0px;
@@ -94,7 +125,7 @@ main {
 }
 .alltimes-item, .allfio-item{
     background-color: #efefff;
-    color: #070062;
+    color: #171260;
     width: 100%;
     height: 100px;
     font-size: 40px;
@@ -110,6 +141,6 @@ main {
 }
 
 ::selection{
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }
