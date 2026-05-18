@@ -2,18 +2,25 @@
     --bg-color: #222676;
     --bg-sub-color: #171260;
     --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
 } */
 
 :root {
     --bg-color: #ffffff;
     --bg-sub-color: #b2c8ff;
     --text-main: #171260;
+    --btn-bg: #171260;
+    --btn-text: #efefff;
 }
 
 body.dark-theme {
     --bg-color: #222676;
     --bg-sub-color: #171260;
     --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #171260;
 }
 
 body{
@@ -26,7 +33,7 @@ body{
 main{
     background-color: var(--bg-sub-color);
     width: 1420px;
-    height: 2620px;
+    height: 2870px;
     margin: 0px auto;
 }
 #title{
@@ -43,6 +50,21 @@ hr{
     border-style: none;
     margin: 0px auto;
 }
+
+#dis{
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    width: 550px;
+    height: 90px;
+    font-family: 'Comic Relief', monospace;
+    font-size: 48px;
+    border: none;
+    border-radius: 10px;
+}
+#dis:hover{
+    background-color: #5267af;
+}
+
 #first{
     margin: 39px 30px 80px;
 }
@@ -66,9 +88,9 @@ section>div{
     font-size: 32px;
     display: flex;
     justify-content: start;
-    gap: 50px;
     overflow: auto;
     scrollbar-width: none;
+    gap: 50px;
 }
 
 .comment-item{
@@ -90,7 +112,7 @@ section>div{
     height: 50px;
     border-style: none;
     position: absolute;
-    top: 2520px;
+    top: 2770px;
     right: 110px;
     cursor: pointer;
 }
