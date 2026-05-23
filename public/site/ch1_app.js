@@ -292,7 +292,15 @@ async function loadDoctors(){
     }
 }
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
 (()=>{
+    CheckTheme();
     document.querySelector('.button-time').click();
     if (document.querySelector('.search').value != ''){
         document.querySelector('.search').input();

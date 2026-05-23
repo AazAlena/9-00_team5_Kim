@@ -2,6 +2,7 @@
 
 const page = {
     fioDateDoctor: document.querySelector('#title'),
+    stat: document.querySelector('#dis'),
     workSlotsCount: document.querySelector('#sum_work_slots'),
     apptCount: document.querySelector('#sum_appt'),
     utilization: document.querySelector('#disposal'),
@@ -11,6 +12,10 @@ const page = {
     transferFill: document.querySelector('.comments-transfer'),
     button: document.querySelector('#arrow'),
 };
+
+page.stat.addEventListener('click', () => {
+    window.location.href = './full_stat.html';
+});
 
 page.button.addEventListener('click', () => {
     window.location.href = './Lk_admin2.html';

@@ -76,6 +76,14 @@ page.return.addEventListener('click', () => {
     window.location.href = './speciality.html';
 });
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
 (() => {
+    CheckTheme();
     loadData();
 })();

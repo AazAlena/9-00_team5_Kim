@@ -137,7 +137,15 @@ document.querySelector('.alltimes').addEventListener('click', (e) => {
     };
 });
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
 (() => {
+    CheckTheme();
     if (localStorage.getItem('doctorId') && localStorage.getItem('flag') === 'transfer'){
         let dateTime = (localStorage.getItem('date')).split('-');
         document.querySelector('.search').value =`${dateTime[2]}.${dateTime[1]}`;

@@ -77,6 +77,14 @@ function getSpecialtiesPage(specialtiesArr){
     }
 }
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
 (()=>{
+    CheckTheme();
     loadSpecialties();
 })()
