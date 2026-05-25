@@ -221,6 +221,14 @@ if (page.export) {
     page.export.addEventListener('click', exportToExcel);
 }
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
 (() => {
+    CheckTheme();
     loadData();
 })();

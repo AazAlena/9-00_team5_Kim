@@ -16,8 +16,13 @@ const page = {
         section: document.querySelector('#calendar'),
         monthInput: document.querySelector('#month'),
     },
+    report: document.querySelector('.report-button'),
     appt: document.querySelector('.doctors'),
 };
+
+page.report.addEventListener('click', () => {
+    window.location.href = './full_stat.html';
+});
 
 //клик на кнопку навигации
 page.nav.button.addEventListener('click', () => {

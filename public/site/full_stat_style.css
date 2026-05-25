@@ -60,6 +60,7 @@ h1{
     padding: 0px 5px;
     border-radius: 10px;
     border: none;
+    font-family: 'Comic Relief', monospace;
 }
 #fio-select:hover, #spec-select:hover, #dateFrom:hover, #dateTo:hover{
     background-color: #ffffff;
@@ -92,24 +93,41 @@ input{
 .header-table{
     width: 90vw;
     font-size: 16px;
-    padding: 40px 10px 0px;
+    padding: 40px 0px 0px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 .head-wrapper{
-    width: 90%;
-    padding: 0px 40px;
+    width: 94%;
+    padding: 0px;
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+}
+.head-fio {
+    width: 30%;
+    padding: 10px;
+    text-align: center;
+}
+.head-speciality {
+    width: 15%;
+    padding: 10px;
+    text-align: center;
+}
+.head-slots,
+.head-booked-slots,
+.head-cancel-return-slots,
+.head-completed-slots {
+    width: 10%;
+    padding: 10px;
+    text-align: center;
 }
 
 .doctors{
     background-color: var(--bg-sub-color);
     width: 90vw;
-    height: 65vh;
+    height: 60vh;
     padding: 20px;
     border-radius: 10px;
     display: flex;
@@ -121,60 +139,43 @@ input{
     gap: 10px;
 }
 
-.head-fio{
-    width: 40%;
-    padding: 10px;
-    text-align: center;
-}
-
-.head-speciality{
-    width: 20%;
-    padding: 10px;
-    text-align: center;
-}
-
-.head-slots, .head-booked-slots, .head-cancel-return-slots, .head-completed-slots{
-    width: 10%;
-    padding: 10px;
-    text-align: center;
-}
-
 .doctors-item{
-    width: 90%;
     background-color: #efefff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    cursor: pointer;
-    gap: 10px;
+    width: 94%;
+    font-size: 20px;
     border-radius: 10px;
+    padding: 20px 1%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
     transition: 0.2s;
-    box-shadow: 0 2px 6px var(--text-main);
 }
 .doctors-item:hover{
+    font-size: 32px;
     transform: translateY(-3px);
 }
 
 .fio{
-    background-color: rgb(236, 246, 255);
-    width: 40%;
+    background-color: #5267af;
+    color: #efefff;
+    width: 30%;
     padding: 10px;
     border-radius: 10px;
     text-align: center;
 }
 
 .speciality{
-    width: 20%;
-    background-color: rgb(185, 211, 237);
+    background-color: var(--bg-sub-color);
+    width: 15%;
     padding: 10px;
     text-align: center;
     border-radius: 10px;
 }
 
 .slots, .booked-slots, .cancel-return-slots, .completed-slots{
+    background-color: var(--bg-sub-color);
     width: 10%;
-    background-color: rgb(198, 220, 239);
     padding: 10px;
     text-align: center;
     border-radius: 10px;
