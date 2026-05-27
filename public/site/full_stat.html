@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./full_stat_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
+    <title>Report</title>
+</head>
+<body>
+    <h1>Статистика</h1>
+    <div class="filters">
+        <div class="date-inputs">
+            <label for="dateFrom">С</label>
+            <input type="date" id="dateFrom">
+            <label for="dateTo">По</label>
+            <input type="date" id="dateTo">
+        </div>
+        <div class="spec-filt">
+            <label for="spec-select">Специальность</label>
+            <select name="" id="spec-select">
+            </select>
+        </div>
+        <div class="fio-filt">
+            <label for="fio-select">ФИО</label>
+            <select name="" id="fio-select"></select>
+        </div>
+        <button id="exportExcelBtn" class="export-btn">Выгрузить Excel</button>
+    </div>
+    <!-- Врачи, работающие в выбранный период или врачи, нужной специальности, работающие в выбранный период, или конкретный врач, работающий в выбранный период-->
+    <div class="header-table">
+        <div class="head-wrapper">
+            <div class="head-fio">ФИО врача</div>
+            <div class="head-speciality">Специальность</div>
+            <div class="head-slots">Кол-во слотов</div>
+            <div class="head-booked-slots">Кол-во записей</div>
+            <div class="head-cancel-return-slots">Отменено</div>
+            <div class="head-completed-slots">Завершено</div>
+        </div>  
+    </div>
+    <div class="doctors">
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="./full_stat_app.js"></script>
+</body>
+</html>

@@ -62,13 +62,22 @@ page.button.addEventListener('click', async () => {
     }
     let doctorId = localStorage.getItem('doctorId');
     let patientCode = localStorage.getItem('userId');
-    let slotDateTime = localStorage.getItem('dateTime');
+    let slotDateTime = `${localStorage.getItem('date')} ${localStorage.getItem('time')}`;
     try {
-        console.log(doctorId, patientCode, slotDateTime, comment);
         let result = await cancelAppointment(doctorId, patientCode, slotDateTime, comment);
     }
     catch (error) {
         console.error('Ошибка:', error.message);
-        alert(error.message);
     }
 });
+
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
+(() => {
+    CheckTheme();
+})();

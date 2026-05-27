@@ -73,3 +73,14 @@ page.enterButton.addEventListener('click', async () => {
         alert(error.message);
     }
 })
+
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
+(() => {
+    CheckTheme();
+})();

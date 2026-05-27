@@ -62,21 +62,28 @@ page.buttonProof.addEventListener('click', async () => {
         const result = await createAppointment(doctorId, slotDateTime, patientCode);
         localStorage.removeItem('doctorFio');
         localStorage.removeItem('doctorId');
-        localStorage.removeItem('time');
-        localStorage.removeItem('date');
         localStorage.removeItem('doctorsAvailable');
         localStorage.removeItem('doctorSpecialty');
         window.location.href = './Lk_patient.html';
     } catch (error) {
         console.error('Ошибка:', error.message);
-        alert(`Не удалось записаться: ${error.message}`);
     }
 });
 
 page.return.addEventListener('click', () => {
+    localStorage.removeItem('date');
+    localStorage.removeItem('time');
     window.location.href = './speciality.html';
 });
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
 (() => {
+    CheckTheme();
     loadData();
-})()
+})();

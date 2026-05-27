@@ -40,7 +40,6 @@ async function loadSpecialties(){
     }
     catch (error) {
         console.error('Ошибка загрузки записей:', error.message);
-        alert(error.message);
     }
 }
 
@@ -51,7 +50,7 @@ document.querySelector('.search').addEventListener('input', () =>{
     specialtyItems.forEach(item => {
         const specialtyName = item.textContent.toLowerCase();
         if (searchTerm === '') {
-            item.style.display = 'block';
+            item.style.display = 'block'; 
             return;
         }
         // Проверяем, содержит ли имя все слова из поиска
@@ -78,6 +77,14 @@ function getSpecialtiesPage(specialtiesArr){
     }
 }
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
 (()=>{
+    CheckTheme();
     loadSpecialties();
 })()

@@ -1,89 +1,28 @@
-/* * {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0px;
-}
-
-main {
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-.conteiner {
-    display: flex;
-    height: 100vh;
-    justify-content: start;
-    align-items: center;
-    flex-direction: column;
-    width: 1420px;
-    background-color: #D9D9D9;
-    padding: 100px 205px 0px 205px;
-    gap: 55px;
-}
-
-.h1 {
-    font-family: 'Inter', monospace;
-    font-size: 67px;
-    font-weight: 400;
-    text-align: center;
-}
-
-.search {
-    width: 100%;
-    height: 82px;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-    background-color: #FFFFFF;
-    font-family: 'Inter', monospace;
-    font-size: 28px;
-    padding: 10px 20px;
-}
-
-.search-icon {
-    padding: 10px 20px 10px 67px;
-    background-image: url(./images/poisk.svg);
-    background-size: 47px;
-    background-repeat: no-repeat;
-    background-position: 10px center;
-}
-
-.allfio {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    background-color: #F0EDED;
-    padding: 30px;
-    overflow: auto;
-    scrollbar-width: none;
-    width: 100%;
-    height: 660px;
-}
-
-.allfio-item {
-    background-color: #D9D9D9;
-    width: 100%;
-    border: none;
-    border-radius: 10px;
-    font-family: 'Inter', monospace;
-    font-size: 28px;
-    padding: 33px 30px;
-    cursor: pointer;
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
 } */
 
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+}
 
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+}
 
 * {
     box-sizing: border-box;
 }
 
 body {
-    color: #070062;
+    background-color: var(--bg-color);
+    color: var(--text-main);
     font-family: 'Comic Relief', monospace;
     margin: 0px;
 }
@@ -97,7 +36,7 @@ main {
 }
 
 .conteiner {
-    background-color: #b2c8ff;
+    background-color: var(--bg-sub-color);
     width: 1420px;
     height: 100vh;
     padding: 100px 205px 0px 205px;
@@ -138,7 +77,7 @@ main {
 }
 
 .allfio{
-    background-color: #6277bc;
+    background-color: #5267af;
     width: 100%;
     height: 100%;
     border-radius: 20px 20px 0px 0px;
@@ -151,7 +90,7 @@ main {
 }
 .allfio-item{
     background-color: #efefff;
-    color: #070062;
+    color: #171260;
     width: 100%;
     height: 100px;
     font-size: 40px;
@@ -167,6 +106,6 @@ main {
 }
 
 ::selection{
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }

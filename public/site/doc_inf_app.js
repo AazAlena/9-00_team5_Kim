@@ -2,6 +2,7 @@
 
 const page = {
     fioDateDoctor: document.querySelector('#title'),
+    stat: document.querySelector('#dis'),
     workSlotsCount: document.querySelector('#sum_work_slots'),
     apptCount: document.querySelector('#sum_appt'),
     utilization: document.querySelector('#disposal'),
@@ -12,13 +13,17 @@ const page = {
     button: document.querySelector('#arrow'),
 };
 
+page.stat.addEventListener('click', () => {
+    window.location.href = './full_stat.html';
+});
+
 page.button.addEventListener('click', () => {
     window.location.href = './Lk_admin2.html';
 });
 
 function loadData(){
     let data = JSON.parse(localStorage.getItem('doctorUtil'));
-    let dateTime = localStorage.getItem('dateTime').split('-').reverse().join('.');
+    let dateTime = localStorage.getItem('date').split('-').reverse().join('.');
     page.fioDateDoctor.innerHTML = `${localStorage.getItem('doctorFio')}, <br> ${dateTime}`
     page.workSlotsCount.innerHTML = 'Кол-во рабочих слотов: ' + `<span style="color: #070062;">${data.total_slots}</span>`;
     page.apptCount.innerHTML = 'Кол-во отработанных слотов: ' + `<span style="color: #070062;">${data.booked_slots}</span>`;
@@ -52,6 +57,16 @@ function loadComments(comments, flag){
     });
 };
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+        document.querySelector('#dark').style.display = 'inline';
+        document.querySelector('#light').style.display = 'none';
+    }
+}
+
 (() => {
+    CheckTheme();
     loadData();
 })()

@@ -1,4 +1,35 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --text-sub: #171260;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #171260;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+    --text-sub: #efefff;
+    --btn-bg: #171260;
+    --btn-text: #efefff;
+    --btn-hover: #5267af;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --text-sub: #171260;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #171260;
+}
+
 body, main, button{
+    background-color: var(--bg-color);
     font-family: 'Comic Relief', monospace;
     margin: 0px;
 }
@@ -19,13 +50,15 @@ body, main, button{
     margin-bottom: 25px;
     cursor: pointer;
 }
-#nav_butt>img{
-    width: 60px;
-    height: 48px;
+#nav_butt{
+    background-image: url(./img/Union.svg);
 }
+/* #nav_butt{
+    background-image: url(./img/Union\ light.svg);
+} */
 #nav_fill>button{
     background-color: rgba(1, 1, 0, 0);
-    color: #070062;
+    color: var(--text-main);
     width: 160px;
     font-size: 32px;
     border: none;
@@ -36,14 +69,14 @@ body, main, button{
 
 }
 #nav_fill>button:hover {
-    color: #6277bc;
+    color: #5267af;
 }
 #nav_fill{
     display: none;
 }
 
 #bg{
-    background-color: #b2c8ff;
+    background-color: var(--bg-sub-color);
     width: 1420px;
     height: 100vh;
     margin: 0px auto;
@@ -59,10 +92,10 @@ body, main, button{
 }
 
 .first{
-    color: #070062;
+    color: var(--text-main);
     width: 600px;
     height: 790px;
-    border: 2px solid #070062;
+    border: 2px solid var(--text-main);
     border-radius: 10px;
     padding: 55px 25px 55px;
     margin-bottom: 65px;
@@ -73,7 +106,7 @@ label{
 }
 select{
     background-color: #efefff;
-    color: #070062;
+    color: #171260;
     width: 600px;
     height: 80px;
     font-family: 'Comic Relief', monospace;
@@ -88,8 +121,8 @@ select:hover{
     background-color: #ffffff;
 }
 .item>button{
-    background-color: #b2c8ff;
-    color: #070062;
+    background-color: var(--bg-sub-color);
+    color: var(--text-main);
     width: 60px;
     height: 60px;
     font-family: 'Comic Relief', monospace;
@@ -111,8 +144,8 @@ select:hover{
 #calendar{
     width: 600px;
     height: 598px;
-    border-top: 2px solid #070062;
-    border-bottom: 2px solid #070062;
+    border-top: 2px solid var(--text-main);
+    border-bottom: 2px solid var(--text-main);
     margin: 55px 0px;
     display: flex;
     flex-direction: row;
@@ -121,7 +154,7 @@ select:hover{
 }
 
 .second{
-    background-color: #6277bc;
+    background-color: #5267af;
     height: calc(100vh - 65px);
     margin-top: 65px;
     border-radius: 10px 10px 0px 0px;
@@ -140,38 +173,37 @@ hr{
 }
 
 ::selection{
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }
 
 .doctors {
+    height: 782px;
+    padding: 38px 25px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    padding: 38px 25px;
     gap: 30px;
     overflow: auto;
     scrollbar-width: none;
-    height: 782px;
 }
 
 .doctors_item {
-    box-sizing: border-box;
+    background-color: #efefff;
+    color: #171260;
     width: 600px;
     height: 100px;
+    font-family: 'Comic Relief', monospace;
+    font-size: 40px;
+    padding: 30px 20px;
+    box-sizing: border-box;
     border-radius: 10px;
     flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #efefff;
-    padding: 30px 20px;
-    font-family: 'Comic Relief', monospace;
-    font-size: 40px;
-    color: #070062;
-    cursor: pointer;
 }
 
 .doctors_item:hover {

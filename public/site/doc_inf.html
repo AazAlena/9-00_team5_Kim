@@ -6,13 +6,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
-    <title>Disposal</title>
+    <title>Подробная статистика по врачу</title>
     <link rel="stylesheet" href="./doc_inf_style.css">
 </head>
 <body>
     <main>
         <h1 id="title"></h1>
         <hr>
+        <section>
+            <button id="dis" type="buttons">Отчёт за период</button>
+        </section>
         <section id="first">
             <h2>Общее состояние</h2>
             <div id="sum_work_slots"></div>
@@ -32,11 +35,17 @@
             <div id="sum_reappt"></div>
             <div>
                 <p>Комментарии:</p>
-                <div class="comments comments-transfer"></div>
+                <div class="comments comments-transfer">
+                    <div class="comment-item">
+                        <div class="fio">tksjtjskrjr</div>
+                        <div class="comment-text">sfhsjfhhhfshfhsjfh</div>
+                    </div>
+                </div>
             </div>
         </section>
             <button type="button" id="arrow">
-                <img src="./img/Arrow.svg" alt="">
+                <img id="light" src="./img/Arrow.svg" alt="">
+                <img id="dark" src="./img/Arrow 2.svg" alt="">
             </button>
     </main>
     <script src="./doc_inf_app.js"></script>

@@ -14,6 +14,7 @@ document.querySelector('.button-time').addEventListener('click', () => {
     document.querySelector('.search').id = 'date';
     document.querySelector('.search').value = '';
     document.querySelector('.h1').textContent = 'Выберите время';
+    document.querySelector('.search').placeholder = 'Введите дату';
 });
 
 // для кнопочки выбора по фамилии
@@ -165,7 +166,6 @@ async function loadSlots(date, spec){
     }
     catch (error) {
         console.error('Ошибка загрузки записей:', error.message);
-        alert(error.message);
     }
 }
 
@@ -289,11 +289,18 @@ async function loadDoctors(){
     }
     catch (error) {
         console.error('Ошибка загрузки записей:', error.message);
-        alert(error.message);
+    }
+}
+
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
     }
 }
 
 (()=>{
+    CheckTheme();
     document.querySelector('.button-time').click();
     if (document.querySelector('.search').value != ''){
         document.querySelector('.search').input();

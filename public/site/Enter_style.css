@@ -1,32 +1,64 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+    --btn-bg: #171260;
+    --btn-text: #efefff;
+    --btn-hover: #5267af;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+}
+
+body{
+    background-color: var(--bg-color);
+    height: 100vh;
+    margin: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
 #Entrance{
     width: 750px;
     height: 885px;
-    margin: 0px auto;
     font-family: 'Comic relief', monospace;
     font-size: 32px;
-    position: relative;
-    top: -20px;
 }
 .entr_bg{
-    background-color: #B2C8FF;
-    color: #070062;
+    background-color: var(--bg-sub-color);
+    color: var(--text-main);
     width: 750px;
     height: 840px;
     border-radius: 20px;
-    margin: 0px auto;
-    text-align: center;
 }
 .entr_fill{
     width: 700px;
     height: 620px;
-    margin: 110px auto;
+    margin: 0px auto;
     position: relative;
     top: 110px;
 }
 h1{
     height: 90px;
     font-size: 64px;
-    margin-bottom: 80px;
+    margin: 0px 0px 80px;
 }
 input{
     background-color: #efefff;
@@ -40,7 +72,7 @@ input{
     border-style: none;
 }
 input:focus{
-    background-color: white;
+    background-color: #ffffff;
 }
 label{
     height: 45px;
@@ -61,13 +93,13 @@ label{
 }
 #eye_close1{
     position: relative;
-    bottom: 225px;
+    bottom: 115px;
     left: 650px;
     cursor: pointer;
 }
 #entr_butt{
-    background-color: #070062;
-    color: #efefff;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
     width: 350px;
     height: 80px;
     font-family: 'Comic relief', monospace;
@@ -76,14 +108,12 @@ label{
     border-style: none;
     display: block;
     margin: 30px auto 0px;
-    transition: background-color 0.5s, color 0.5s;
 }
 #entr_butt:hover{
-    background-color: #6277bc;
-    color: #efefff;
+    background-color: var(--btn-hover);
 }
 #a{
-    color: #070062;
+    color: var(--text-main);
     width: 280px;
     display: block;
     margin: 0px auto;
@@ -91,10 +121,10 @@ label{
     text-align: center;
 }
 #a:hover{
-    color: #6277bc;
+    color: #5267af;
 }
 
 ::selection{
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }

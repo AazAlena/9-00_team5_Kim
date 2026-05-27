@@ -1,0 +1,182 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+    --btn-bg: #5267af;
+    --btn-text: #efefff;
+    --btn-hover: #171260;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+}
+
+body{
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Comic Relief', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+h1{
+    font-size: 48px;
+    text-align: center;
+}
+
+.filters{
+    background-color: var(--bg-sub-color);
+    width: calc(90vw - 40px);
+    height: 50px;
+    font-size: 20px;
+    padding: 25px 40px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+#fio-select, #spec-select, #dateFrom, #dateTo{
+    background-color: #efefff;
+    width: 12vw;
+    height: 35px;
+    padding: 0px 5px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'Comic Relief', monospace;
+}
+#fio-select:hover, #spec-select:hover, #dateFrom:hover, #dateTo:hover{
+    background-color: #ffffff;
+}
+
+#exportExcelBtn{
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    width: 14vw;
+    height: 40px;
+    font-family: 'Comic Relief', monospace;
+    font-size: 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+#exportExcelBtn:hover{
+    background-color: var(--btn-hover);
+}
+.date-inputs, .spec-filt, .fio-filt{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+input{   
+    font-size: 16px;
+}
+
+.header-table{
+    width: 90vw;
+    font-size: 16px;
+    padding: 40px 0px 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.head-wrapper{
+    width: 94%;
+    padding: 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.head-fio {
+    width: 30%;
+    padding: 10px;
+    text-align: center;
+}
+.head-speciality {
+    width: 15%;
+    padding: 10px;
+    text-align: center;
+}
+.head-slots,
+.head-booked-slots,
+.head-cancel-return-slots,
+.head-completed-slots {
+    width: 10%;
+    padding: 10px;
+    text-align: center;
+}
+
+.doctors{
+    background-color: var(--bg-sub-color);
+    width: 90vw;
+    height: 60vh;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    overflow: auto;
+    scrollbar-width: none;
+    gap: 10px;
+}
+
+.doctors-item{
+    background-color: #efefff;
+    width: 94%;
+    font-size: 20px;
+    border-radius: 10px;
+    padding: 20px 1%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.doctors-item:hover{
+    font-size: 32px;
+    transform: translateY(-3px);
+}
+
+.fio{
+    background-color: #5267af;
+    color: #efefff;
+    width: 30%;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.speciality{
+    background-color: var(--bg-sub-color);
+    width: 15%;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.slots, .booked-slots, .cancel-return-slots, .completed-slots{
+    background-color: var(--bg-sub-color);
+    width: 10%;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+}

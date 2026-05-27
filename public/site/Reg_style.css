@@ -1,29 +1,64 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+    --btn-bg: #171260;
+    --btn-text: #efefff;
+    --btn-hover: #5267af;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+}
+
+body{
+    background-color: var(--bg-color);
+    height: 100vh;
+    margin: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
 #Registration{
     height: 900px;
-    margin: 65px auto;
     font-family: 'Comic relief', monospace;
     font-size: 32px;
 }
 .regfill_bg{
-    background-color: #B2C8FF;
-    color: #070062;
+    background-color: var(--bg-sub-color);
+    color: var(--text-main);
     width: 750px;
     height: 900px;
     border-radius: 20px;
-    margin: 0px auto;
     text-align: center;
 }
 .regfill{
     width: 700px;
     height: 800px;
-    margin: 50px auto;
+    margin: 0px auto;
     position: relative;
     top: 50px;
 }
 .regfill>h1{
     height: 85px;
     font-size: 64px;
-    margin: 50px auto 0px;
+    margin: 0px;
 }
 #reg_form>input{
     background-color: #efefff;
@@ -37,7 +72,7 @@
     border-style: none;
 }
 #reg_form>input:focus{
-    background-color: white;
+    background-color: #ffffff;
 }
 #reg_form>label{
     height: 45px;
@@ -58,19 +93,19 @@
 }
 #eye_close1{
     position: relative;
-    bottom: 350px;
+    bottom: 300px;
     left: 650px;
     cursor: pointer;
 }
 #eye_close2{
     position: relative;
-    bottom: 250px;
+    bottom: 200px;
     left: 650px;
     cursor: pointer;
 }
 #reg_butt{
-    background-color: #070062;
-    color: #efefff;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
     width: 350px;
     height: 80px;
     font-family: 'Comic relief', monospace;
@@ -79,11 +114,10 @@
     border-style: none;
     display: block;
     margin: 15px auto 0px;
-    transition: background-color 0.5s, color 0.5s;
 }
 #reg_butt:hover{
-    background-color: #6277bc;
-    color: #efefff;
+    background-color: var(--btn-hover);
+    color: var(--btn-text);
 }
 #a{
     width: 300px;
@@ -93,10 +127,10 @@
     text-align: center;
 }
 #a:hover{
-    color: #6277bc;
+    color: #5267af;
 }
 
 ::selection{
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }

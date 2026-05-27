@@ -95,7 +95,12 @@ page.calendar.section.addEventListener('click', async (e) => {
         allButtons.forEach(button => {
             button.style.backgroundColor = '';
         });
-        e.target.style.backgroundColor = '#EFEFFF';
+        if (localStorage.getItem('theme') === 'light'){
+            e.target.style.backgroundColor = '#EFEFFF';
+        }
+        else if (localStorage.getItem('theme') === 'dark'){
+            e.target.style.backgroundColor = '#5267af';
+        }
         let selectedYear = new Date().getFullYear();
         let selectedMonth = String(page.calendar.monthInput.value).padStart(2, '0');
         let selectedDayNumber = String(e.target.textContent).padStart(2, '0');
@@ -106,7 +111,6 @@ page.calendar.section.addEventListener('click', async (e) => {
         }
         catch (error) {
             console.error('Ошибка загрузки записей:', error.message);
-            alert(error.message);
         }
     }
 });
@@ -180,8 +184,17 @@ function CheckEnter(){
     }
 }
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+        page.nav.button.style.backgroundImage = 'url(./img/Union_light.svg)';
+    }
+}
+
 (()=>{
     CheckEnter();
+    CheckTheme();
     page.calendar.monthInput.value = new Date().getMonth()+1;
     getFirstDay();
 })()

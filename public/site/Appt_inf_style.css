@@ -1,10 +1,35 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --btn-bg: #5267af;
+    --btn-text: #efefff;
+    --btn-hover: #171260;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+}
+
 body, button{
+    background-color: var(--bg-color);
     font-family: 'Comic Relief', monospace;
     margin: 0px;
 }
 
 #appt_inf{
-    background-color: #B2C8FF;
+    background-color: var(--bg-sub-color);
     width: 1420px;
     height: calc(100vh - 70px);
     padding: 70px 0px 0px;
@@ -29,18 +54,18 @@ h1{
     margin-top: 0px;
 }
 h1, h2{
-    color: #070062;
+    color: #171260;
     font-size: 64px;
 }
 
 p, div>p, #fill_txt>div{
-    color: #070062;
+    color: #171260;
     font-size: 40px;
 }
 
 .butt_fill{
-    background-color: #6277bc;
-    color: #efefff;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
     width: 500px;
     height: 80px;
     font-size: 48px;
@@ -50,7 +75,7 @@ p, div>p, #fill_txt>div{
     cursor: pointer;
 }
 .butt_fill:hover{
-    background-color: #070062;
+    background-color: var(--btn-hover);
 }
 
 #buttx2{
@@ -77,6 +102,6 @@ p, div>p, #fill_txt>div{
 }
 
 ::selection{
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }

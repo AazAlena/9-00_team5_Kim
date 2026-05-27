@@ -16,8 +16,13 @@ const page = {
         section: document.querySelector('#calendar'),
         monthInput: document.querySelector('#month'),
     },
+    report: document.querySelector('.report-button'),
     appt: document.querySelector('.doctors'),
 };
+
+page.report.addEventListener('click', () => {
+    window.location.href = './full_stat.html';
+});
 
 //клик на кнопку навигации
 page.nav.button.addEventListener('click', () => {
@@ -32,7 +37,6 @@ page.nav.button.addEventListener('click', () => {
 
 //клик на кнопку главная
 page.nav.main.addEventListener('click', () => {
-    localStorage.removeItem('dateTime');
     localStorage.removeItem('doctorFio');
     localStorage.removeItem('doctorId');
     window.location.href = './Main_screen.html';
@@ -41,7 +45,6 @@ page.nav.main.addEventListener('click', () => {
 //клик на кнопку выхода
 page.nav.exit.addEventListener('click', () => {
     localStorage.removeItem('userId');
-    localStorage.removeItem('dateTime');
     localStorage.removeItem('doctorFio');
     localStorage.removeItem('doctorId');
     localStorage.removeItem('role');
@@ -106,7 +109,12 @@ page.calendar.section.addEventListener('click', async (e) => {
         allButtons.forEach(button => {
             button.style.backgroundColor = '';
         });
-        e.target.style.backgroundColor = '#EFEFFF';
+        if (localStorage.getItem('theme') === 'light'){
+            e.target.style.backgroundColor = '#EFEFFF';
+        }
+        else if (localStorage.getItem('theme') === 'dark'){
+            e.target.style.backgroundColor = '#5267af';
+        }
         let selectedYear = new Date().getFullYear();
         let selectedMonth = String(page.calendar.monthInput.value).padStart(2, '0');
         let selectedDayNumber = String(e.target.textContent).padStart(2, '0');
@@ -118,7 +126,6 @@ page.calendar.section.addEventListener('click', async (e) => {
         }
         catch (error) {
             console.error('Ошибка загрузки записей:', error.message);
-            alert(error.message);
         }
     }
 });
@@ -177,7 +184,7 @@ page.appt.addEventListener('click', async (e) => {
     if (e.target.className === 'doctors_item'){
         localStorage.setItem('doctorId', doctors[e.target.id].id);
         localStorage.setItem('doctorFio', doctors[e.target.id].fio);
-        localStorage.setItem('dateTime', selectedDate);
+        localStorage.setItem('date', selectedDate);
         window.location.href = './Lk_admin2.html';
     }
 });
@@ -189,15 +196,29 @@ function CheckEnter(){
     }
 }
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+        page.nav.button.style.backgroundImage = 'url(./img/Union_light.svg)';
+    }
+}
+
 (()=>{
     CheckEnter();
+    CheckTheme();
     page.calendar.monthInput.value = new Date().getMonth()+1;
-    if (localStorage.getItem('dateTime')){
-        page.calendar.monthInput.value = String(Number(localStorage.getItem('dateTime').split('-')[1]));
+    if (localStorage.getItem('date')){
+        page.calendar.monthInput.value = String(Number(localStorage.getItem('date').split('-')[1]));
         getFirstDay();
         Array.from(page.calendar.section.children).forEach(elem => {
-            if (elem.innerText === String(Number(localStorage.getItem('dateTime').split('-')[2]))){
-                elem.firstChild.style.backgroundColor = '#EFEFFF';
+            if (elem.innerText === String(Number(localStorage.getItem('date').split('-')[2]))){
+                if (localStorage.getItem('theme') === 'light'){
+                    elem.firstChild.style.backgroundColor = '#EFEFFF';
+                }
+                else if (localStorage.getItem('theme') === 'dark'){
+                    elem.firstChild.style.backgroundColor = '#5267af';
+                }
                 elem.firstChild.click();
             }
         });

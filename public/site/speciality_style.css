@@ -1,20 +1,39 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+}
+
 *{
     box-sizing: border-box;
 }
 body{
+    background-color: var(--bg-color);
     font-family: 'Comic Relief', monospace;
     margin: 0px;
 }
 main{
-    display: flex;
     height: 100vh;
+    display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
 }
 
 .conteiner{
-    background-color: #b2c8ff;
+    background-color: var(--bg-sub-color);
     width: 1420px;
     height: 100vh;
     padding: 100px 205px 0px 205px;
@@ -26,7 +45,7 @@ main{
 }
 
 .h1{
-    color: #070062;
+    color: var(--text-main);
     width: 1010px;
     font-size: 64px;
     text-align: center;
@@ -52,7 +71,7 @@ main{
 }
 
 .allspecialties{
-    background-color: #6277bc;
+    background-color: #5267af;
     width: 100%;
     height: 660px;
     border-radius: 10px 10px 0px 0px;
@@ -66,7 +85,7 @@ main{
 
 .allspecialties-item{
     background-color: #efefff;
-    color: #070062;
+    color: #171260;
     width: 100%;
     font-family: 'Comic Relief', monospace;
     font-size: 40px;
@@ -80,6 +99,6 @@ main{
 }
 
 ::selection{
-    background-color: #6277bc;
+    background-color: #5267af;
     color: #efefff;
 }

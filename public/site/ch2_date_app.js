@@ -89,7 +89,6 @@ async function loadSlots(date){
     }
     catch (error) {
         console.error('Ошибка загрузки записей:', error.message);
-        alert(error.message);
     }
 }
 
@@ -138,9 +137,17 @@ document.querySelector('.alltimes').addEventListener('click', (e) => {
     };
 });
 
+function CheckTheme(){
+    let theme = localStorage.getItem('theme');
+    if (theme === 'dark'){
+        document.body.classList.add('dark-theme');
+    }
+}
+
 (() => {
+    CheckTheme();
     if (localStorage.getItem('doctorId') && localStorage.getItem('flag') === 'transfer'){
-        let dateTime = (localStorage.getItem('dateTime').split(' ')[0]).split('-');
+        let dateTime = (localStorage.getItem('date')).split('-');
         document.querySelector('.search').value =`${dateTime[2]}.${dateTime[1]}`;
     }
     if (document.querySelector('.search').value != ''){
