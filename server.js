@@ -19,3 +19,16 @@ app.listen(PORT, () => {
     console.log(`\n🚀 Сервер запущен на http://localhost:${PORT}/site/Main_screen.html`);
     //console.log(`\n🚀 Сервер запущен на http://localhost:${PORT}/auth.html`);
 });
+
+setTimeout(async () => {
+    try {
+        const response = await fetch('http://localhost:3000/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const result = await response.json();
+        console.log('✅ Автоимпорт:', result.message);
+    } catch (err) {
+        console.log('⚠️ Автоимпорт не выполнен (CSV могут отсутствовать)');
+    }
+}, 2000);
