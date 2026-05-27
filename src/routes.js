@@ -6,9 +6,6 @@ const validation = require('./validation');
 const { validateAll } = require('../data/validate');
 const CURRENT_DATE = new Date();
 module.exports = function (app) {
-
-    //
-
     // ========== 1. ВСЕ ВРАЧИ (без фильтра по специальности) ==========
     app.get('/doctors/all', (req, res) => {
         db.all(`
