@@ -13,9 +13,6 @@
     --bg-sub-color: #b2c8ff;
     --text-main: #171260;
     --text-sub: #efefff;
-    --btn-bg: #171260;
-    --btn-text: #efefff;
-    --btn-hover: #5267af;
 }
 
 body.dark-theme {
@@ -23,9 +20,6 @@ body.dark-theme {
     --bg-sub-color: #171260;
     --text-main: #efefff;
     --text-sub: #171260;
-    --btn-bg: #efefff;
-    --btn-text: #171260;
-    --btn-hover: #171260;
 }
 
 body, main, button{
@@ -155,20 +149,36 @@ select:hover{
 
 .second{
     background-color: #5267af;
-    height: calc(100vh - 65px);
+    height: calc(100vh - 95px);
+    padding: 30px 25px 0px;
     margin-top: 65px;
     border-radius: 10px 10px 0px 0px;
 }
+#head{
+    width: 100%;
+}
+.report-button{
+    background-color: #efefff;
+    color: #171260;
+    width: 400px;
+    height: 80px;
+    font-size: 40px;
+    border: none;
+    border-radius: 10px;
+}
+.report-button:hover{
+    background-color: #171260;
+    color: #efefff;
+}
 h1{
     color: #efefff;
-    height: 67px;
     font-family: 'Comic Relief', monospace;
     font-size: 48px;
-    margin: 55px 25px 23px;
 }
 hr{
     background-color: #efefff;
     height: 2px;
+    margin: 0px;
     border-style: none;
 }
 
@@ -178,8 +188,8 @@ hr{
 }
 
 .doctors {
-    height: 782px;
-    padding: 38px 25px;
+    height: 718px;
+    padding: 40px 25px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
