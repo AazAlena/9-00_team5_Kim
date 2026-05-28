@@ -9,19 +9,29 @@ D7,Федоров Игорь Павлович,fedorov@clinic.ru,123,doctor
 D8,Михайлова Татьяна Сергеевна,mikhailova@clinic.ru,123,doctor
 D9,Новиков Дмитрий Алексеевич,novikov@clinic.ru,123,doctor
 D10,Соколова Анна Владимировна,sokolova@clinic.ru,123,doctor
-P001,Пациент 001,patient001@mail.ru,123,patient
-P002,Пациент 002,patient002@mail.ru,123,patient
-P003,Пациент 003,patient003@mail.ru,123,patient
-P004,Пациент 004,patient004@mail.ru,123,patient
-P005,Пациент 005,patient005@mail.ru,123,patient
-P006,Пациент 006,patient006@mail.ru,123,patient
-P007,Пациент 007,patient007@mail.ru,123,patient
-P008,Пациент 008,patient008@mail.ru,123,patient
-P009,Пациент 009,patient009@mail.ru,123,patient
-P010,Пациент 010,patient010@mail.ru,123,patient
-P011,Пациент 011,patient011@mail.ru,123,patient
-P012,Пациент 012,patient012@mail.ru,123,patient
-P013,Пациент 013,patient013@mail.ru,123,patient
-P014,Пациент 014,patient014@mail.ru,123,patient
-P015,Пациент 015,patient015@mail.ru,123,patient
+D11,Кузнецов Олег Викторович,oleg.kuznetsov@clinic.ru,123,doctor
+D12,Соловьёва Екатерина Андреевна,ekaterina.sol@clinic.ru,123,doctor
+D13,Морозов Сергей Ильич,sergey.morozov@clinic.ru,123,doctor
+D14,Волкова Наталья Павловна,natalia.volkova@clinic.ru,123,doctor
+D15,Алексеев Дмитрий Сергеевич,alekseev@clinic.ru,123,doctor
+D16,Григорьева Анна Михайловна,anna.grig@clinic.ru,123,doctor
+D17,Егоров Павел Николаевич,egorov@clinic.ru,123,doctor
+D18,Тимофеева Ирина Александровна,timofeeva@clinic.ru,123,doctor
+D19,Николаев Юрий Петрович,nikolaev@clinic.ru,123,doctor
+D20,Фёдорова Елена Борисовна,fedorova@clinic.ru,123,doctor
+P001,Иванов Иван Иванович,patient001@mail.ru,123,patient
+P002,Петров Пётр Петрович,patient002@mail.ru,123,patient
+P003,Сидоров Александр Сергеевич,patient003@mail.ru,123,patient
+P004,Козлов Дмитрий Николаевич,patient004@mail.ru,123,patient
+P005,Морозова Елена Владимировна,patient005@mail.ru,123,patient
+P006,Новиков Андрей Андреевич,patient006@mail.ru,123,patient
+P007,Волкова Мария Петровна,patient007@mail.ru,123,patient
+P008,Зайцев Алексей Алексеевич,patient008@mail.ru,123,patient
+P009,Соколова Ольга Игоревна,patient009@mail.ru,123,patient
+P010,Лебедев Сергей Викторович,patient010@mail.ru,123,patient
+P011,Крылова Татьяна Дмитриевна,patient011@mail.ru,123,patient
+P012,Попов Илья Васильевич,patient012@mail.ru,123,patient
+P013,Павлова Наталья Юрьевна,patient013@mail.ru,123,patient
+P014,Семёнов Григорий Павлович,patient014@mail.ru,123,patient
+P015,Васильева Анастасия Кирилловна,patient015@mail.ru,123,patient
 A1,Администратор,admin@clinic.ru,123,admin
