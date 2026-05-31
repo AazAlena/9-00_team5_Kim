@@ -68,6 +68,7 @@ appointment(page.appoinmentBtn);
 page.nav.enterExitBtn.addEventListener('click', () => {
     if (loginFlag){
         localStorage.removeItem('userId');
+        localStorage.removeItem('role');
         CheckEnter();
     }
     else{
@@ -89,8 +90,6 @@ async function registerPatient(fio, email, password) {
     const data = await response.json();
 
     if (response.status === 201) {
-      console.log(data.message);
-      console.log('ID пациента:', data.patient_id);
       return data;
     } 
     

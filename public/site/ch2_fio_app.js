@@ -2,7 +2,6 @@
 
 function getDoctors(){
     let availableDoctors = JSON.parse(localStorage.getItem('doctorsAvailable'));
-    console.log(availableDoctors);
     loadDoctors(availableDoctors);
 }
 

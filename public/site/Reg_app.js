@@ -29,8 +29,6 @@ async function registerPatient(fio, email, password) {
     const data = await response.json();
 
     if (response.status === 201) {
-      console.log(data.message);
-      console.log('ID пациента:', data.patient_id);
       return data;
     } 
     

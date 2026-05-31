@@ -77,7 +77,6 @@ function getFirstDay(){
     let firstDayIndex = (new Date(yearNow, month, 1, 0, 0, 0)).getDay();
     let firstDay =  firstDayIndex === 0 ? 6 : firstDayIndex - 1;
     let lastDay = new Date(yearNow, month+1, 0).getDate();
-    console.log(firstDay,lastDay);
     loadDays(firstDay,lastDay);
 }
 
