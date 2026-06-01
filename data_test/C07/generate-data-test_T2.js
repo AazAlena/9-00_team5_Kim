@@ -10,7 +10,7 @@ const DATA_DIR = path.join(__dirname, 'data');  // ← сохраняем в dat
 const DOCTOR_COUNT = 20;        // 20 врачей
 const PATIENT_COUNT = 30;       // 30 пациентов
 const APPOINTMENT_COUNT = 450;   // 450 записей (~T1×1.5, т.к. больше врачей и дней)
-const WORK_DAYS = 23;            // 23 дня (1–23 мая)
+const WORK_DAYS = 30;            // 23 дня (1–23 мая)
 
 // Специальности (20 врачей, 5 специальностей повторяются)
 const specialities = [
