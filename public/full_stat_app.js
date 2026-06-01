@@ -1,5 +1,21 @@
 'use strict';
 
+const MAX_DAYS = 62; // Максимально допустимое количество дней
+
+// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ПРОВЕРКИ ДАТ ==========
+function getDateDiffDays(fromDateStr, toDateStr) {
+    const from = new Date(fromDateStr);
+    const to = new Date(toDateStr);
+    const diffTime = to - from;
+    return diffTime / (1000 * 60 * 60 * 24);
+}
+
+function isDateRangeValid(fromDateStr, toDateStr) {
+    if (!fromDateStr || !toDateStr) return false;
+    const days = getDateDiffDays(fromDateStr, toDateStr);
+    return days >= 0 && days <= MAX_DAYS;
+}
+
 const page = {
     dateFrom: document.querySelector('#dateFrom'),
     dateTo: document.querySelector('#dateTo'),
@@ -9,7 +25,7 @@ const page = {
     export: document.querySelector('#exportExcelBtn'),
 }
 
-async function fetchReport(from, to, speciality, doctorId){
+async function fetchReport(from, to, speciality, doctorId) {
     let url = `http://localhost:3000/api/doctors/report?from=${from}&to=${to}`;
     if (speciality && speciality !== 'Все') url += `&speciality=${encodeURIComponent(speciality)}`;
     if (doctorId) url += `&doctorId=${doctorId}`;
@@ -40,7 +56,6 @@ function renderDoctorsTable(doctors) {
             <div class="completed-slots">${doc.totalCompleted}</div>
         `;
         page.doctors.appendChild(row);
-        
     });
 }
 
@@ -51,6 +66,12 @@ async function loadReport() {
         alert('Выберите период дат');
         return;
     }
+    // Проверка на максимальную длительность периода
+    if (!isDateRangeValid(from, to)) {
+        alert(`Превышен допустимый период в ${MAX_DAYS} дня. Пожалуйста, выберите диапазон не более ${MAX_DAYS} дней.`);
+        return;
+    }
+
     const speciality = page.speciality.value === '0' ? null : page.speciality.value;
     const doctorId = page.fio.value || null;
     try {
@@ -62,11 +83,9 @@ async function loadReport() {
     }
 }
 
-
 page.dateFrom.addEventListener('change', () => {
     page.doctors.innerHTML = '';
-    if (page.dateTo.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
-        console.log(Number(new Date(page.dateTo.value)) + Number(new Date(page.dateFrom.value)));
+    if (page.dateTo.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)) {
         loadReport();
         loadDailyChart();
     }
@@ -74,8 +93,7 @@ page.dateFrom.addEventListener('change', () => {
 
 page.dateTo.addEventListener('change', () => {
     page.doctors.innerHTML = '';
-    if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
-        console.log(Number(new Date(page.dateTo.value)) + Number(new Date(page.dateFrom.value)));
+    if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)) {
         loadReport();
         loadDailyChart();
     }
@@ -85,8 +103,7 @@ page.speciality.addEventListener('change', () => {
     page.doctors.innerHTML = '';
     page.fio.value = '0';
     loadDoctorsFilt(page.speciality.value);
-    if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
-        console.log(Number(new Date(page.dateTo.value)) + Number(new Date(page.dateFrom.value)));
+    if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)) {
         loadReport();
         loadDailyChart();
     }
@@ -94,20 +111,17 @@ page.speciality.addEventListener('change', () => {
 
 page.fio.addEventListener('change', () => {
     page.doctors.innerHTML = '';
-    if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
-        console.log(Number(new Date(page.dateTo.value)) + Number(new Date(page.dateFrom.value)));
+    if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)) {
         loadReport();
         loadDailyChart();
     }
 });
 
-
-async function loadSpecialityFilt(){
+async function loadSpecialityFilt() {
     try {
         const response = await fetch('http://localhost:3000/speciality');
         if (!response.ok) throw new Error('Ошибка загрузки специальностей');
         const data = await response.json();
-        // Очищаем select, оставляя "Все"
         page.speciality.innerHTML = '<option value="0">Все</option>';
         const uniqueSpecs = new Set();
         data.forEach(item => {
@@ -150,18 +164,18 @@ async function loadDoctorsFilt(speciality = null) {
 }
 
 page.doctors.addEventListener('click', (e) => {
-    if (e.target.className != 'doctors'){
-        if (e.target.className === 'doctors-item'){
-            localStorage.setItem('doctorId',e.target.id);
-            localStorage.setItem('doctorFio',e.target.querySelector('.fio').innerText);
-        }else{
-            localStorage.setItem('doctorId',e.target.parentElement.id);
-            localStorage.setItem('doctorFio',e.target.parentElement.querySelector('.fio').innerText);
+    if (e.target.className != 'doctors') {
+        if (e.target.className === 'doctors-item') {
+            localStorage.setItem('doctorId', e.target.id);
+            localStorage.setItem('doctorFio', e.target.querySelector('.fio').innerText);
+        } else {
+            localStorage.setItem('doctorId', e.target.parentElement.id);
+            localStorage.setItem('doctorFio', e.target.parentElement.querySelector('.fio').innerText);
         }
     }
 });
 
-function loadData(){
+function loadData() {
     loadSpecialityFilt();
     loadDoctorsFilt();
 }
@@ -171,10 +185,16 @@ let diagramma = null;
 let currentDailyData = [];
 
 async function loadDailyChart() {
-
     const from = page.dateFrom.value;
     const to = page.dateTo.value;
     if (!from || !to) return;
+
+    // Проверка на максимальную длительность периода
+    if (!isDateRangeValid(from, to)) {
+        const chartDiv = document.querySelector("#diagramma");
+        if (chartDiv) chartDiv.innerHTML = '<div style="color:black;">⚠️ Период превышает 62 дня. Выберите меньший интервал.</div>';
+        return;
+    }
 
     const speciality = page.speciality.value === '0' ? null : page.speciality.value;
     const doctorId = page.fio.value || null;
@@ -192,7 +212,7 @@ async function loadDailyChart() {
         const dates = dailyData.map(d => d.date);
         const slotsData = dailyData.map(d => d.totalSlots);
         const bookingsData = dailyData.map(d => d.totalBookings);
-        const utilizationData = dailyData.map(d => d.utilization); // для тултипа
+        const utilizationData = dailyData.map(d => d.utilization);
 
         const options = {
             series: [
@@ -205,7 +225,7 @@ async function loadDailyChart() {
                 toolbar: {
                     show: true,
                     tools: {
-                        download: true,   // скачать PNG
+                        download: true,
                         zoom: true,
                         zoomin: true,
                         zoomout: true,
@@ -252,7 +272,7 @@ async function loadDailyChart() {
                     }
                 }
             },
-            dataLabels: { enabled: false },     // ← отключаем надписи на столбцах
+            dataLabels: { enabled: false },
             stroke: { width: [0, 0] },
             colors: ['#222676', '#5267af'],
             plotOptions: {
@@ -277,12 +297,18 @@ async function loadDailyChart() {
     }
 }
 
-// ========== ЭКСПОРТ В CSV (без кавычек) ==========
+// ========== ЭКСПОРТ В CSV ==========
 async function exportToCSV() {
     const from = page.dateFrom.value;
     const to = page.dateTo.value;
     if (!from || !to) {
         alert('Выберите период дат');
+        return;
+    }
+
+    // Проверка на максимальную длительность периода
+    if (!isDateRangeValid(from, to)) {
+        alert(`Превышен допустимый период в ${MAX_DAYS} дня. Невозможно выгрузить отчёт за ${Math.round(getDateDiffDays(from, to))} дней.`);
         return;
     }
 
@@ -304,7 +330,6 @@ async function exportToCSV() {
 
         const reportData = await response.json();
 
-        // Заголовки (без кавычек)
         const headers = [
             'doctor_id',
             'doctor_full_name',
@@ -314,14 +339,13 @@ async function exportToCSV() {
             'utilization'
         ];
 
-        // Формируем строки без кавычек
         const rows = reportData.doctors.map(doc => {
             const booked = doc.totalBookingsAll;
             const total = doc.totalSlots;
             let utilization = 0;
             if (total > 0) {
                 utilization = (booked / total) * 100;
-                utilization = Math.round(utilization); // целое число процентов
+                utilization = Math.round(utilization);
             }
             return [
                 doc.doctorId,
@@ -333,14 +357,12 @@ async function exportToCSV() {
             ];
         });
 
-        // Собираем CSV строку (поля разделены запятыми, кавычек нет)
         const csvLines = [headers.join(',')];
         for (const row of rows) {
             csvLines.push(row.join(','));
         }
         const csvContent = csvLines.join('\n');
 
-        // Добавляем BOM для кириллицы
         const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
@@ -367,16 +389,15 @@ if (page.export) {
     page.export.addEventListener('click', exportToCSV);
 }
 
-function CheckTheme(){
+function CheckTheme() {
     let theme = localStorage.getItem('theme');
-    if (theme === 'dark'){
+    if (theme === 'dark') {
         document.body.classList.add('dark-theme');
     }
 }
 
-//Проверка входа 
-function CheckEnter(){
-    if (!localStorage.getItem('userId')){
+function CheckEnter() {
+    if (!localStorage.getItem('userId')) {
         window.location.href = './Enter.html';
     }
 }

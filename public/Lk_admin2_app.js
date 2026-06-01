@@ -27,7 +27,6 @@ page.back.addEventListener('click', () => {
 
 //Загрузка календаря
 function loadDays(emptyLen,daysLen){
-    page.calendar.monthInput.value = new Date().getMonth()+1;
     const namesDays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
     for (let i = 0; i < 7; i++){
         let elem = document.createElement('div');
