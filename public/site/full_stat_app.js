@@ -66,6 +66,7 @@ async function loadReport() {
 page.dateFrom.addEventListener('change', () => {
     page.doctors.innerHTML = '';
     if (page.dateTo.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
+        console.log(Number(new Date(page.dateTo.value)) + Number(new Date(page.dateFrom.value)));
         loadReport();
         loadDailyChart();
     }
@@ -74,6 +75,7 @@ page.dateFrom.addEventListener('change', () => {
 page.dateTo.addEventListener('change', () => {
     page.doctors.innerHTML = '';
     if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
+        console.log(Number(new Date(page.dateTo.value)) + Number(new Date(page.dateFrom.value)));
         loadReport();
         loadDailyChart();
     }
@@ -84,6 +86,7 @@ page.speciality.addEventListener('change', () => {
     page.fio.value = '0';
     loadDoctorsFilt(page.speciality.value);
     if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
+        console.log(Number(new Date(page.dateTo.value)) + Number(new Date(page.dateFrom.value)));
         loadReport();
         loadDailyChart();
     }
@@ -92,6 +95,7 @@ page.speciality.addEventListener('change', () => {
 page.fio.addEventListener('change', () => {
     page.doctors.innerHTML = '';
     if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
+        console.log(Number(new Date(page.dateTo.value)) + Number(new Date(page.dateFrom.value)));
         loadReport();
         loadDailyChart();
     }
@@ -273,8 +277,8 @@ async function loadDailyChart() {
     }
 }
 
-// ========== ЭКСПОРТ В EXCEL (клиентский) ==========
-async function exportToExcel() {
+// ========== ЭКСПОРТ В CSV (без кавычек) ==========
+async function exportToCSV() {
     const from = page.dateFrom.value;
     const to = page.dateTo.value;
     if (!from || !to) {
@@ -285,80 +289,82 @@ async function exportToExcel() {
     const speciality = page.speciality.value === '0' ? null : page.speciality.value;
     const doctorId = page.fio.value || null;
 
-    // Формируем URL для отчёта по врачам
     let reportUrl = `http://localhost:3000/api/doctors/report?from=${from}&to=${to}`;
     if (speciality && speciality !== 'Все') reportUrl += `&speciality=${encodeURIComponent(speciality)}`;
     if (doctorId) reportUrl += `&doctorId=${doctorId}`;
 
-    // Формируем URL для дневной статистики
-    let dailyUrl = `http://localhost:3000/api/doctors/daily-report?from=${from}&to=${to}`;
-    if (speciality && speciality !== 'Все') dailyUrl += `&speciality=${encodeURIComponent(speciality)}`;
-    if (doctorId) dailyUrl += `&doctorId=${doctorId}`;
-
     try {
         const exportBtn = page.export;
         const originalText = exportBtn.textContent;
-        exportBtn.textContent = '⏳ Загрузка данных...';
+        exportBtn.textContent = '⏳ Загрузка...';
         exportBtn.disabled = true;
 
-        // Запрашиваем оба набора данных параллельно
-        const [reportRes, dailyRes] = await Promise.all([
-            fetch(reportUrl),
-            fetch(dailyUrl)
-        ]);
+        const response = await fetch(reportUrl);
+        if (!response.ok) throw new Error('Ошибка получения данных');
 
-        if (!reportRes.ok) throw new Error('Ошибка получения отчёта по врачам');
-        if (!dailyRes.ok) throw new Error('Ошибка получения дневной статистики');
+        const reportData = await response.json();
 
-        const reportData = await reportRes.json();
-        const dailyData = await dailyRes.json();
+        // Заголовки (без кавычек)
+        const headers = [
+            'doctor_id',
+            'doctor_full_name',
+            'specialty',
+            'total_slots',
+            'booked_slots',
+            'utilization'
+        ];
 
-        exportBtn.textContent = '📊 Формирование Excel...';
+        // Формируем строки без кавычек
+        const rows = reportData.doctors.map(doc => {
+            const booked = doc.totalBookingsAll;
+            const total = doc.totalSlots;
+            let utilization = 0;
+            if (total > 0) {
+                utilization = (booked / total) * 100;
+                utilization = Math.round(utilization); // целое число процентов
+            }
+            return [
+                doc.doctorId,
+                doc.fio,
+                doc.speciality,
+                total,
+                booked,
+                utilization
+            ];
+        });
 
-        // Лист 1: Врачи
-        const doctorsRows = reportData.doctors.map(doc => ({
-            'ФИО врача': doc.fio,
-            'Специальность': doc.speciality,
-            'Всего слотов': doc.totalSlots,
-            'Количество записей': doc.totalBookingsAll,
-            'Отмены': doc.totalCancels,
-            'Переносы': doc.totalReschedules,
-            'Завершено': doc.totalCompleted
-        }));
-        const wsDoctors = XLSX.utils.json_to_sheet(doctorsRows);
+        // Собираем CSV строку (поля разделены запятыми, кавычек нет)
+        const csvLines = [headers.join(',')];
+        for (const row of rows) {
+            csvLines.push(row.join(','));
+        }
+        const csvContent = csvLines.join('\n');
 
-        // Лист 2: Загрузка по дням
-        const dailyRows = dailyData.daily.map(item => ({
-            'Дата': item.date,
-            'Всего слотов': item.totalSlots,
-            'Занято слотов': item.totalBookings,
-            'Загрузка, %': item.utilization
-        }));
-        const wsDaily = XLSX.utils.json_to_sheet(dailyRows);
+        // Добавляем BOM для кириллицы
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', `report_${from}_to_${to}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
 
-        // Создаём книгу и добавляем листы
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, wsDoctors, `Врачи_${from}_${to}`);
-        XLSX.utils.book_append_sheet(wb, wsDaily, `Загрузка_по_дням`);
-
-        // Сохраняем файл
-        XLSX.writeFile(wb, `report_${from}_to_${to}.xlsx`);
-
-        // Восстанавливаем кнопку
         exportBtn.textContent = originalText;
         exportBtn.disabled = false;
     } catch (error) {
-        console.error('exportToExcel:', error);
+        console.error('exportToCSV:', error);
         alert('Ошибка выгрузки: ' + error.message);
         if (page.export) {
-            page.export.textContent = '📎 Выгрузить Excel';
+            page.export.textContent = '📎 Выгрузить CSV';
             page.export.disabled = false;
         }
     }
 }
 
 if (page.export) {
-    page.export.addEventListener('click', exportToExcel);
+    page.export.addEventListener('click', exportToCSV);
 }
 
 function CheckTheme(){
