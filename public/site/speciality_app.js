@@ -84,7 +84,15 @@ function CheckTheme(){
     }
 }
 
+//Проверка входа 
+function CheckEnter(){
+    if (!localStorage.getItem('userId')){
+        window.location.href = './Enter.html';
+    }
+}
+
 (()=>{
+    CheckEnter();
     CheckTheme();
     loadSpecialties();
 })()

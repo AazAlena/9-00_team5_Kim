@@ -57,7 +57,6 @@ page.buttonProof.addEventListener('click', async () => {
     let patientCode = localStorage.getItem('userId');
     let doctorId = localStorage.getItem('doctorId');
     let slotDateTime = `${localStorage.getItem('date')} ${localStorage.getItem('time')}` ;
-    console.log(patientCode,doctorId,slotDateTime);
     try {
         const result = await createAppointment(doctorId, slotDateTime, patientCode);
         localStorage.removeItem('doctorFio');
@@ -83,7 +82,15 @@ function CheckTheme(){
     }
 }
 
+//Проверка входа 
+function CheckEnter(){
+    if (!localStorage.getItem('userId')){
+        window.location.href = './Enter.html';
+    }
+}
+
 (() => {
+    CheckEnter();
     CheckTheme();
     loadData();
 })();

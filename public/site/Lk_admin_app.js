@@ -21,7 +21,7 @@ const page = {
 };
 
 page.report.addEventListener('click', () => {
-    window.location.href = './full_stat.html';
+    window.open('./full_stat.html', '_blank');
 });
 
 //клик на кнопку навигации
@@ -119,7 +119,6 @@ page.calendar.section.addEventListener('click', async (e) => {
         let selectedMonth = String(page.calendar.monthInput.value).padStart(2, '0');
         let selectedDayNumber = String(e.target.textContent).padStart(2, '0');
         selectedDate = `${selectedYear}-${selectedMonth}-${selectedDayNumber}`;
-        console.log(selectedDate);
         try {
             doctors = await getWorkingDoctors(selectedDate);
             loadDoctors(doctors);

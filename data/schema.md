@@ -1,4 +1,4 @@
-# Схема данных T1 для Кейса 7
+# Схема данных T1 и Т2 для Кейса 7
 
 **case**: 07_DoctorSchedule  
 **dataset_version**: 1.0  

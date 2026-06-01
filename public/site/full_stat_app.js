@@ -67,6 +67,7 @@ page.dateFrom.addEventListener('change', () => {
     page.doctors.innerHTML = '';
     if (page.dateTo.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
         loadReport();
+        loadDailyChart();
     }
 });
 
@@ -74,6 +75,7 @@ page.dateTo.addEventListener('change', () => {
     page.doctors.innerHTML = '';
     if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
         loadReport();
+        loadDailyChart();
     }
 });
 
@@ -83,6 +85,7 @@ page.speciality.addEventListener('change', () => {
     loadDoctorsFilt(page.speciality.value);
     if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
         loadReport();
+        loadDailyChart();
     }
 });
 
@@ -90,6 +93,7 @@ page.fio.addEventListener('change', () => {
     page.doctors.innerHTML = '';
     if (page.dateFrom.value != '' && new Date(page.dateTo.value) >= new Date(page.dateFrom.value)){
         loadReport();
+        loadDailyChart();
     }
 });
 
@@ -158,6 +162,117 @@ function loadData(){
     loadDoctorsFilt();
 }
 
+// ========== ДИАГРАММА ЗАГРУЗКИ ПО ДНЯМ ==========
+let diagramma = null;
+let currentDailyData = [];
+
+async function loadDailyChart() {
+
+    const from = page.dateFrom.value;
+    const to = page.dateTo.value;
+    if (!from || !to) return;
+
+    const speciality = page.speciality.value === '0' ? null : page.speciality.value;
+    const doctorId = page.fio.value || null;
+
+    let url = `http://localhost:3000/api/doctors/daily-report?from=${from}&to=${to}`;
+    if (speciality && speciality !== 'Все') url += `&speciality=${encodeURIComponent(speciality)}`;
+    if (doctorId) url += `&doctorId=${doctorId}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Ошибка получения дневной статистики');
+        const data = await response.json();
+        const dailyData = data.daily;
+
+        const dates = dailyData.map(d => d.date);
+        const slotsData = dailyData.map(d => d.totalSlots);
+        const bookingsData = dailyData.map(d => d.totalBookings);
+        const utilizationData = dailyData.map(d => d.utilization); // для тултипа
+
+        const options = {
+            series: [
+                { name: 'Всего слотов', type: 'column', data: slotsData },
+                { name: 'Занято слотов', type: 'column', data: bookingsData }
+            ],
+            chart: {
+                type: 'bar',
+                height: 400,
+                toolbar: {
+                    show: true,
+                    tools: {
+                        download: true,   // скачать PNG
+                        zoom: true,
+                        zoomin: true,
+                        zoomout: true,
+                        pan: true,
+                        reset: true
+                    }
+                },
+                zoom: {
+                    enabled: true,
+                    type: 'x',
+                    autoScaleYaxis: true
+                },
+                fontFamily: 'Comic Relief, cursive',
+                animations: { enabled: true, easing: 'easeinout' }
+            },
+            title: {
+                text: 'Загрузка по дням',
+                align: 'center',
+                style: { fontSize: '20px', fontWeight: 'bold', fontFamily: 'Comic Relief, cursive', color: '#171260' }
+            },
+            xaxis: {
+                categories: dates,
+                title: { text: 'Дата', style: { color: '#171260', fontSize: '15px' } },
+                labels: { rotate: -30 }
+            },
+            yaxis: {
+                title: { text: 'Количество слотов', style: { color: '#171260', fontSize: '15px' } },
+                min: 0,
+                tickAmount: 5,
+                forceNiceScale: false,
+                labels: { formatter: (val) => Math.round(val) }
+            },
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: (value, { seriesIndex, dataPointIndex }) => {
+                        if (seriesIndex === 0) return `Всего слотов: ${value}`;
+                        if (seriesIndex === 1) {
+                            const percent = utilizationData[dataPointIndex];
+                            return `Занято слотов: ${value} (${percent}%)`;
+                        }
+                        return value;
+                    }
+                }
+            },
+            dataLabels: { enabled: false },     // ← отключаем надписи на столбцах
+            stroke: { width: [0, 0] },
+            colors: ['#222676', '#5267af'],
+            plotOptions: {
+                bar: { borderRadius: 10, columnWidth: '60%' }
+            },
+            legend: {
+                position: 'bottom',
+                horizontalAlign: 'center',
+                fontSize: '20px',
+                fontFamily: 'Comic Relief, cursive',
+                itemMargin: { horizontal: 12, vertical: 0 }
+            }
+        };
+
+        if (diagramma) diagramma.destroy();
+        diagramma = new ApexCharts(document.querySelector("#diagramma"), options);
+        diagramma.render();
+    } catch (error) {
+        console.error('loadDailyChart:', error);
+        const chartDiv = document.querySelector("#diagramma");
+        if (chartDiv) chartDiv.innerHTML = '<div style="color:black;">Не удалось загрузить диаграмму</div>';
+    }
+}
+
 // ========== ЭКСПОРТ В EXCEL (клиентский) ==========
 async function exportToExcel() {
     const from = page.dateFrom.value;
@@ -167,15 +282,18 @@ async function exportToExcel() {
         return;
     }
 
-    // Получаем текущие данные из таблицы (или запрашиваем заново)
-    // Проще всего взять уже загруженные данные из переменной, но у вас их нет.
-    // Поэтому сделаем отдельный запрос к /api/doctors/report и сформируем Excel.
     const speciality = page.speciality.value === '0' ? null : page.speciality.value;
     const doctorId = page.fio.value || null;
 
-    let url = `http://localhost:3000/api/doctors/report?from=${from}&to=${to}`;
-    if (speciality && speciality !== 'Все') url += `&speciality=${encodeURIComponent(speciality)}`;
-    if (doctorId) url += `&doctorId=${doctorId}`;
+    // Формируем URL для отчёта по врачам
+    let reportUrl = `http://localhost:3000/api/doctors/report?from=${from}&to=${to}`;
+    if (speciality && speciality !== 'Все') reportUrl += `&speciality=${encodeURIComponent(speciality)}`;
+    if (doctorId) reportUrl += `&doctorId=${doctorId}`;
+
+    // Формируем URL для дневной статистики
+    let dailyUrl = `http://localhost:3000/api/doctors/daily-report?from=${from}&to=${to}`;
+    if (speciality && speciality !== 'Все') dailyUrl += `&speciality=${encodeURIComponent(speciality)}`;
+    if (doctorId) dailyUrl += `&doctorId=${doctorId}`;
 
     try {
         const exportBtn = page.export;
@@ -183,14 +301,22 @@ async function exportToExcel() {
         exportBtn.textContent = '⏳ Загрузка данных...';
         exportBtn.disabled = true;
 
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Ошибка получения данных');
-        const data = await response.json();
+        // Запрашиваем оба набора данных параллельно
+        const [reportRes, dailyRes] = await Promise.all([
+            fetch(reportUrl),
+            fetch(dailyUrl)
+        ]);
+
+        if (!reportRes.ok) throw new Error('Ошибка получения отчёта по врачам');
+        if (!dailyRes.ok) throw new Error('Ошибка получения дневной статистики');
+
+        const reportData = await reportRes.json();
+        const dailyData = await dailyRes.json();
 
         exportBtn.textContent = '📊 Формирование Excel...';
 
-        // Преобразуем данные в формат для XLSX
-        const rows = data.doctors.map(doc => ({
+        // Лист 1: Врачи
+        const doctorsRows = reportData.doctors.map(doc => ({
             'ФИО врача': doc.fio,
             'Специальность': doc.speciality,
             'Всего слотов': doc.totalSlots,
@@ -199,12 +325,26 @@ async function exportToExcel() {
             'Переносы': doc.totalReschedules,
             'Завершено': doc.totalCompleted
         }));
+        const wsDoctors = XLSX.utils.json_to_sheet(doctorsRows);
 
-        const ws = XLSX.utils.json_to_sheet(rows);
+        // Лист 2: Загрузка по дням
+        const dailyRows = dailyData.daily.map(item => ({
+            'Дата': item.date,
+            'Всего слотов': item.totalSlots,
+            'Занято слотов': item.totalBookings,
+            'Загрузка, %': item.utilization
+        }));
+        const wsDaily = XLSX.utils.json_to_sheet(dailyRows);
+
+        // Создаём книгу и добавляем листы
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, `Стат_${from}_${to}`);
+        XLSX.utils.book_append_sheet(wb, wsDoctors, `Врачи_${from}_${to}`);
+        XLSX.utils.book_append_sheet(wb, wsDaily, `Загрузка_по_дням`);
+
+        // Сохраняем файл
         XLSX.writeFile(wb, `report_${from}_to_${to}.xlsx`);
 
+        // Восстанавливаем кнопку
         exportBtn.textContent = originalText;
         exportBtn.disabled = false;
     } catch (error) {
@@ -228,7 +368,15 @@ function CheckTheme(){
     }
 }
 
+//Проверка входа 
+function CheckEnter(){
+    if (!localStorage.getItem('userId')){
+        window.location.href = './Enter.html';
+    }
+}
+
 (() => {
+    CheckEnter();
     CheckTheme();
     loadData();
 })();

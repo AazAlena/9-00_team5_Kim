@@ -59,25 +59,6 @@ db.serialize(() => {
             FOREIGN KEY (id) REFERENCES user(id)
         )
     `);
-
-    /*db.run(`
-        CREATE TABLE IF NOT EXISTS patients (
-            patient_id TEXT PRIMARY KEY,
-            patient_full_name TEXT NOT NULL,
-            patient_mail TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            FOREIGN KEY (patient_id) REFERENCES appointments(patient_id)
-        )
-    `);*/
-
-    /*db.run(`
-        CREATE TABLE IF NOT EXISTS admins (
-            admin_id TEXT PRIMARY KEY,
-            admin_full_name TEXT NOT NULL,
-            admin_mail TEXT UNIQUE NOT NULL,
-            admin_password TEXT NOT NULL
-        )
-    `);*/
     
     console.log('✅ Таблицы созданы или уже существуют');
 });

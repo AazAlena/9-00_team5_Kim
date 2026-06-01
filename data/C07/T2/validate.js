@@ -223,7 +223,7 @@ function validateReferences(rows, filename, field, refFile, refField, allData) {
 // ГЛАВНАЯ ФУНКЦИЯ ВАЛИДАЦИИ
 
 async function validateAll() {
-    const dataDir = __dirname;
+    const dataDir = path.join(__dirname, 'C07', 'T2');
     const errors = [];
     const allData = {};
 

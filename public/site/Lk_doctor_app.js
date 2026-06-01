@@ -155,7 +155,6 @@ async function getDoctorAppointments(doctorId, date) {
         const data = await response.json();
 
         if (response.status === 200) {
-            console.log(data.appointments)
             return data.appointments;
         }
         

@@ -121,7 +121,6 @@ async function loadDoctorInfo(){
     page.utilization.fioData.innerHTML = `${doctorSurname} ${doctorFirstName}.${doctorSecondName}.<br>${date}`;
     try {
         let result = await getDoctorDailyStats(localStorage.getItem('doctorId'), localStorage.getItem('date'));
-        console.log(result);
         page.utilization.percent.innerText = 'Утилизация: ' + result.completed_percent + '%';
         let arr = result.canceled_list;
         let totalArr = result;
@@ -139,7 +138,6 @@ async function loadDoctorInfo(){
         delete totalArr.canceled_list;
         totalArr.cancel_arr = cancelArr;
         totalArr.transfer_arr = transferArr;
-        console.log(totalArr);
         localStorage.setItem('doctorUtil', JSON.stringify(totalArr));
         page.utilization.cancel.innerText = 'Кол-во отмен: ' + cancelArr.length;
         page.utilization.transfer.innerText = 'Кол-во переносов: ' + transferArr.length;

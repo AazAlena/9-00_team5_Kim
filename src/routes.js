@@ -3,7 +3,7 @@ const fs = require('fs');
 const db = require('./db');
 const importFunctions = require('./import');
 const validation = require('./validation');
-const { validateAll } = require('../data/validate');
+const { validateAll } = require('../data/C07/T1/validate');
 const CURRENT_DATE = new Date();
 module.exports = function (app) {
     // ========== 1. ВСЕ ВРАЧИ (без фильтра по специальности) ==========
@@ -120,142 +120,107 @@ module.exports = function (app) {
         res.json({ from, to, doctors: result });
     });
 
-    // ========== 3. ДЕТАЛЬНАЯ СТАТИСТИКА ПО ВРАЧУ (с комментариями) ==========
-    // GET /api/doctor/details?doctorId=D1&from=2026-05-01&to=2026-05-31
-    app.get('/api/doctor/details', async (req, res) => {
-        const { doctorId, from, to } = req.query;
-        if (!doctorId || !from || !to) {
-            return res.status(400).json({ error: 'doctorId, from, to обязательны' });
+    // ========== ДНЕВНАЯ СТАТИСТИКА ДЛЯ ДИАГРАММЫ ==========
+    app.get('/api/doctors/daily-report', async (req, res) => {
+        const { from, to, speciality, doctorId } = req.query;
+        if (!from || !to) {
+            return res.status(400).json({ error: 'Параметры from и to обязательны' });
         }
 
-        // Получаем ФИО врача и его специальность
-        const doctorInfo = await new Promise((resolve, reject) => {
-            db.get(`
-                SELECT u.id, u.fio, s.speciality
-                FROM user u
-                LEFT JOIN speciality s ON u.id = s.id
-                WHERE u.id = ? AND u.role = 'doctor'
-            `, [doctorId], (err, row) => {
-                if (err) reject(err);
-                else resolve(row);
-            });
-        });
-        if (!doctorInfo) {
-            return res.status(404).json({ error: 'Врач не найден' });
+        // 1. Получаем врачей с учётом фильтров
+        let doctorsQuery = `
+            SELECT u.id, u.fio, s.speciality
+            FROM user u
+            LEFT JOIN speciality s ON u.id = s.id
+            WHERE u.role = 'doctor'
+        `;
+        const params = [];
+        if (speciality && speciality !== 'Все') {
+            doctorsQuery += ` AND s.speciality = ?`;
+            params.push(speciality);
+        }
+        if (doctorId) {
+            doctorsQuery += ` AND u.id = ?`;
+            params.push(doctorId);
         }
 
-        // 1. Общее количество слотов за период (аналогично предыдущему)
-        const workDays = await new Promise((resolve, reject) => {
-            db.all(`
-                SELECT start_time, end_time, slots_minutes, break_start, break_end
-                FROM work_slot
-                WHERE id = ? AND date BETWEEN ? AND ?
-            `, [doctorId, from, to], (err, rows) => {
+        const doctors = await new Promise((resolve, reject) => {
+            db.all(doctorsQuery, params, (err, rows) => {
                 if (err) reject(err);
                 else resolve(rows);
             });
         });
+
+        if (doctors.length === 0) {
+            return res.json({ daily: [] });
+        }
+
+        // 2. Генерируем список всех дней в периоде
+        const startDate = new Date(from);
+        const endDate = new Date(to);
+        const dateList = [];
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            dateList.push(d.toISOString().slice(0,10));
+        }
+
+        // 3. Для каждого дня считаем суммарные слоты и записи по всем выбранным врачам
+        const dailyStats = [];
         const toMinutes = (t) => {
             if (!t) return 0;
             const [h, m] = t.split(':').map(Number);
             return h * 60 + m;
         };
-        let totalSlots = 0;
-        for (const day of workDays) {
-            const start = toMinutes(day.start_time);
-            const end = toMinutes(day.end_time);
-            const step = day.slots_minutes;
-            let workMinutes = end - start;
-            if (day.break_start && day.break_end) {
-                workMinutes -= (toMinutes(day.break_end) - toMinutes(day.break_start));
+
+        for (const date of dateList) {
+            let totalSlots = 0;
+            let totalBookings = 0;
+
+            for (const doc of doctors) {
+                // Расписание врача на этот день
+                const workSlot = await new Promise((resolve) => {
+                    db.get(`SELECT start_time, end_time, slots_minutes, break_start, break_end
+                            FROM work_slot WHERE id = ? AND date = ?`,
+                        [doc.id, date], (err, row) => {
+                            if (err || !row) resolve(null);
+                            else resolve(row);
+                        });
+                });
+
+                if (workSlot) {
+                    const start = toMinutes(workSlot.start_time);
+                    const end = toMinutes(workSlot.end_time);
+                    const step = workSlot.slots_minutes;
+                    let workMinutes = end - start;
+                    if (workSlot.break_start && workSlot.break_end) {
+                        workMinutes -= (toMinutes(workSlot.break_end) - toMinutes(workSlot.break_start));
+                    }
+                    totalSlots += Math.floor(workMinutes / step);
+                }
+
+                // Количество записей (booked или completed) в этот день у этого врача
+                const bookingCount = await new Promise((resolve) => {
+                    db.get(`SELECT COUNT(*) as cnt FROM appointment
+                            WHERE doctor_id = ? AND date(slot_datetime) = ?
+                            AND status IN ('booked', 'completed')`,
+                        [doc.id, date], (err, row) => {
+                            if (err) resolve(0);
+                            else resolve(row ? row.cnt : 0);
+                        });
+                });
+                totalBookings += bookingCount;
             }
-            totalSlots += Math.floor(workMinutes / step);
+
+            const utilization = totalSlots > 0 ? (totalBookings / totalSlots) * 100 : 0;
+            dailyStats.push({
+                date: date,
+                totalSlots: totalSlots,
+                totalBookings: totalBookings,
+                utilization: Math.round(utilization * 10) / 10
+            });
         }
 
-        // 2. Общие цифры по записям
-        const totals = await new Promise((resolve, reject) => {
-            db.get(`
-                SELECT 
-                    COUNT(CASE WHEN a.status = 'completed' THEN 1 END) as completed,
-                    COUNT(CASE WHEN a.status = 'canceled' AND (c.why_canceled IS NULL OR c.why_canceled NOT LIKE 'Перенос:%') THEN 1 END) as cancels,
-                    COUNT(CASE WHEN a.status = 'canceled' AND c.why_canceled LIKE 'Перенос:%' THEN 1 END) as reschedules
-                FROM appointment a
-                LEFT JOIN canceled_appointment c ON a.appt_id = c.appt_id
-                WHERE a.doctor_id = ? AND a.slot_datetime BETWEEN ? AND ?
-            `, [doctorId, `${from} 00:00:00`, `${to} 23:59:59`], (err, row) => {
-                if (err) reject(err);
-                else resolve(row || { completed: 0, cancels: 0, reschedules: 0 });
-            });
-        });
-
-        // 3. Список отмен (с комментариями и ФИО пациента)
-        const cancellations = await new Promise((resolve, reject) => {
-            db.all(`
-                SELECT 
-                    a.slot_datetime,
-                    p.fio as patient_fio,
-                    c.why_canceled as reason
-                FROM appointment a
-                JOIN user p ON a.patient_code = p.id
-                JOIN canceled_appointment c ON a.appt_id = c.appt_id
-                WHERE a.doctor_id = ? 
-                AND a.status = 'canceled'
-                AND (c.why_canceled IS NULL OR c.why_canceled NOT LIKE 'Перенос:%')
-                AND a.slot_datetime BETWEEN ? AND ?
-                ORDER BY a.slot_datetime
-            `, [doctorId, `${from} 00:00:00`, `${to} 23:59:59`], (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows);
-            });
-        });
-
-        // 4. Список переносов (с комментариями и ФИО пациента)
-        const reschedules = await new Promise((resolve, reject) => {
-            db.all(`
-                SELECT 
-                    a.slot_datetime,
-                    p.fio as patient_fio,
-                    c.why_canceled as reason
-                FROM appointment a
-                JOIN user p ON a.patient_code = p.id
-                JOIN canceled_appointment c ON a.appt_id = c.appt_id
-                WHERE a.doctor_id = ? 
-                AND a.status = 'canceled'
-                AND c.why_canceled LIKE 'Перенос:%'
-                AND a.slot_datetime BETWEEN ? AND ?
-                ORDER BY a.slot_datetime
-            `, [doctorId, `${from} 00:00:00`, `${to} 23:59:59`], (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows);
-            });
-        });
-
-        res.json({
-            doctor: {
-                id: doctorInfo.id,
-                fio: doctorInfo.fio,
-                speciality: doctorInfo.speciality || 'Не указана'
-            },
-            period: { from, to },
-            totalSlots,
-            totalBookings: totals.completed,
-            totalCancels: totals.cancels,
-            totalReschedules: totals.reschedules,
-            totalCompleted: totals.completed,
-            cancellations: cancellations.map(c => ({
-                datetime: c.slot_datetime,
-                patientFio: c.patient_fio,
-                reason: c.reason
-            })),
-            reschedules: reschedules.map(r => ({
-                datetime: r.slot_datetime,
-                patientFio: r.patient_fio,
-                reason: r.reason
-            }))
-        });
+        res.json({ daily: dailyStats });
     });
-
-    //
 
     //1)запрос на получение списка специальностей
     //на странице со специальностями:
@@ -983,11 +948,11 @@ module.exports = function (app) {
         try {
             // 1. Получаем пути к файлам
             const { specialityPath, userPath, workSlotPath, appointmentPath, canceledAppointmentPath } = req.body;
-            const specPath = specialityPath || path.join(__dirname, '..', 'data', 'speciality.csv');
-            const userPathFinal = userPath || path.join(__dirname, '..', 'data', 'user.csv');
-            const workSlotPathFinal = workSlotPath || path.join(__dirname, '..', 'data', 'work_slot.csv');
-            const appointmentPathFinal = appointmentPath || path.join(__dirname, '..', 'data', 'appointment.csv');
-            const canceledPathFinal = canceledAppointmentPath || path.join(__dirname, '..', 'data', 'canceled_appointment.csv');
+            const specPath = specialityPath || path.join(__dirname, '..', 'data','C07', 'T1', 'speciality.csv');
+            const userPathFinal = userPath || path.join(__dirname, '..', 'data','C07', 'T1', 'user.csv');
+            const workSlotPathFinal = workSlotPath || path.join(__dirname, '..', 'data', 'C07', 'T1', 'work_slot.csv');
+            const appointmentPathFinal = appointmentPath || path.join(__dirname, '..', 'data', 'C07', 'T1', 'appointment.csv');
+            const canceledPathFinal = canceledAppointmentPath || path.join(__dirname, '..', 'data', 'C07', 'T1', 'canceled_appointment.csv');
 
             // 2. Проверяем существование файлов
             if (!fs.existsSync(specPath)) return res.status(400).json({ error: `Файл не найден: ${specPath}` });

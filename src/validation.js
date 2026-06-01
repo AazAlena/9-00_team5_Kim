@@ -45,12 +45,6 @@ function validateDate(dateStr) {
     if (isNaN(date.getTime())) {
         return { valid: false, value: null, message: 'Некорректная дата' };
     }
-    // (опционально) запрет на прошедшие даты – раскомментировать при необходимости
-    // const today = new Date();
-    // today.setHours(0,0,0,0);
-    // if (date < today) {
-    //     return { valid: false, value: null, message: 'Дата не может быть в прошлом' };
-    // }
     return { valid: true, value: dateStr, message: '' };
 }
 

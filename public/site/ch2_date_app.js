@@ -18,7 +18,6 @@ async function getDoctorSlots(doctorId, date) {
         const data = await response.json();
 
         if (response.status === 200) {
-            console.log(data);
             return data;
         }
         
@@ -125,7 +124,6 @@ document.querySelector('.search').addEventListener('input', () =>{
         }
         let dateSearch = String(date.getFullYear()) + '-' + String(date.getMonth()+1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
         localStorage.setItem('date', dateSearch);
-        console.log(dateSearch);
         loadSlots(dateSearch);
     }
 });
