@@ -108,7 +108,7 @@ nav>a:hover {
 #Main_img {
     display: block;
 }
-#main_xyi {
+#main_text {
     background-color: var(--bg-color);
     width: calc(1420px * 0.6);
     height: 852px;
