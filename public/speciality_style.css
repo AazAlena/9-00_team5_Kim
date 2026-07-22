@@ -1,0 +1,104 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+}
+
+*{
+    box-sizing: border-box;
+}
+body{
+    background-color: var(--bg-color);
+    font-family: 'Comic Relief', monospace;
+    margin: 0px;
+}
+main{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.conteiner{
+    background-color: var(--bg-sub-color);
+    width: 1420px;
+    height: 100vh;
+    padding: 100px 205px 0px 205px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: column;
+    gap:50px;
+}
+
+.h1{
+    color: var(--text-main);
+    width: 1010px;
+    font-size: 64px;
+    text-align: center;
+}
+
+.search{
+    background-color: #efefff;
+    width: 100%;
+    height: 80px;
+    font-family: 'Comic Relief', monospace;
+    font-size: 32px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    padding: 10px 20px 10px 67px;
+    background-image: url(./img/poisk.svg);
+    background-size: 47px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+.search:focus{
+    background-color: #ffffff;
+}
+
+.allspecialties{
+    background-color: #5267af;
+    width: 100%;
+    height: 660px;
+    border-radius: 10px 10px 0px 0px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+.allspecialties-item{
+    background-color: #efefff;
+    color: #171260;
+    width: 100%;
+    font-family: 'Comic Relief', monospace;
+    font-size: 40px;
+    padding: 30px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+.allspecialties-item:hover{
+    background-color: #ffffff;
+}
+
+::selection{
+    background-color: #5267af;
+    color: #efefff;
+}

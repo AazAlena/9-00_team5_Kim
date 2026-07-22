@@ -1,0 +1,130 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+    --btn-bg: #171260;
+    --btn-text: #efefff;
+    --btn-hover: #5267af;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+}
+
+body{
+    background-color: var(--bg-color);
+    height: 100vh;
+    margin: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#Entrance{
+    width: 750px;
+    height: 885px;
+    font-family: 'Comic relief', monospace;
+    font-size: 32px;
+}
+.entr_bg{
+    background-color: var(--bg-sub-color);
+    color: var(--text-main);
+    width: 750px;
+    height: 840px;
+    border-radius: 20px;
+}
+.entr_fill{
+    width: 700px;
+    height: 620px;
+    margin: 0px auto;
+    position: relative;
+    top: 110px;
+}
+h1{
+    height: 90px;
+    font-size: 64px;
+    margin: 0px 0px 80px;
+}
+input{
+    background-color: #efefff;
+    width: 660px;
+    height: 75px;
+    font-family: 'Comic relief', monospace;
+    font-size: 24px;
+    padding: 0px 20px;
+    margin-bottom: 50px;
+    border-radius: 10px;
+    border-style: none;
+}
+input:focus{
+    background-color: #ffffff;
+}
+label{
+    height: 45px;
+    display: block;
+    text-align: start;
+}
+.eye_butt{
+    width: 55px;
+    height: 55px;
+    background-color: rgba(1, 1, 1, 0);
+    border-style: none;
+    padding: 0px;
+    display: block;
+}
+.eye_butt>img{
+    width: 55px;
+    height: 55px;
+}
+#eye_close1{
+    position: relative;
+    bottom: 115px;
+    left: 650px;
+    cursor: pointer;
+}
+#entr_butt{
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    width: 350px;
+    height: 80px;
+    font-family: 'Comic relief', monospace;
+    font-size: 32px;
+    border-radius: 10px;
+    border-style: none;
+    display: block;
+    margin: 30px auto 0px;
+}
+#entr_butt:hover{
+    background-color: var(--btn-hover);
+}
+#a{
+    color: var(--text-main);
+    width: 280px;
+    display: block;
+    margin: 0px auto;
+    text-decoration: none;
+    text-align: center;
+}
+#a:hover{
+    color: #5267af;
+}
+
+::selection{
+    background-color: #5267af;
+    color: #efefff;
+}

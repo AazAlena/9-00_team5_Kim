@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КрейзиМед</title>
+    <link rel="stylesheet" href="Main_screen_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="" id="appt">Записаться на приём</a></li>
+                <li><a href="" id="lk">Личный кабинет</a></li>
+                <li>
+                    <button id="sun" class="theme">
+                        <img src="./img/sun.svg" alt="">
+                    </button>
+                </li>
+            </ul>
+            <button type="button" id="but_enter">Вход</button>
+        </nav>
+    </header>
+    <main>
+        <section id="hd">
+            <img id="Main_img" src="./img/Main_picture.png" alt="">
+        </section>
+        <div id="main_text">
+            <div id="main_fill">
+                <h1>КрейзиМед</h1>
+                <p>
+                    Адрес нашей поликлиники:
+                    <br>
+                    Москва, ул.Первомайская 19с5
+                    <br><br>
+                    Связаться с нами:
+                    <br>
+                    +7 666 555 67 69
+                    <br><br>
+                    ne@pishite.nam
+                </p>
+            </div>
+        </div>
+
+        <section class="appt_b">
+            <button type="button" class="appt_but">
+                Записаться на приём
+                <img id="light" src="./img/arrowhead.svg" alt="">
+                <img id="dark" src="./img/arrowhead_dark.svg" alt="" style="display: none;">
+            </button>
+        </section>
+
+        <section id="doc">
+            <h1>Наши врачи</h1>
+            <div id="Carousel-slider">
+                <div class="Carousel-slider">
+                    <div class="slider-item superHero superHero1" data-href="#">
+                        <div class="podpis">
+                            <p>Иван Алексеевич Кравцов</p>
+                        </div>
+                    </div>
+                    <div class="slider-item superHero superHero2" data-href="#">
+                        <div class="podpis">
+                            <p>Павел Дмитриевич Гусев</p>
+                        </div>
+                    </div>
+                    <div class="slider-item superHero superHero3" data-href="#">
+                        <div class="podpis">
+                            <p>Анна Сергеевна Морозова</p>
+                        </div>
+                    </div>
+                    <div class="slider-item superHero superHero4" data-href="#">
+                        <div class="podpis">
+                            <p>Ольга Ивановна Мир</p>
+                        </div>
+                    </div>
+                    <div class="slider-item superHero superHero5" data-href="#">
+                        <div class="podpis">
+                            <p>Ирина Петровна Громова</p>
+                        </div>
+                    </div>
+                    <div class="slider-item superHero superHero6" data-href="#">
+                        <div class="podpis">
+                            <p>Игорь Петрович Павлов</p>
+                        </div>
+                    </div>
+                    <div class="slider-item superHero superHero7" data-href="#">
+                        <div class="podpis">
+                            <p>Андрей Павлович Жук</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="stat">
+            <div class="item scroll-item item-top">
+                <p>
+                    Заботимся о вашем здоровье с 2014 года: современная диагностика и лечение без очередей
+                </p>
+            </div>
+            <div class="stat_cont">
+                <div class="item scroll-item item-left">
+                    <p>
+                        В штате более 40 специалистов высшей категории и кандидатов медицинских наук.<br>Регулярно проходим
+                        стажировки в ведущих клиниках страны.
+                    </p>
+                </div>
+                <div class="item scroll-item item-right">
+                    <p>
+                        Собственная лаборатория и новое оборудование экспертного класса (МРТ, КТ, УЗИ).<br>Результаты анализов
+                        приходят на почту в течение суток.
+                    </p>
+                </div>
+            </div>
+            <div class="stat_cont">
+                <div class="item scroll-item item-left">
+                    <p>
+                        Выбирайте специалиста и удобное время через сайт.
+                    </p>
+                </div>
+                <div class="item scroll-item item-right">
+                    <p>
+                        Скидки до 15% на обследования для всей семьи.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="Registration">
+            <div class="regfill_bg">
+                <div class="regfill">
+                    <h2>Создать Аккаунт</h2>
+                    <form action="" id="reg_form">
+                        <label for="fio">Фио</label>
+                        <input 
+                            type="text"
+                            placeholder="Иванов Иван Иванович"
+                            id="fio"
+                            name="fio"
+                            required
+                        >
+                        <label for="email">Почта</label>
+                        <input 
+                            type="email"
+                            placeholder="your@mail.com"
+                            id="email"
+                            name="email"
+                            required
+                        >
+                        <label for="password">Пароль</label>
+                        <input 
+                            type="password"
+                            id="password"
+                            name="password"
+                            required
+                        >
+                        <label for="repass">Повторите пароль</label>
+                        <input 
+                            type="password"
+                            id="repass" 
+                            name="repass"
+                            required
+                        >
+                        <button id="reg_butt">Подтвердить</button>
+                    </form>
+                </div>
+                <button type="button" id="eye_close1" class="eye_butt">
+                    <img src="./img/eye_close.svg" alt="" id="eye1">
+                </button>
+                <button type="button" id="eye_close2" class="eye_butt">
+                    <img src="./img/eye_close.svg" alt="" id="eye2">
+                </button>
+            </div>
+            <a href="" id="a">Уже есть аккаунт?</a>
+        </section>
+
+        <section id="map">
+            <script type="text/javascript" charset="utf-8" async
+                src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Af140b4de5c939de457e4e1d5a18934ead7545eaa1c00a4f47902874024dd46b6&amp;lang=ru_RU&amp;scroll=true">
+            </script>
+        </section>
+    </main>
+
+    <footer>
+        <p>+7 666 555 67 69</p>
+        <p>ne@pishite.nam</p>
+    </footer>
+    <script src="./Main_screen_app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/micro-slider@1.0.9/dist/micro-slider.min.js"></script>
+</body>
+</html>

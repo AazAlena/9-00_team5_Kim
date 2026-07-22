@@ -1,0 +1,136 @@
+/* :root {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+} */
+
+:root {
+    --bg-color: #ffffff;
+    --bg-sub-color: #b2c8ff;
+    --text-main: #171260;
+    --btn-bg: #171260;
+    --btn-text: #efefff;
+    --btn-hover: #5267af;
+}
+
+body.dark-theme {
+    --bg-color: #222676;
+    --bg-sub-color: #171260;
+    --text-main: #efefff;
+    --btn-bg: #efefff;
+    --btn-text: #171260;
+    --btn-hover: #5267af;
+}
+
+body{
+    background-color: var(--bg-color);
+    height: 100vh;
+    margin: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#Registration{
+    height: 900px;
+    font-family: 'Comic relief', monospace;
+    font-size: 32px;
+}
+.regfill_bg{
+    background-color: var(--bg-sub-color);
+    color: var(--text-main);
+    width: 750px;
+    height: 900px;
+    border-radius: 20px;
+    text-align: center;
+}
+.regfill{
+    width: 700px;
+    height: 800px;
+    margin: 0px auto;
+    position: relative;
+    top: 50px;
+}
+.regfill>h1{
+    height: 85px;
+    font-size: 64px;
+    margin: 0px;
+}
+#reg_form>input{
+    background-color: #efefff;
+    width: 660px;
+    height: 75px;
+    font-family: 'Comic relief', monospace;
+    font-size: 24px;
+    padding: 0px 20px;
+    margin-bottom: 35px;
+    border-radius: 10px;
+    border-style: none;
+}
+#reg_form>input:focus{
+    background-color: #ffffff;
+}
+#reg_form>label{
+    height: 45px;
+    display: block;
+    text-align: start;
+}
+.eye_butt{
+    width: 55px;
+    height: 55px;
+    background-color: rgba(1, 1, 1, 0);
+    border-style: none;
+    padding: 0px;
+    display: block;
+}
+.eye_butt>img{
+    width: 55px;
+    height: 55px;
+}
+#eye_close1{
+    position: relative;
+    bottom: 300px;
+    left: 650px;
+    cursor: pointer;
+}
+#eye_close2{
+    position: relative;
+    bottom: 200px;
+    left: 650px;
+    cursor: pointer;
+}
+#reg_butt{
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    width: 350px;
+    height: 80px;
+    font-family: 'Comic relief', monospace;
+    font-size: 32px;
+    border-radius: 10px;
+    border-style: none;
+    display: block;
+    margin: 15px auto 0px;
+}
+#reg_butt:hover{
+    background-color: var(--btn-hover);
+    color: var(--btn-text);
+}
+#a{
+    width: 300px;
+    display: block;
+    margin: 10px auto 0px;
+    text-decoration: none;
+    text-align: center;
+}
+#a:hover{
+    color: #5267af;
+}
+
+::selection{
+    background-color: #5267af;
+    color: #efefff;
+}

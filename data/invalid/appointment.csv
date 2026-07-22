@@ -1,0 +1,2 @@
+appt_id,doctor_id,patient_code,slot_datetime,status
+999,D1,P001,2025-05-20 20:00,booked

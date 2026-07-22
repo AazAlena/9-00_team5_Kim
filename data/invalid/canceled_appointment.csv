@@ -1,0 +1,2 @@
+appt_id,doctor_id,patient_code,slot_datetime,status
+5,D1,P001,2025-05-20 10:00,canceled

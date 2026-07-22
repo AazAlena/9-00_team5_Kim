@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Enter_style.css"><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
+    <title>Вход</title>
+</head>
+<body>
+    <main>
+        <section id="Entrance">
+            <div class="entr_bg">
+                <div class="entr_fill">
+                    <h1>Войти в Аккаунт</h1>
+                    <form action="">
+                        <label for="email">Почта</label>
+                        <input 
+                            type="email"
+                            value="your@mail.com"
+                            id="email"
+                            name="email"
+                            required
+                        >
+                        <label for="pass">Пароль</label>
+                        <input 
+                            type="password"
+                            id="pass"
+                            name="password"
+                            required
+                        >
+                    </form>
+                    <button id="entr_butt">Подтвердить</button>
+                </div>
+                <button type="button" id="eye_close1" class="eye_butt">
+                    <img src="./img/eye_close.svg" alt="" id="eye1">
+                </button>
+            </div>
+            <a id="a" href="./Reg.html">Ещё нет аккаунта?</a>
+        </section>
+    </main>
+    <script src="./Enter_app.js"></script>
+</body>
+</html>
