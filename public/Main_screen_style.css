@@ -395,7 +395,7 @@ footer>p {
     #stat{
         width: 100vw;
     }
-    #main_xyi {
+    #main_text {
         width: 60vw;
         height: calc(100vw * 0.6 + 2px);
         left: 0vw;
@@ -427,7 +427,7 @@ footer>p {
     #stat {
         width: 100vw;
     }
-    #main_xyi {
+    #main_text {
         width: calc(1280px * 0.6);
         height: calc(1280px * 0.6 + 2px);
         left: calc((100% - 1280px) / 2);
